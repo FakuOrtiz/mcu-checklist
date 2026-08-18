@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cronología UCM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: #0A0B12; color: #EDEBE3; font-family: Inter, sans-serif; padding-bottom: 60px; }
+  button { font-family: inherit; }
+  .display-font { font-family: Cinzel, serif; }
+  .bg-decor { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(circle at 15% 0%, rgba(62,124,224,0.10), transparent 40%),
+                radial-gradient(circle at 85% 15%, rgba(224,138,52,0.08), transparent 40%); }
+  header, main, footer { position: relative; z-index: 1; }
+  header { padding: 32px 20px 24px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B7D; margin: 0 0 4px; }
+  h1 { font-size: 32px; font-weight: 700; color: #F3E7C9; margin: 0 0 16px; }
+  .gauge { display: flex; gap: 10px; margin-bottom: 16px; }
+  .gem-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .gem { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid #2A2B38; }
+  .gem-num { font-size: 10px; color: #5A5A6C; }
+  .stat-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
+  .rank { font-size: 14px; color: #9A9AAC; margin: 0; }
+  .count { font-size: 24px; font-weight: 600; color: #F3E7C9; margin: 2px 0 0; }
+  .count span { color: #5A5A6C; font-weight: 400; }
+  .count .count-sub { font-size: 12px; }
+  button.reset { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B6B7D; border: 1px solid #23232E; background: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+  .progress-outer { width: 100%; height: 8px; border-radius: 999px; overflow: hidden; background: #181923; display: flex; }
+  .phase-bar-outer { width: 100%; height: 4px; border-radius: 999px; overflow: hidden; background: #181923; margin-bottom: 12px; display: flex; }
+  .bar-seg { height: 100%; transition: width .3s ease; }
+  .upcoming-note { font-size: 12px; color: #5A5A6C; margin: 8px 0 0; min-height: 1px; }
+  .controls-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .control-group { display: flex; gap: 10px; }
+  .control-sep { width: 1px; height: 12px; background: #262735; }
+  .mini-toggle { font-size: 11px; padding: 0; cursor: pointer; border: none; background: none; color: #5A5A6C; }
+  .mini-toggle.active { color: #C9A85C; font-weight: 600; }
+  main { padding: 0 20px; }
+  section.saga { margin-bottom: 40px; }
+  .saga-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+  .saga-head h2 { font-size: 18px; font-weight: 600; color: #D8CBA8; margin: 0; }
+  .saga-complete { font-size: 12px; color: #D8B23A; }
+  .phase-block { margin-bottom: 32px; }
+  .phase-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .phase-head h3 { font-size: 14px; font-weight: 500; color: #C9C9D6; margin: 0; }
+  .phase-count { font-size: 12px; color: #5A5A6C; margin-left: auto; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (min-width: 480px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 768px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+  .card { text-align: left; background: none; border: none; padding: 0; cursor: pointer; transition: transform .16s ease; }
+  .card:active { transform: scale(0.97); }
+  .poster-box { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; margin-bottom: 6px; background: #15161F; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; text-align: center; }
+  .poster-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .placeholder-title { font-size: 9px; line-height: 1.2; color: rgba(237,235,227,0.75); position: relative; z-index: 1; }
+  .type-badge { position: absolute; top: 4px; left: 4px; display: flex; align-items: center; gap: 3px; border-radius: 999px; padding: 2px 6px; background: rgba(10,11,18,0.8); z-index: 2; }
+  .type-badge span { font-size: 8px; font-weight: 500; }
+  .info-btn { position: absolute; top: 4px; right: 4px; border-radius: 999px; padding: 4px; background: rgba(10,11,18,0.75); z-index: 2; display: flex; }
+  .stamp-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(10,11,18,0.35); z-index: 3; pointer-events: none; }
+  .stamp-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transform: rotate(-10deg); }
+  .lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: rgba(10,11,18,0.72); text-align: center; padding: 8px; z-index: 3; }
+  .lock-date { font-size: 9px; color: #9A9AAC; }
+  .card-title { font-size: 11px; line-height: 1.25; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 28px; }
+  .card-year { font-size: 10px; color: #4A4A5A; margin: 2px 0 0; }
+  footer { padding: 32px 20px 16px; }
+  footer p { font-size: 10px; color: #3F3F4C; }
+  #toast { position: fixed; top: 16px; left: 50%; transform: translate(-50%, -12px); opacity: 0; z-index: 60; padding: 8px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; background: #15161F; transition: all .22s ease-out; pointer-events: none; max-width: 85vw; text-align: center; }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  #modalBackdrop { position: fixed; inset: 0; z-index: 50; background: rgba(10,11,18,0.75); display: none; align-items: flex-end; justify-content: center; }
+  #modalBackdrop.show { display: flex; }
+  @media (min-width: 640px) { #modalBackdrop { align-items: center; } }
+  #modalBox { width: 100%; max-width: 480px; border-radius: 16px 16px 0 0; padding: 20px; max-height: 80vh; overflow-y: auto; background: #13141D; border: 1px solid #23232E; }
+  @media (min-width: 640px) { #modalBox { border-radius: 16px; } }
+  #modalYear { font-size: 11px; color: #5A5A6C; margin: 0; }
+  #modalTitle { font-size: 18px; font-weight: 600; color: #F3E7C9; margin: 0; }
+  #modalClose { padding: 6px; border-radius: 999px; background: #1C1D28; border: none; cursor: pointer; display: flex; }
+  #modalSynopsis { font-size: 14px; line-height: 1.6; color: #C9C9D6; margin: 12px 0 16px; }
+  .modal-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #5A5A6C; margin: 0 0 8px; }
+  #modalCharacters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .char-chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: #1C1D28; color: #C9C9D6; border: 1px solid #262735; }
+  #postCreditsSection { margin-top: 20px; padding-top: 16px; border-top: 1px solid #23232E; }
+  #postCreditsBtn { font-size: 12px; padding: 8px 12px; border-radius: 999px; width: 100%; text-align: center; color: #9A9AAC; border: 1px solid #262735; background: #1C1D28; cursor: pointer; }
+  #postCreditsText { font-size: 14px; line-height: 1.6; color: #C9C9D6; }
+  #quizLaunchSection { margin-top: 12px; }
+  #quizLaunchBtn { font-size: 13px; font-weight: 600; padding: 10px 12px; border-radius: 999px; width: 100%; text-align: center; color: #0A0B12; border: none; background: #F3E7C9; cursor: pointer; }
+  #quizBackdrop { position: fixed; inset: 0; z-index: 55; background: rgba(10,11,18,0.8); display: none; align-items: flex-end; justify-content: center; }
+  #quizBackdrop.show { display: flex; }
+  @media (min-width: 640px) { #quizBackdrop { align-items: center; } }
+  #quizBox { width: 100%; max-width: 480px; border-radius: 16px 16px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; background: #13141D; border: 1px solid #23232E; }
+  @media (min-width: 640px) { #quizBox { border-radius: 16px; } }
+  #quizHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  #quizProgress { font-size: 12px; color: #9A9AAC; font-weight: 500; }
+  #quizClose { padding: 6px; border-radius: 999px; background: #1C1D28; border: none; cursor: pointer; display: flex; }
+  #quizBar { width: 100%; height: 4px; border-radius: 999px; overflow: hidden; background: #181923; margin-bottom: 18px; }
+  #quizBarInner { height: 100%; border-radius: 999px; background: #F3E7C9; transition: width .25s ease; width: 0%; }
+  .quiz-question { font-size: 15px; font-weight: 600; color: #EDEBE3; margin: 0 0 16px; line-height: 1.4; }
+  .quiz-option { display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 10px; background: #1C1D28; border: 1px solid #262735; color: #C9C9D6; font-size: 13px; cursor: pointer; }
+  .quiz-option.correct { border-color: #3FA65C; background: rgba(63,166,92,0.15); color: #8FE0A8; }
+  .quiz-option.incorrect { border-color: #D14B4B; background: rgba(209,75,75,0.15); color: #F5928F; }
+  .quiz-next { margin-top: 8px; width: 100%; padding: 10px; border-radius: 999px; border: none; background: #F3E7C9; color: #0A0B12; font-weight: 600; font-size: 13px; cursor: pointer; }
+  .quiz-score { font-size: 32px; font-weight: 700; color: #F3E7C9; text-align: center; margin: 8px 0 4px; }
+  .quiz-verdict { font-size: 14px; color: #C9C9D6; text-align: center; margin: 0 0 20px; }
+  .quiz-actions { display: flex; gap: 8px; }
+  .quiz-actions button { flex: 1; padding: 10px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+  #quizRetryBtn { background: #F3E7C9; color: #0A0B12; }
+  #quizCloseBtn { background: #1C1D28; color: #C9C9D6; border: 1px solid #262735 !important; }
+  .skip-overlay, .summary-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(10,11,18,0.5); z-index: 3; pointer-events: none; }
+  .skip-circle, .summary-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .skip-circle { background: #4A4A5A; }
+  .summary-circle { background: #38BDF8; }
+  #statusBackdrop { position: fixed; inset: 0; z-index: 58; background: rgba(10,11,18,0.8); display: none; align-items: flex-end; justify-content: center; }
+  #statusBackdrop.show { display: flex; }
+  @media (min-width: 640px) { #statusBackdrop { align-items: center; } }
+  #statusBox { width: 100%; max-width: 420px; border-radius: 16px 16px 0 0; padding: 16px; background: #13141D; border: 1px solid #23232E; }
+  @media (min-width: 640px) { #statusBox { border-radius: 16px; } }
+  #statusItemTitle { margin: 0 0 12px; }
+  .status-option { display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 10px; background: #1C1D28; border: 1px solid #262735; color: #EDEBE3; font-size: 14px; cursor: pointer; }
+  .status-option-clear { color: #6B6B7D; }
+  .status-option-cancel { color: #6B6B7D; margin-bottom: 0; margin-top: 4px; background: none; border: none; text-align: center; }
+  #confirmBackdrop { position: fixed; inset: 0; z-index: 59; background: rgba(10,11,18,0.8); display: none; align-items: center; justify-content: center; padding: 20px; }
+  #confirmBackdrop.show { display: flex; }
+  #confirmBox { width: 100%; max-width: 340px; border-radius: 16px; padding: 20px; background: #13141D; border: 1px solid #23232E; }
+  #confirmMessage { font-size: 14px; line-height: 1.5; color: #EDEBE3; margin: 0 0 16px; }
+  .confirm-actions { display: flex; gap: 8px; }
+  .confirm-actions button { flex: 1; padding: 10px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+  #confirmYesBtn { background: #D14B4B; color: #F5EDED; }
+  #confirmNoBtn { background: #1C1D28; color: #C9C9D6; border: 1px solid #262735 !important; }
+  .status-option.current { border-color: #F3E7C9; }
+  .phase-chevron { transition: transform .15s ease; flex-shrink: 0; }
+  .phase-chevron.collapsed { transform: rotate(-90deg); }
+  .phase-grid-wrap { overflow: hidden; transition: max-height .32s ease; }
+</style>
+</head>
+<body>
+<div class="bg-decor"></div>
+<div id="toast"></div>
+
+<header>
+  <p class="eyebrow">Cronología completa</p>
+  <h1 class="display-font">Universo Marvel</h1>
+  <div class="controls-row" id="viewToggle" style="margin-top:0; margin-bottom:14px;">
+    <button class="mini-toggle active" data-view="ucm">UCM</button>
+    <button class="mini-toggle" data-view="other">Otros Universos</button>
+  </div>
+  <div class="gauge" id="gauge"></div>
+  <div class="stat-row">
+    <div>
+      <p class="count" id="count"></p>
+    </div>
+    <button class="reset" id="resetBtn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      Reiniciar
+    </button>
+  </div>
+  <div class="progress-outer" id="overallBar"></div>
+  <p class="upcoming-note" id="upcomingNote"></p>
+  <div class="controls-row" id="ucmControls">
+    <div class="control-group" id="filters">
+      <button class="mini-toggle active" data-filter="all">Todo</button>
+      <button class="mini-toggle" data-filter="movie">Películas</button>
+      <button class="mini-toggle" data-filter="series">Series</button>
+    </div>
+    <div class="control-sep"></div>
+    <div class="control-group" id="sortToggle">
+      <button class="mini-toggle active" data-sort="release">Por estreno</button>
+      <button class="mini-toggle" data-sort="chrono">Cronológico</button>
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<footer><p>Progreso guardado en este navegador (localStorage). Sin conexión a APIs externas.</p></footer>
+
+<div id="modalBackdrop">
+  <div id="modalBox">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px;">
+      <div>
+        <p id="modalYear"></p>
+        <h3 id="modalTitle" class="display-font"></h3>
+      </div>
+      <button id="modalClose">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A9AAC" stroke-width="1.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p id="modalSynopsis"></p>
+    <p class="modal-label">Personajes principales</p>
+    <div id="modalCharacters"></div>
+    <div id="postCreditsSection" style="display:none;">
+      <button id="postCreditsBtn">Mostrar escena post-créditos</button>
+      <p id="postCreditsText" style="display:none;"></p>
+    </div>
+    <div id="quizLaunchSection" style="display:none;">
+      <button id="quizLaunchBtn">Hacer el quiz (10 preguntas)</button>
+    </div>
+  </div>
+</div>
+
+<div id="quizBackdrop">
+  <div id="quizBox">
+    <div id="quizHeader">
+      <span id="quizProgress"></span>
+      <button id="quizClose"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A9AAC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div id="quizBar"><div id="quizBarInner"></div></div>
+    <div id="quizBody"></div>
+  </div>
+</div>
+
+<div id="statusBackdrop">
+  <div id="statusBox">
+    <p id="statusItemTitle" class="modal-label"></p>
+    <button class="status-option" data-status="watched">Vista</button>
+    <button class="status-option" data-status="summary">Solo vi el resumen</button>
+    <button class="status-option" data-status="skip">No la quiero ver</button>
+    <button class="status-option status-option-clear" data-status="">Sin marcar</button>
+    <button class="status-option status-option-cancel" id="statusCancelBtn">Cancelar</button>
+  </div>
+</div>
+
+<div id="confirmBackdrop">
+  <div id="confirmBox">
+    <p id="confirmMessage"></p>
+    <div class="confirm-actions">
+      <button id="confirmYesBtn">Reiniciar</button>
+      <button id="confirmNoBtn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const PHASES = {
+  1: { label: "Fase 1", color: "#3E7CE0", glow: "#8FB6FF" },
+  2: { label: "Fase 2", color: "#D8B23A", glow: "#F5DE8C" },
+  3: { label: "Fase 3", color: "#D14B4B", glow: "#F5928F" },
+  4: { label: "Fase 4", color: "#8B5CE0", glow: "#C4A8FF" },
+  5: { label: "Fase 5", color: "#3FA65C", glow: "#8FE0A8" },
+  6: { label: "Fase 6", color: "#E08A34", glow: "#FFC98F" },
+};
+const SAGAS = [
+  { id: "infinito", label: "Saga del Infinito", phases: [1, 2, 3] },
+  { id: "multiverso", label: "Saga del Multiverso", phases: [4, 5, 6] },
+];
+const WATCHED_COLOR = "#10B981";
+const WATCHED_GLOW = "#6EE7B7";
+const SUMMARY_COLOR = "#38BDF8";
+const TYPE_META = {
+  movie: { label: "Película", color: "#C9A85C" },
+  series: { label: "Serie", color: "#5B8DEF" },
+  special: { label: "Especial", color: "#9B7EDE" },
+};
+
+const DATA = [
+  { id: "iron-man", es: "Iron Man", en: "Iron Man", year: 2008, date: "2008-05-02", type: "movie", phase: 1,
+    synopsis: "Tony Stark, magnate de armamento, resulta gravemente herido y secuestrado durante una demostración de armas; un electroimán conectado a un reactor Arc en su pecho es lo único que evita que la metralla llegue a su corazón. Con esa misma tecnología construye una armadura de alta tecnología para escapar — y decide usarla para proteger al mundo en vez de venderlo como arma.",
+    characters: ["Tony Stark / Iron Man", "Pepper Potts", "James Rhodes", "Obadiah Stane"],
+    postCredits: "Nick Fury aparece en la mansión de Tony para decirle que no es el único con habilidades especiales, y le habla por primera vez de la 'Iniciativa Vengadores'." },
+  { id: "hulk", es: "El Increíble Hulk", en: "The Incredible Hulk", year: 2008, date: "2008-06-13", type: "movie", phase: 1,
+    synopsis: "Bruce Banner, expuesto a una sobredosis de radiación gamma durante un experimento militar que buscaba recrear el suero del supersoldado, ahora se transforma en un gigante verde imparable cada vez que su ritmo cardíaco se dispara por ira o estrés extremo. Prófugo del ejército que quiere convertir su condición en arma, busca desesperadamente una cura.",
+    characters: ["Bruce Banner / Hulk", "Betty Ross", "Thaddeus Ross", "Emil Blonsky"],
+    postCredits: "Tony Stark visita al General Ross en un bar y le dice que está 'armando un equipo' — su primera referencia directa a los Vengadores." },
+  { id: "iron-man-2", es: "Iron Man 2", en: "Iron Man 2", year: 2010, date: "2010-05-07", type: "movie", phase: 1,
+    synopsis: "Con su identidad como Iron Man ya pública, Tony Stark descubre que el mismo reactor Arc que lo mantiene con vida lo está envenenando lentamente con paladio. Mientras busca una solución, un rival armamentista y un ingeniero ruso con sed de venganza ponen en jaque su legado.",
+    characters: ["Tony Stark", "Natasha Romanoff", "James Rhodes", "Ivan Vanko"],
+    postCredits: "El agente Coulson, enviado a Nuevo México, descubre un cráter en el desierto con un objeto enterrado — el martillo de Thor." },
+  { id: "thor", es: "Thor", en: "Thor", year: 2011, date: "2011-05-06", type: "movie", phase: 1,
+    synopsis: "Por su arrogancia y por desatar una guerra con Jotunheim, Odín destierra a Thor a la Tierra y le quita sus poderes, dejando su martillo Mjolnir bajo un hechizo que solo alguien digno puede levantar. Sin sus habilidades divinas, Thor debe aprender humildad entre los humanos para poder recuperarlas.",
+    characters: ["Thor", "Loki", "Jane Foster", "Odín"],
+    postCredits: "Nick Fury visita al Dr. Erik Selvig y le muestra el Teseracto, un cubo de energía de origen cósmico, para que lo estudie." },
+  { id: "cap-1", es: "Capitán América: El Primer Vengador", en: "Captain America The First Avenger", year: 2011, date: "2011-07-22", type: "movie", phase: 1,
+    synopsis: "Steve Rogers, un joven de salud frágil rechazado por el ejército, es aceptado en un programa experimental que lo transforma en supersoldado mediante un suero que lleva sus capacidades físicas al máximo humano posible. Ya transformado, enfrenta a HYDRA, la división de ciencia oscura del ejército nazi.",
+    characters: ["Steve Rogers / Capitán América", "Bucky Barnes", "Peggy Carter", "Cráneo Rojo"],
+    postCredits: "Steve despierta en pleno Times Square moderno y descubre que estuvo congelado casi 70 años; Nick Fury le confirma que hay un trabajo esperándolo." },
+  { id: "avengers-1", es: "Los Vengadores", en: "The Avengers", year: 2012, date: "2012-05-04", type: "movie", phase: 1,
+    synopsis: "Loki, hermano adoptivo de Thor, llega a la Tierra con un ejército alienígena y un cetro capaz de controlar mentes, obligando a Nick Fury a reunir por primera vez a los héroes más poderosos del planeta para detenerlo.",
+    characters: ["Iron Man", "Capitán América", "Thor", "Hulk", "Viuda Negra", "Ojo de Halcón", "Loki"],
+    postCredits: "Un ser alienígena le advierte a alguien fuera de cámara que desafiar a la Tierra 'es cortejar a la muerte' — quien escucha, sonríe. Es la primera aparición de Thanos. Al final, los Vengadores comen shawarma en silencio entre los escombros." },
+  { id: "iron-man-3", es: "Iron Man 3", en: "Iron Man 3", year: 2013, date: "2013-05-03", type: "movie", phase: 2,
+    synopsis: "Tras casi morir en la batalla de Nueva York, Tony Stark sufre ataques de pánico mientras un terrorista llamado el Mandarín pone en jaque al país.",
+    characters: ["Tony Stark", "James Rhodes", "Pepper Potts", "Mandarín / Aldrich Killian"],
+    postCredits: "Se revela que Tony le estuvo contando toda la película a Bruce Banner, quien se queda dormido — un chiste sobre la terapia entre 'amigos científicos'." },
+  { id: "thor-2", es: "Thor: Un Mundo Oscuro", en: "Thor The Dark World", year: 2013, date: "2013-11-08", type: "movie", phase: 2,
+    synopsis: "Una fuerza ancestral llamada el Éter resurge, poniendo a Thor y Jane Foster en el centro de un conflicto que amenaza todos los reinos.",
+    characters: ["Thor", "Jane Foster", "Loki", "Malekith"],
+    postCredits: "Sif y Volstagg le entregan el Éter a un misterioso Coleccionista, quien comenta que 'uno menos, quedan cinco' — la primera mención directa a las Gemas del Infinito." },
+  { id: "cap-2", es: "Capitán América: El Soldado de Invierno", en: "Captain America The Winter Soldier", year: 2014, date: "2014-04-04", type: "movie", phase: 2,
+    synopsis: "Steve Rogers descubre que S.H.I.E.L.D. está infiltrado y debe enfrentar a un misterioso asesino del pasado mientras huye como fugitivo.",
+    characters: ["Steve Rogers", "Natasha Romanoff", "Bucky Barnes / Soldado del Invierno", "Sam Wilson / Falcon"],
+    postCredits: "En una base secreta de HYDRA se revela al Barón von Strucker experimentando con el cetro de Loki sobre dos gemelos con habilidades — los futuros Quicksilver y Bruja Escarlata." },
+  { id: "gotg-1", es: "Guardianes de la Galaxia", en: "Guardians of the Galaxy", year: 2014, date: "2014-08-01", type: "movie", phase: 2,
+    synopsis: "Peter Quill roba un orbe misterioso que resulta contener una Gema del Infinito, lo que lo convierte en blanco de medio universo. Para protegerlo, se une a un grupo dispar de criminales espaciales.",
+    characters: ["Peter Quill / Star-Lord", "Gamora", "Drax", "Rocket", "Groot"],
+    postCredits: "En la sala de trofeos del Coleccionista aparece, entre curiosos objetos, un Howard el Pato viviente." },
+  { id: "avengers-2", es: "Vengadores: La Era de Ultrón", en: "Avengers Age of Ultron", year: 2015, date: "2015-05-01", type: "movie", phase: 2,
+    synopsis: "Tony Stark y Bruce Banner experimentan en secreto con la inteligencia artificial alojada en el cetro de Loki para crear un programa que proteja al planeta, pero el resultado, Ultrón, decide que la única forma de salvar la Tierra es exterminando a la humanidad.",
+    characters: ["Iron Man", "Ultrón", "Bruja Escarlata", "Visión", "Thor", "Capitán América"],
+    postCredits: "Thanos se pone él mismo el Guantelete del Infinito (todavía vacío) y dice, resignado: 'Bien, lo haré yo mismo'." },
+  { id: "antman-1", es: "Ant-Man", en: "Ant-Man", year: 2015, date: "2015-07-17", type: "movie", phase: 2,
+    synopsis: "El científico Hank Pym recluta al exladrón Scott Lang para usar el traje Ant-Man, una tecnología que le permite encogerse hasta escala subatómica mientras multiplica su fuerza, con el fin de impedir que su propia invención caiga en malas manos.",
+    characters: ["Scott Lang / Ant-Man", "Hope van Dyne", "Hank Pym"],
+    postCredits: "Falcon y el Capitán América confrontan a alguien que resulta ser Bucky Barnes; por separado, Hank Pym le muestra a Hope su propio traje de la Avispa." },
+  { id: "civil-war", es: "Capitán América: Civil War", en: "Captain America Civil War", year: 2016, date: "2016-05-06", type: "movie", phase: 3,
+    synopsis: "Un accidente internacional divide a los Vengadores entre quienes apoyan la supervisión gubernamental y quienes defienden su independencia.",
+    characters: ["Capitán América", "Iron Man", "Bucky Barnes", "Black Panther", "Spider-Man"],
+    postCredits: "Zemo, ya preso, recibe la visita de un agente que le advierte que 'alguien' quiere hablar con él. Por separado, Peter Parker prueba emocionado sus lanzatelarañas en su cuarto." },
+  { id: "dr-strange-1", es: "Doctor Strange", en: "Doctor Strange", year: 2016, date: "2016-11-04", type: "movie", phase: 3,
+    synopsis: "Tras un accidente automovilístico que destruye sus manos, el neurocirujano Stephen Strange viaja a Katmandú buscando una cura y termina aprendiendo artes místicas capaces de manipular el tiempo y abrir portales entre dimensiones.",
+    characters: ["Stephen Strange", "Christine Palmer", "Karl Mordo", "Anciana"],
+    postCredits: "Strange se reúne con Thor para ayudarlo a encontrar a Odín. Por separado, Mordo le quita los poderes a un hechicero, declarando que 'hay demasiados magos'." },
+  { id: "gotg-2", es: "Guardianes de la Galaxia Vol. 2", en: "Guardians of the Galaxy Vol 2", year: 2017, date: "2017-05-05", type: "movie", phase: 3,
+    synopsis: "Los Guardianes exploran el origen del padre biológico de Peter Quill mientras defienden su recién formada familia.",
+    characters: ["Star-Lord", "Gamora", "Rocket", "Ego", "Yondu"],
+    postCredits: "Varias escenas cortas: Kraglin practicando con la flecha de Yondu, un Groot adolescente rebelde, y Ayesha revelando un capullo con un ser dorado al que planea llamar 'Adam'." },
+  { id: "spiderman-homecoming", es: "Spider-Man: Homecoming", en: "Spider-Man Homecoming", year: 2017, date: "2017-07-07", type: "movie", phase: 3,
+    synopsis: "Picado por una araña genéticamente alterada durante una visita escolar, Peter Parker gana fuerza, agilidad y sentido arácnido sobrehumanos. Bajo la tutela de Tony Stark, intenta equilibrar la secundaria con su nueva vida como Spider-Man.",
+    characters: ["Peter Parker / Spider-Man", "Tony Stark", "Ned Leeds", "Vulture"],
+    postCredits: "Un gag cómico: el Capitán América (en un video de propaganda escolar) habla sobre la paciencia, rompiendo la cuarta pared." },
+  { id: "thor-3", es: "Thor: Ragnarok", en: "Thor Ragnarok", year: 2017, date: "2017-11-03", type: "movie", phase: 3,
+    synopsis: "Thor queda atrapado en un planeta lejano y debe competir como gladiador para regresar a tiempo de evitar la destrucción de Asgard.",
+    characters: ["Thor", "Hulk", "Loki", "Valquiria", "Hela"],
+    postCredits: "La nave de Thor es interceptada por una nave mucho más grande que proyecta una sombra amenazante sobre ellos — la nave de Thanos." },
+  { id: "black-panther-1", es: "Black Panther", en: "Black Panther", year: 2018, date: "2018-02-16", type: "movie", phase: 3,
+    synopsis: "T'Challa hereda no solo el trono de Wakanda sino también el manto de Black Panther, cuya fuerza y sentidos sobrehumanos provienen de una hierba en forma de corazón potenciada por vibranio. Debe decidir si mantener el aislamiento de su nación o compartir su tecnología con el mundo.",
+    characters: ["T'Challa / Black Panther", "Killmonger", "Okoye", "Shuri"],
+    postCredits: "T'Challa anuncia ante la ONU que Wakanda revelará su verdadera riqueza tecnológica al mundo. En otra escena, Bucky Barnes se recupera en Wakanda, y Shuri lo saluda como 'Lobo Blanco'." },
+  { id: "infinity-war", es: "Vengadores: Infinity War", en: "Avengers Infinity War", year: 2018, date: "2018-04-27", type: "movie", phase: 3,
+    synopsis: "Thanos recorre el universo en busca de las Gemas del Infinito, y los héroes de la Tierra deben unirse como nunca antes para detenerlo.",
+    characters: ["Thanos", "Iron Man", "Capitán América", "Thor", "Gamora", "Doctor Strange"],
+    postCredits: "Nick Fury alcanza a enviar un mensaje de auxilio justo antes de desintegrarse — el buscapersonas termina de transmitir mostrando un símbolo estelar." },
+  { id: "antman-2", es: "Ant-Man y la Avispa", en: "Ant-Man and the Wasp", year: 2018, date: "2018-07-06", type: "movie", phase: 3,
+    synopsis: "Scott Lang se reúne con Hope van Dyne y Hank Pym en una misión de rescate que involucra el misterioso Reino Cuántico.",
+    characters: ["Scott Lang", "Hope van Dyne / Avispa", "Hank Pym", "Janet van Dyne"],
+    postCredits: "Mientras Scott está en el Reino Cuántico, Hank, Janet y Hope se desintegran afuera por el chasquido de Thanos, dejándolo atrapado sin nadie que pueda sacarlo." },
+  { id: "captain-marvel", es: "Capitana Marvel", en: "Captain Marvel", year: 2019, date: "2019-03-08", type: "movie", phase: 3,
+    synopsis: "Una piloto de la Fuerza Aérea con memoria fragmentada, cuyo cuerpo quedó fusionado con energía cósmica tras un accidente con un motor experimental, descubre en medio de una guerra intergaláctica que su pasado en la Tierra es distinto de lo que le hicieron creer.",
+    characters: ["Carol Danvers / Capitana Marvel", "Nick Fury", "Talos"],
+    postCredits: "Capitana Marvel llega a la sede de los Vengadores mientras el equipo lidia con la ausencia de la mitad del universo, preguntando dónde está Fury. Su gato, Goose, escupe el Teseracto en la oficina de Fury." },
+  { id: "endgame", es: "Vengadores: Endgame", en: "Avengers Endgame", year: 2019, date: "2019-04-26", type: "movie", phase: 3,
+    synopsis: "Tras el chasquido de Thanos, los Vengadores sobrevivientes idean un plan desesperado para revertir el daño causado.",
+    characters: ["Iron Man", "Capitán América", "Thor", "Viuda Negra", "Hulk", "Ojo de Halcón"],
+    postCredits: "No hay escena adicional — los créditos cierran con el sonido de un martillo golpeando metal en el taller original de Tony, un homenaje silencioso." },
+  { id: "far-from-home", es: "Spider-Man: Far From Home", en: "Spider-Man Far From Home", year: 2019, date: "2019-07-02", type: "movie", phase: 3,
+    synopsis: "Peter Parker busca unas vacaciones tranquilas en Europa, pero es reclutado para enfrentar una nueva amenaza elemental.",
+    characters: ["Peter Parker", "Nick Fury", "Mysterio", "MJ"],
+    postCredits: "J. Jonah Jameson revela en vivo la identidad de Spider-Man al mundo con un video editado. Además, se descubre que 'Fury' y 'Hill' en realidad eran skrulls disfrazados todo este tiempo; el Fury real está en el espacio." },
+  { id: "wandavision", es: "WandaVision", en: "WandaVision", year: 2021, date: "2021-01-15", type: "series", phase: 4,
+    synopsis: "Wanda Maximoff vive una idílica vida de sitcom en un pueblo que esconde un misterio mucho más oscuro.",
+    characters: ["Wanda Maximoff", "Visión", "Mónica Rambeau", "Agnes"],
+    postCredits: "Wanda, ya sola, escucha las voces de sus hijos pidiendo ayuda mientras estudia un misterioso libro de hechizos oscuro." },
+  { id: "falcon-ws", es: "Falcon y el Soldado de Invierno", en: "The Falcon and the Winter Soldier", year: 2021, date: "2021-03-19", type: "series", phase: 4,
+    synopsis: "Sam Wilson y Bucky Barnes deben trabajar juntos para enfrentar a un grupo extremista mientras cargan con el legado del escudo del Capitán América.",
+    characters: ["Sam Wilson", "Bucky Barnes", "John Walker", "Zemo"],
+    postCredits: "Se revela que Sharon Carter, indultada y reincorporada al gobierno, sigue vendiendo secretos en secreto como la misteriosa 'Power Broker'." },
+  { id: "loki-1", es: "Loki (T1)", en: "Loki", year: 2021, date: "2021-06-09", type: "series", phase: 4,
+    synopsis: "Tras robar el Teseracto, una versión de Loki es reclutada por una organización que vigila la línea temporal para reparar el daño que causó.",
+    characters: ["Loki", "Mobius", "Sylvie"],
+    postCredits: "Loki regresa a la TVA y descubre que ya no la reconocen — ahora hay una estatua de un desconocido gobernando el lugar mientras las líneas temporales empiezan a ramificarse sin control." },
+  { id: "black-widow", es: "Black Widow", en: "Black Widow", year: 2021, date: "2021-07-09", type: "movie", phase: 4,
+    synopsis: "Antes de los eventos de Vengadores, Natasha Romanoff enfrenta fantasmas de su pasado como espía encubierta junto a su familia adoptiva.",
+    characters: ["Natasha Romanoff", "Yelena Belova", "Alexei / Guardián Rojo"],
+    postCredits: "Yelena visita la tumba de Natasha y es contactada por Valentina Allegra de Fontaine, quien le da un nuevo objetivo a eliminar: Clint Barton." },
+  { id: "whatif-1", es: "What If…? (T1)", en: "What If", year: 2021, date: "2021-08-11", type: "series", phase: 4,
+    synopsis: "Una serie de universos alternativos explora cómo un pequeño cambio podría transformar por completo eventos clave del UCM.",
+    characters: ["El Vigilante (narrador)", "Versiones alternativas de los héroes del UCM"] },
+  { id: "shang-chi", es: "Shang-Chi y la Leyenda de los Diez Anillos", en: "Shang-Chi and the Legend of the Ten Rings", year: 2021, date: "2021-09-03", type: "movie", phase: 4,
+    synopsis: "Un joven con un pasado oculto es forzado a confrontar la organización secreta de su padre, quien ha usado durante siglos diez anillos místicos que le otorgan poder e inmortalidad.",
+    characters: ["Shang-Chi", "Katy", "Xu Wenwu", "Xialing"],
+    postCredits: "Wong, Capitana Marvel y Bruce Banner examinan los diez anillos de Shang-Chi y descubren que emiten una señal desconocida. Por separado, Wong invoca a Abominación para una pelea amistosa por apuestas." },
+  { id: "eternals", es: "Eternals", en: "Eternals", year: 2021, date: "2021-11-05", type: "movie", phase: 4,
+    synopsis: "Un grupo de seres inmortales creados por los Celestiales para proteger a la humanidad de monstruos llamados Desviantes ha vivido en secreto en la Tierra durante miles de años, hasta que una amenaza ancestral los obliga a reunirse de nuevo.",
+    characters: ["Sersi", "Ikaris", "Thena", "Kingo"],
+    postCredits: "Eros, hermano de Thanos, llega junto a Pip para ayudar a los Eternals restantes. En otra escena, Dane Whitman está por abrir un misterioso estuche cuando una voz le pregunta si está seguro de querer hacerlo." },
+  { id: "hawkeye", es: "Hawkeye", en: "Hawkeye", year: 2021, date: "2021-11-24", type: "series", phase: 4,
+    synopsis: "Clint Barton intenta pasar la Navidad con su familia, pero una joven arquera lo arrastra de vuelta a su pasado como Ronin.",
+    characters: ["Clint Barton", "Kate Bishop", "Yelena Belova"] },
+  { id: "no-way-home", es: "Spider-Man: No Way Home", en: "Spider-Man No Way Home", year: 2021, date: "2021-12-17", type: "movie", phase: 4,
+    synopsis: "Peter Parker pide ayuda mágica para que el mundo olvide su identidad secreta, con consecuencias que abren la puerta al multiverso.",
+    characters: ["Peter Parker", "Doctor Strange", "MJ", "Ned"],
+    postCredits: "Eddie Brock, con el simbionte Venom, aparece brevemente en un bar del UCM, se entera de la existencia de los Vengadores y es succionado de vuelta a su universo, dejando una gota del simbionte atrás." },
+  { id: "moon-knight", es: "Moon Knight", en: "Moon Knight", year: 2022, date: "2022-03-30", type: "series", phase: 4,
+    synopsis: "Un hombre con trastorno de identidad disociativa descubre que comparte su cuerpo con un avatar de un dios egipcio.",
+    characters: ["Marc Spector / Steven Grant", "Layla", "Khonshu"],
+    postCredits: "Se revela un tercer alter dentro de Marc: Jake Lockley, quien libera al villano Harrow de un hospital psiquiátrico y lo ejecuta." },
+  { id: "dr-strange-2", es: "Doctor Strange en el Multiverso de la Locura", en: "Doctor Strange in the Multiverse of Madness", year: 2022, date: "2022-05-06", type: "movie", phase: 4,
+    synopsis: "Doctor Strange viaja a través del multiverso para proteger a una joven con una habilidad única, enfrentando versiones alternativas de la realidad.",
+    characters: ["Stephen Strange", "América Chávez", "Wanda Maximoff"],
+    postCredits: "Strange, con un tercer ojo tras usar el Libro de Vishanti, es abordado por Clea, quien lo invita a ayudarla a resolver una incursión multiversal." },
+  { id: "ms-marvel", es: "Ms. Marvel", en: "Ms Marvel", year: 2022, date: "2022-06-08", type: "series", phase: 4,
+    synopsis: "Una adolescente fanática de los superhéroes descubre que un brazalete heredado de su familia le otorga poderes de energía cósmica ligados a su herencia paquistaní.",
+    characters: ["Kamala Khan / Ms. Marvel", "Bruno", "Nakia"],
+    postCredits: "Una nave de S.A.B.E.R. contacta a Kamala en medio de la noche — el comienzo de su conexión con los eventos de Secret Invasion." },
+  { id: "thor-4", es: "Thor: Love and Thunder", en: "Thor Love and Thunder", year: 2022, date: "2022-07-08", type: "movie", phase: 4,
+    synopsis: "Thor busca la paz interior, pero un villano que caza dioses lo obliga a tomar las armas una vez más junto a viejos y nuevos aliados.",
+    characters: ["Thor", "Jane Foster", "Valquiria", "Gorr"],
+    postCredits: "Zeus envía a su hijo Hércules a buscar venganza contra Thor. Por separado, Jane Foster llega al Valhalla, recibida por Heimdall." },
+  { id: "i-am-groot", es: "Yo Soy Groot", en: "I Am Groot", year: 2022, date: "2022-08-10", type: "series", phase: 4,
+    synopsis: "Cortos protagonizados por un pequeño y travieso Groot durante su crecimiento a bordo de la nave de los Guardianes.",
+    characters: ["Groot", "Rocket"] },
+  { id: "she-hulk", es: "She-Hulk: Abogada Hulka", en: "She-Hulk Attorney at Law", year: 2022, date: "2022-08-18", type: "series", phase: 4,
+    synopsis: "Una transfusión de sangre de emergencia con su primo Bruce Banner le transmite a Jennifer Walters el gen Hulk, dándole fuerza y tamaño sobrehumanos que debe aprender a controlar mientras mantiene su carrera de abogada.",
+    characters: ["Jennifer Walters / She-Hulk", "Bruce Banner", "Emil Blonsky"],
+    postCredits: "Jennifer rompe la cuarta pared y confronta directamente a K.E.V.I.N., la IA que escribe los guiones de Marvel Studios, para exigir un final distinto al que le habían dado." },
+  { id: "werewolf", es: "Werewolf by Night", en: "Werewolf by Night", year: 2022, date: "2022-10-07", type: "special", phase: 4,
+    synopsis: "Jack Russell esconde una maldición licántropa heredada de su familia mientras participa en una cacería secreta de monstruos que compite por una reliquia poderosa.",
+    characters: ["Jack Russell", "Elsa Bloodstone"] },
+  { id: "wakanda-forever", es: "Black Panther: Wakanda Forever", en: "Black Panther Wakanda Forever", year: 2022, date: "2022-11-11", type: "movie", phase: 4,
+    synopsis: "Wakanda enfrenta amenazas externas e internas tras la pérdida de su rey, mientras Namor, gobernante de un reino submarino con fuerza sobrehumana y capacidad de volar gracias al vibranio azul, entra en escena.",
+    characters: ["Shuri", "Okoye", "Namor", "Ramonda"],
+    postCredits: "Se revela que Shuri y Nakia criaron en secreto al hijo de T'Challa en Haití — un niño llamado también T'Challa." },
+  { id: "gotg-holiday", es: "Especial Navideño de los Guardianes", en: "The Guardians of the Galaxy Holiday Special", year: 2022, date: "2022-11-25", type: "special", phase: 4,
+    synopsis: "Los Guardianes intentan darle a Peter Quill el mejor regalo de Navidad posible, con resultados tan torpes como entrañables.",
+    characters: ["Drax", "Mantis", "Peter Quill"] },
+  { id: "quantumania", es: "Ant-Man y la Avispa: Quantumanía", en: "Ant-Man and the Wasp Quantumania", year: 2023, date: "2023-02-17", type: "movie", phase: 5,
+    synopsis: "La familia Lang-Van Dyne queda atrapada en el Reino Cuántico y se enfrenta a Kang el Conquistador, un ser exiliado ahí que dice controlar el tiempo mismo a través de variantes de sí mismo en el multiverso.",
+    characters: ["Scott Lang", "Hope van Dyne", "Kang el Conquistador", "Cassie Lang"],
+    postCredits: "En la TVA, Loki y Mobius descubren que múltiples variantes de Kang se están reuniendo en un consejo — el primer indicio de una guerra multiversal por venir." },
+  { id: "gotg-3", es: "Guardianes de la Galaxia Vol. 3", en: "Guardians of the Galaxy Vol 3", year: 2023, date: "2023-05-05", type: "movie", phase: 5,
+    synopsis: "Los Guardianes emprenden una misión desesperada para salvar a Rocket, revelando que fue creado mediante experimentación genética forzada por un científico obsesionado con la perfección llamado el Alto Evolucionador.",
+    characters: ["Rocket", "Star-Lord", "Alto Evolucionador", "Gamora"],
+    postCredits: "Rocket, ya en paz, disfruta de sus nuevos amigos peludos rescatados. Por separado, Peter Quill regresa a la Tierra a visitar a su abuelo." },
+  { id: "secret-invasion", es: "Secret Invasion", en: "Secret Invasion", year: 2023, date: "2023-06-21", type: "series", phase: 5,
+    synopsis: "Nick Fury descubre que una facción de skrulls (una raza alienígena capaz de cambiar de forma y suplantar identidades) lleva años infiltrada preparando una invasión encubierta de la Tierra.",
+    characters: ["Nick Fury", "Talos", "Gravik"],
+    postCredits: "G'iah, tras consumir muestras de sangre de superhumanos, obtiene múltiples poderes combinados de golpe, convirtiéndose en una amenaza mucho más peligrosa." },
+  { id: "loki-2", es: "Loki (T2)", en: "Loki", year: 2023, date: "2023-10-06", type: "series", phase: 5,
+    synopsis: "Loki y el TVA enfrentan el colapso de la línea temporal sagrada tras los eventos que desataron el multiverso.",
+    characters: ["Loki", "Mobius", "Sylvie", "Victor Timely"] },
+  { id: "the-marvels", es: "The Marvels", en: "The Marvels", year: 2023, date: "2023-11-10", type: "movie", phase: 5,
+    synopsis: "Una anomalía cuántica entrelaza los poderes de Carol Danvers, Kamala Khan y Mónica Rambeau, de modo que usar sus habilidades al mismo tiempo las teletransporta entre ellas — algo que deben aprender a controlar en equipo.",
+    characters: ["Carol Danvers", "Kamala Khan", "Mónica Rambeau"],
+    postCredits: "Una variante de Kamala Khan de otro universo llega a reclutar a nuestra Kamala para un nuevo equipo de jóvenes héroes." },
+  { id: "whatif-2", es: "What If…? (T2)", en: "What If", year: 2023, date: "2023-12-22", type: "series", phase: 5,
+    synopsis: "Nuevas historias alternativas continúan explorando giros inesperados en momentos clave del UCM.",
+    characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
+  { id: "echo", es: "Echo", en: "Echo", year: 2024, date: "2024-01-09", type: "series", phase: 5,
+    synopsis: "Maya López, sorda de nacimiento y sin poderes sobrehumanos más allá de una habilidad fotográfica para imitar movimientos, regresa a su comunidad de origen para enfrentar su pasado ligado al crimen organizado de Kingpin.",
+    characters: ["Maya López / Echo", "Kingpin", "Bucky Barnes"],
+    postCredits: "Kingpin, que había sido dado por muerto tras recibir un disparo en Hawkeye, es mostrado recuperándose en secreto, preparando su regreso al poder." },
+  { id: "deadpool-wolverine", es: "Deadpool & Wolverine", en: "Deadpool and Wolverine", year: 2024, date: "2024-07-26", type: "movie", phase: 5,
+    synopsis: "Deadpool, cuyo cáncer terminal fue 'curado' por un programa que le dio un factor de curación descontrolado y desfiguró su piel, recluta a una versión reticente de Wolverine para una misión que pone en juego la existencia misma de su universo.",
+    characters: ["Wade Wilson / Deadpool", "Logan / Wolverine"],
+    postCredits: "Una larga secuencia de bloopers y escenas detrás de cámara, con un cierre emotivo dedicado a los actores que interpretaron a Wolverine y otros personajes en películas anteriores de X-Men." },
+  { id: "agatha", es: "Agatha All Along", en: "Agatha All Along", year: 2024, date: "2024-09-18", type: "series", phase: 5,
+    synopsis: "Tras los eventos de WandaVision, Agatha Harkness reúne a un grupo de brujas para recorrer un peligroso camino mágico y recuperar sus poderes.",
+    characters: ["Agatha Harkness", "Teen", "Jennifer Kale"],
+    postCredits: "Se revela que 'Teen', el joven que acompañó a Agatha, es en realidad Billy Maximoff — el hijo de Wanda, ahora usando el nombre de Billy Kaplan." },
+  { id: "whatif-3", es: "What If…? (T3)", en: "What If", year: 2024, date: "2024-12-22", type: "series", phase: 5,
+    synopsis: "La serie de universos alternativos continúa explorando nuevas variantes de héroes y villanos conocidos.",
+    characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
+  { id: "brave-new-world", es: "Capitán América: Un Nuevo Mundo", en: "Captain America Brave New World", year: 2025, date: "2025-02-14", type: "movie", phase: 5,
+    synopsis: "El nuevo Capitán América, Sam Wilson, enfrenta una conspiración internacional que pone a prueba su liderazgo sin el suero de supersoldado.",
+    characters: ["Sam Wilson / Capitán América", "Joaquín Torres", "Thaddeus Ross"],
+    postCredits: "Sam visita a Samuel Sterns (el Líder) preso en La Balsa. Sterns le advierte, con tono ominoso, que existen otros mundos además del suyo — y que los héroes de la Tierra tendrán que proteger más que un solo planeta." },
+  { id: "daredevil-1", es: "Daredevil: Born Again (T1)", en: "Daredevil Born Again", year: 2025, date: "2025-03-04", type: "series", phase: 5,
+    synopsis: "Ciego desde niño por un accidente con residuos químicos que también agudizó el resto de sus sentidos a niveles sobrehumanos, Matt Murdock retoma su doble vida como abogado de día y vigilante nocturno en un Hell's Kitchen que vuelve a caer bajo la sombra de Kingpin.",
+    characters: ["Matt Murdock / Daredevil", "Kingpin", "Karen Page"] },
+  { id: "thunderbolts", es: "Thunderbolts*", en: "Thunderbolts", year: 2025, date: "2025-05-02", type: "movie", phase: 5,
+    synopsis: "Un grupo de antihéroes y exagentes con pasados turbios es reunido para una misión encubierta que los obliga a confiar entre sí.",
+    characters: ["Yelena Belova", "Bucky Barnes", "John Walker"],
+    postCredits: "Valentina rebautiza al equipo como los 'New Avengers'. En una escena posterior, ya instalados en la torre, el grupo es alertado de una nave interdimensional entrando en la atmósfera — con el símbolo de los 4 Fantásticos." },
+  { id: "ironheart", es: "Ironheart", en: "Ironheart", year: 2025, date: "2025-06-24", type: "series", phase: 5,
+    synopsis: "Riri Williams, una genio de la ingeniería que construyó su primera armadura desde cero inspirada en la de Iron Man, la perfecciona mientras enfrenta fuerzas que combinan magia y alta tecnología.",
+    characters: ["Riri Williams / Ironheart", "Parker Robbins"] },
+  { id: "fantastic-four", es: "Los 4 Fantásticos: Primeros Pasos", en: "The Fantastic Four First Steps", year: 2025, date: "2025-07-25", type: "movie", phase: 6,
+    synopsis: "Un equipo de exploradores expuesto a radiación cósmica durante un viaje espacial obtiene poderes extraordinarios — elasticidad, invisibilidad, control del fuego y fuerza rocosa — y debe proteger la Tierra de una amenaza cósmica.",
+    characters: ["Reed Richards", "Sue Storm", "Johnny Storm", "Ben Grimm"],
+    postCredits: "Cuatro años después, mientras Sue le lee a su hijo Franklin, una figura encapuchada aparece sosteniendo la máscara plateada del Doctor Doom, observando al niño con interés." },
+  { id: "eyes-wakanda", es: "Eyes of Wakanda", en: "Eyes of Wakanda", year: 2025, date: "2025-08-01", type: "series", phase: 6,
+    synopsis: "Serie animada que recorre distintas épocas de la historia de Wakanda a través de guerreros que protegieron sus reliquias más valiosas.",
+    characters: ["Guerreros wakandianos de distintas eras"] },
+  { id: "marvel-zombies", es: "Marvel Zombies", en: "Marvel Zombies", year: 2025, date: "2025-09-24", type: "series", phase: 6,
+    synopsis: "Un grupo de sobrevivientes enfrenta una realidad alternativa donde un virus convirtió a la mayoría de los héroes en zombis.",
+    characters: ["Kamala Khan", "Versiones zombificadas de héroes conocidos"] },
+  { id: "wonder-man", es: "Wonder Man", en: "Wonder Man", year: 2026, date: "2026-01-27", type: "series", phase: 6,
+    synopsis: "Simon Williams, expuesto a energía iónica por un programa científico que le dio fuerza y resistencia sobrehumanas, intenta abrirse camino como actor en Hollywood mientras lidia con su propio pasado como superhéroe.",
+    characters: ["Simon Williams / Wonder Man"] },
+  { id: "daredevil-2", es: "Daredevil: Born Again (T2)", en: "Daredevil Born Again", year: 2026, date: "2026-03-24", type: "series", phase: 6,
+    synopsis: "Matt Murdock continúa su lucha contra el creciente poder político de Wilson Fisk como alcalde de Nueva York.",
+    characters: ["Matt Murdock", "Kingpin", "Karen Page"] },
+  { id: "punisher-special", es: "The Punisher: One Last Kill", en: "The Punisher One Last Kill", year: 2026, date: "2026-05-12", type: "special", phase: 6,
+    synopsis: "Frank Castle, un exmarine que se convirtió en un vigilante letal sin poderes tras el asesinato de su familia, emprende una última misión personal que pone a prueba los límites de su propio código de justicia.",
+    characters: ["Frank Castle / Punisher"] },
+  { id: "brand-new-day", es: "Spider-Man: Brand New Day", en: "Spider-Man Brand New Day", year: 2026, date: "2026-07-31", type: "movie", phase: 6,
+    synopsis: "Peter Parker enfrenta una nueva etapa de su vida como Spider-Man en un Nueva York transformado tras los eventos multiversales recientes.",
+    characters: ["Peter Parker / Spider-Man"],
+    postCredits: "La app rastreadora de Ned intenta ubicar a Spider-Man en Nueva York sin éxito, hasta que amplía la búsqueda y lo encuentra muy lejos de la Tierra — en pleno espacio." },
+  { id: "visionquest", es: "VisionQuest", en: "VisionQuest", year: 2026, date: "2026-10-14", type: "series", phase: 6 },
+  { id: "doomsday", es: "Vengadores: Doomsday", en: "Avengers Doomsday", year: 2026, date: "2026-12-18", type: "movie", phase: 6 },
+  { id: "secret-wars", es: "Vengadores: Secret Wars", en: "Avengers Secret Wars", year: 2027, date: "2027-12-17", type: "movie", phase: 6 },
+];
+
+const QUIZZES = {
+  "iron-man": [
+    ["¿Qué usa Tony para mantener la metralla lejos de su corazón?", ["Un marcapasos modificado", "Un reactor Arc en el pecho", "Una placa de titanio", "Nada, la extraen de inmediato"], 1],
+    ["¿Quién resulta ser el verdadero villano de la película?", ["Obadiah Stane", "James Rhodes", "Yinsen", "Nick Fury"], 0],
+    ["¿Qué organización secuestra a Tony en Afganistán?", ["HYDRA", "Los Diez Anillos", "Contrabandistas de armas locales", "El ejército afgano regular"], 1],
+    ["¿Quién ayuda a Tony a construir el primer traje en la cueva?", ["Pepper Potts", "Yinsen", "Happy Hogan", "Rhodey"], 1],
+    ["¿Qué frase dice Tony al revelar su identidad ante la prensa?", ["'Soy Iron Man'", "'Tony Stark ha vuelto'", "'La Iniciativa Vengadores existe'", "'Yo soy el héroe que necesitan'"], 0],
+    ["¿Qué organización menciona Nick Fury en la escena post-créditos?", ["S.H.I.E.L.D.", "La Iniciativa Vengadores", "HYDRA", "Una nueva ley de regulación"], 1],
+    ["¿Qué arma vendía la empresa de Tony antes del cambio de rumbo?", ["Escudos de vibranio", "Misiles Jericho", "Robots de combate", "Naves espaciales"], 1],
+    ["¿Cómo se llama la IA que asiste a Tony en su taller?", ["FRIDAY", "JARVIS", "ARIA", "EDITH"], 1],
+    ["¿Qué decide hacer Tony con la compañía armamentista de su familia?", ["Venderla", "Dejar de fabricar armas", "Donarla al gobierno", "Cerrarla completamente"], 1],
+    ["¿Por qué es importante esta película para el futuro del UCM?", ["Presenta el primer contacto con S.H.I.E.L.D. y siembra la idea de los Vengadores", "Introduce el multiverso", "Mata a un personaje clave", "Cierra la historia de Iron Man por completo"], 0]
+  ],
+  "hulk": [
+    ["¿Cómo obtiene Bruce Banner su condición de Hulk?", ["Mordida radiactiva", "Sobredosis de radiación gamma en un experimento", "Nacimiento con mutación genética", "Exposición a vibranio"], 1],
+    ["¿Qué buscaba recrear el experimento que salió mal?", ["El suero del supersoldado", "Un arma nuclear", "Un antídoto contra el cáncer", "Tecnología alienígena"], 0],
+    ["¿Quién es el General que persigue a Hulk?", ["Thaddeus Ross", "Nick Fury", "Alexander Pierce", "Phillip Coulson"], 0],
+    ["¿En qué se convierte Emil Blonsky al final?", ["En un monstruo aún más grande y violento que Hulk", "En un nuevo Hulk idéntico", "En un robot", "En un skrull"], 0],
+    ["¿Quién es el interés romántico de Bruce en la película?", ["Betty Ross", "Natasha Romanoff", "Jane Foster", "Pepper Potts"], 0],
+    ["¿Qué le pasa a Bruce cuando su ritmo cardíaco se dispara?", ["Se desmaya", "Se transforma en Hulk", "Pierde la memoria", "Se vuelve invisible"], 1],
+    ["¿Con quién se reúne Tony Stark en la escena post-créditos?", ["Nick Fury", "El General Ross", "Betty Ross", "Samuel Sterns"], 1],
+    ["¿Qué le dice Tony al General en esa escena?", ["Que quiere reclutar a Hulk", "Que está 'armando un equipo'", "Que Hulk es peligroso", "Que necesita el suero"], 1],
+    ["¿Quién es el científico que ayuda a Bruce a buscar una cura?", ["Samuel Sterns", "Erik Selvig", "Hank Pym", "Bruce mismo"], 0],
+    ["¿Por qué es relevante esta película para el UCM?", ["Introduce a Hulk como pieza clave de los futuros Vengadores", "Presenta el multiverso", "Mata a Bruce Banner", "No tiene relevancia futura"], 0]
+  ],
+  "iron-man-2": [
+    ["¿Qué está envenenando lentamente a Tony?", ["El paladio del reactor Arc", "Una toxina de Obadiah Stane", "Kryptonita", "Radiación gamma"], 0],
+    ["¿Quién es el villano ruso que busca venganza?", ["Ivan Vanko", "Justin Hammer", "Aldrich Killian", "Yuri Petrov"], 0],
+    ["¿Qué descubre Tony que resuelve el problema del paladio?", ["Vibranio", "Un nuevo elemento creado por él mismo", "Uru", "Adamantium"], 1],
+    ["¿Quién se infiltra como 'Natalie Rushman' en Industrias Stark?", ["Natasha Romanoff", "Pepper Potts", "Christine Everhart", "Maya Hansen"], 0],
+    ["¿Qué descubre el agente Coulson en Nuevo México?", ["Un arma alienígena", "El martillo de Thor", "Un artefacto militar ruso", "Una roca radiactiva"], 1],
+    ["¿A quién nombra Tony como nueva CEO de su empresa?", ["Pepper Potts", "Happy Hogan", "James Rhodes", "Natasha Romanoff"], 0],
+    ["¿Qué hace James Rhodes con una de las armaduras de Tony?", ["Se la lleva para ayudar a detener los drones", "La destruye", "La vende a Hammer", "La esconde para siempre"], 0],
+    ["¿Quién ayuda a fabricar los drones enemigos con Vanko?", ["Justin Hammer", "Obadiah Stane", "Aldrich Killian", "Samuel Sterns"], 0],
+    ["¿Qué evento organiza Tony al inicio de la película?", ["La Expo Stark", "Un funeral", "Una boda", "Un juicio del Senado"], 0],
+    ["¿Por qué es clave la escena post-créditos?", ["Revela la ubicación del martillo de Thor, preparando la siguiente película", "Cierra el arco de Tony Stark", "Mata a un Vengador", "Revela el multiverso"], 0]
+  ],
+  "thor": [
+    ["¿Por qué destierra Odín a Thor a la Tierra?", ["Por desatar una guerra con Jotunheim por arrogancia", "Por traicionar a Asgard", "Por casarse sin permiso", "Por perder una batalla"], 0],
+    ["¿Qué condición debe cumplir alguien para levantar Mjolnir?", ["Ser de sangre real", "Ser digno", "Tener fuerza sobrehumana", "Ser asgardiano"], 1],
+    ["¿Quién descubre ser en realidad un Gigante de Hielo?", ["Loki", "Thor", "Odín", "Heimdall"], 0],
+    ["¿Quién es el interés romántico de Thor en Midgard?", ["Jane Foster", "Sif", "Darcy Lewis", "Natasha Romanoff"], 0],
+    ["¿Qué hace Loki para intentar destruir Jotunheim?", ["Abre el Bifrost hacia allá", "Envía un ejército", "Convence a Odín de atacar primero", "Roba el Teseracto"], 0],
+    ["¿Cómo recupera Thor su martillo y sus poderes?", ["Demostrando humildad al sacrificarse por otros", "Peleando contra Loki", "Pidiéndoselo a Odín", "Con ayuda de Jane"], 0],
+    ["¿Quién cae en coma, dejando a Loki como regente?", ["Odín", "Heimdall", "Sif", "La Reina Frigga"], 0],
+    ["¿Qué le muestra Fury a Selvig en la escena post-créditos?", ["El Teseracto", "Mjolnir", "Un cetro alienígena", "Un fragmento de Bifrost"], 0],
+    ["¿Quiénes son los Guerreros Tres que acompañan a Thor?", ["Fandral, Hogun y Volstagg", "Heimdall, Sif y Fandral", "Volstagg, Hogun y Heimdall", "Sif, Hogun y Fandral"], 0],
+    ["¿Por qué es importante el final de esta película para el UCM?", ["Prepara el Teseracto como pieza clave para Los Vengadores", "Revela que Loki sigue con vida", "Mata a Loki", "Revela el multiverso"], 0]
+  ],
+  "cap-1": [
+    ["¿Qué le da a Steve Rogers su fuerza sobrehumana?", ["Un suero de supersoldado experimental", "Una mordida radiactiva", "Entrenamiento militar extremo", "Tecnología alienígena"], 0],
+    ["¿Quién dirige el programa que crea al Capitán América?", ["El Dr. Erskine", "Howard Stark", "Peggy Carter", "El Coronel Phillips"], 0],
+    ["¿A qué organización pertenece Cráneo Rojo?", ["HYDRA", "El ejército alemán regular", "Los Diez Anillos", "Leviatán"], 0],
+    ["¿Qué objeto cósmico busca Cráneo Rojo?", ["El Teseracto", "Mjolnir", "Una fuente de energía alienígena desconocida", "El escudo de vibranio"], 0],
+    ["¿Cómo termina Steve congelado durante décadas?", ["Estrellando un avión en el hielo ártico", "Un accidente de laboratorio", "Una explosión en batalla", "Una traición de HYDRA"], 0],
+    ["¿Quién es el mejor amigo de Steve desde la infancia?", ["Bucky Barnes", "Howard Stark", "El Coronel Phillips", "Dum Dum Dugan"], 0],
+    ["¿De qué metal está hecho el escudo del Capitán América?", ["Vibranio", "Adamantium", "Acero reforzado", "Titanio"], 0],
+    ["¿Quién es el interés romántico de Steve en la película?", ["Peggy Carter", "Natasha Romanoff", "Sharon Carter", "Jane Foster"], 0],
+    ["¿En qué época despierta Steve tras descongelarse?", ["En el presente", "En los años 60", "En los años 80", "Nunca despierta"], 0],
+    ["¿Por qué es clave el Teseracto para el futuro del UCM?", ["Termina en manos de S.H.I.E.L.D. y detona los eventos de Los Vengadores", "Se pierde para siempre", "Destruye HYDRA por completo", "No vuelve a aparecer"], 0]
+  ],
+  "avengers-1": [
+    ["¿Qué usa Loki para controlar mentes?", ["Un cetro que le da poder de control mental", "Un hechizo verbal", "El Teseracto directamente", "Magia asgardiana pura"], 0],
+    ["¿Qué raza trae Loki para invadir la Tierra?", ["Los Chitauri", "Un ejército robótico propio", "Mercenarios asgardianos", "Los Frost Giants"], 0],
+    ["¿Quién muere a manos de Loki, motivando al equipo a unirse de verdad?", ["Agente Coulson", "Nick Fury", "Maria Hill", "Pepper Potts"], 0],
+    ["¿Cómo desvía Iron Man la bomba nuclear?", ["Volando la nave a través del portal", "Con ayuda de Thor", "Usando el Teseracto", "No logra desviarla"], 0],
+    ["¿Quién le da el golpe final a Loki?", ["Hulk, azotándolo contra el piso", "Thor", "Iron Man", "Viuda Negra"], 0],
+    ["¿Qué hace el misterioso personaje que aparece al final?", ["Sonríe al enterarse del desafío que representa la Tierra", "Declara la guerra abiertamente", "Muere en batalla", "Se revela como un aliado"], 0],
+    ["¿Dónde comen los Vengadores tras la batalla?", ["Un local de shawarma", "Un restaurante de lujo", "La Torre Stark", "Un McDonald's"], 0],
+    ["¿Quién es el hermano adoptivo de Thor y villano principal?", ["Loki", "Malekith", "Hela", "Surtur"], 0],
+    ["¿Qué edificio sirve de base a Loki en Nueva York?", ["La Torre Stark", "El Empire State", "Times Square", "El puente de Brooklyn"], 0],
+    ["¿Por qué es importante la escena post-créditos?", ["Insinúa que existe una amenaza cósmica mucho mayor por venir", "Es solo un cameo sin importancia", "Cierra la trama por completo", "Presenta el multiverso"], 0]
+  ],
+  "iron-man-3": [
+    ["¿Quién es el cerebro real detrás del Mandarín?", ["Aldrich Killian", "Trevor Slattery", "Justin Hammer", "Ivan Vanko"], 0],
+    ["¿Qué es en realidad Trevor Slattery?", ["Un actor contratado como fachada", "El verdadero Mandarín", "Un agente de HYDRA", "Un clon de Tony"], 0],
+    ["¿Qué programa usa Killian para crear supersoldados?", ["Extremis", "El suero del supersoldado", "Proyecto Némesis", "Proyecto Insight"], 0],
+    ["¿Qué sufre Tony tras los eventos de Nueva York?", ["Ataques de pánico", "Pérdida de memoria", "Ceguera", "Pérdida de poderes"], 0],
+    ["¿Con qué pelea Tony gran parte de la película?", ["Un traje improvisado, sin su armadura de alta tecnología", "El traje Mark 50", "Sin ningún traje", "El traje de guerra pesado"], 0],
+    ["¿Qué le pasa a Pepper Potts hacia el final?", ["Es inyectada con Extremis y gana poderes", "Muere", "Se vuelve villana", "Pierde la memoria"], 0],
+    ["¿Qué hace Tony con sus armaduras al final?", ["Las destruye", "Las dona", "Las vende", "Las guarda para siempre"], 0],
+    ["¿Qué operación se sugiere que Tony se hace al final?", ["Se extrae la metralla del pecho", "Se opera el corazón", "Pierde un brazo", "No se opera nada"], 0],
+    ["¿A quién le 'cuenta' Tony toda la historia?", ["A Bruce Banner", "A Pepper", "A Nick Fury", "Al público directamente"], 0],
+    ["¿Por qué marca un cambio importante esta película?", ["Cierra su arco de ansiedad post-Nueva York y reduce su dependencia de las armaduras", "Lo mata", "Lo convierte en villano", "No tiene relevancia"], 0]
+  ],
+  "thor-2": [
+    ["¿Qué es el Éter?", ["Una sustancia primordial anterior al universo", "Un arma asgardiana", "Un tipo de magia de Loki", "El poder de Hela"], 0],
+    ["¿Quién queda expuesta al Éter?", ["Jane Foster", "Sif", "Frigga", "Darcy"], 0],
+    ["¿Quién quiere usar el Éter para sumir el universo en oscuridad?", ["Malekith y los Elfos Oscuros", "Los Frost Giants", "Los Chitauri", "Rebeldes asgardianos"], 0],
+    ["¿Quién muere defendiendo Asgard?", ["Frigga", "Odín", "Heimdall", "Sif"], 0],
+    ["¿A quién libera Thor de prisión para pedirle ayuda?", ["Loki", "Malekith", "Hela", "El Coleccionista"], 0],
+    ["¿A quién finge salvar Loki, aparentando morir?", ["A Thor", "A Odín", "A Jane", "A Frigga"], 0],
+    ["¿Quién toma el trono disfrazado de Odín al final?", ["Loki", "Malekith", "Balder", "El verdadero Odín"], 0],
+    ["¿A quién le entregan el Éter para su resguardo?", ["Al Coleccionista", "A S.H.I.E.L.D.", "A los Vengadores", "A Nick Fury"], 0],
+    ["¿Qué dice el Coleccionista sobre las Gemas del Infinito?", ["Que 'uno menos, quedan cinco'", "Que las va a destruir", "Que ya no quedan más por encontrar", "Nada, no las menciona"], 0],
+    ["¿Por qué es importante que el Éter sea una Gema del Infinito?", ["Confirma que hay más Gemas de poder repartidas por el universo, esperando ser reunidas", "No tiene relevancia futura", "Significa que Thor ya tiene una Gema", "Elimina toda amenaza futura"], 0]
+  ],
+  "cap-2": [
+    ["¿Qué organización está infiltrada dentro de S.H.I.E.L.D.?", ["HYDRA", "A.I.M.", "Los Diez Anillos", "Leviatán"], 0],
+    ["¿Quién es el Soldado de Invierno?", ["Bucky Barnes", "Sam Wilson", "Alexander Pierce", "Brock Rumlow"], 0],
+    ["¿Qué proyecto busca eliminar amenazas antes de que ocurran?", ["Proyecto Insight", "Proyecto Vigía", "Proyecto Extremis", "Proyecto Rebirth"], 0],
+    ["¿Con qué nuevo aliado con alas se une Steve?", ["Sam Wilson / Falcon", "James Rhodes", "Bucky Barnes", "Clint Barton"], 0],
+    ["¿Qué decide hacer Steve con la información de HYDRA/S.H.I.E.L.D.?", ["Filtrarla toda, disolviendo S.H.I.E.L.D.", "Ocultarla", "Dársela solo al gobierno", "Destruirla"], 0],
+    ["¿Quién es un alto agente de HYDRA infiltrado en el gobierno?", ["Alexander Pierce", "Nick Fury", "Sharon Carter", "Maria Hill"], 0],
+    ["¿Qué hace Nick Fury para escapar de un atentado?", ["Finge su propia muerte", "Huye a otro país", "Se esconde en la Torre Stark", "No sufre ningún atentado"], 0],
+    ["¿A quién decide ir a buscar Steve al final?", ["A Bucky", "A Peggy", "A Sharon", "A Sam"], 0],
+    ["¿Qué se revela en la escena post-créditos sobre unos gemelos?", ["Que Von Strucker los tiene con el cetro de Loki", "Que son prisioneros comunes de HYDRA", "Que trabajan para S.H.I.E.L.D.", "Que son androides"], 0],
+    ["¿Por qué es tan importante la caída de S.H.I.E.L.D.?", ["Deja a los héroes sin una organización central, cambiando el rumbo del UCM", "No tiene consecuencias", "Fortalece a S.H.I.E.L.D.", "Elimina a HYDRA para siempre"], 0]
+  ],
+  "gotg-1": [
+    ["¿Qué contiene el orbe que roba Peter Quill?", ["Una Gema del Infinito", "Un arma biológica", "Oro alienígena", "Tecnología Kree"], 0],
+    ["¿Quién es el padre adoptivo de Gamora?", ["Thanos", "Ronan", "El Coleccionista", "Ego"], 0],
+    ["¿Qué villano Kree busca el orbe?", ["Ronan el Acusador", "Yondu", "Nebula", "Korath"], 0],
+    ["¿Cómo se llama el grupo de piratas que crio a Peter?", ["Los Ravagers", "Los Nova Corps", "Los Kree", "Los Chitauri"], 0],
+    ["¿Qué objeto de su madre lleva Peter siempre?", ["Un walkman con un mixtape", "Una foto", "Un colgante", "Una carta"], 0],
+    ["¿Cómo derrotan finalmente a Ronan?", ["Usando juntos el poder de la Gema", "Con un arma Nova", "Huyendo", "Con ayuda de Thanos"], 0],
+    ["¿A quién le confían el orbe/Gema al final?", ["A los Nova Corps", "A Thanos", "A Ronan", "A S.H.I.E.L.D."], 0],
+    ["¿Quién es la hermana adoptiva de Gamora, también hija de Thanos?", ["Nebula", "Mantis", "Kraglin", "Bereet"], 0],
+    ["¿Qué aparece en la sala del Coleccionista en la escena post-créditos?", ["Howard el Pato", "Groot bebé", "Rocket disfrazado", "Una armadura vacía"], 0],
+    ["¿Por qué es importante este grupo para el futuro del UCM?", ["Se convierten en aliados clave contra Thanos en las próximas películas", "No vuelven a aparecer", "Se disuelven al final", "Se convierten en villanos"], 0]
+  ],
+  "avengers-2": [
+    ["¿Con qué crean Tony y Bruce a Ultrón?", ["La IA alojada en el cetro de Loki", "Los archivos de HYDRA", "Vibranio robado", "JARVIS modificado"], 0],
+    ["¿Qué decide Ultrón que es la única forma de 'salvar' la Tierra?", ["Exterminar a la humanidad", "Encerrar a los Vengadores", "Aliarse con Thanos", "Huir al espacio"], 0],
+    ["¿Quiénes son los gemelos con poderes que enfrentan al equipo?", ["Wanda y Pietro Maximoff", "Viuda Negra y Ojo de Halcón", "Nebula y Gamora", "Hela y Loki"], 0],
+    ["¿Con qué metal raro crea Ultrón un cuerpo definitivo?", ["Vibranio", "Adamantium", "Uru", "Titanio"], 0],
+    ["¿Quién se convierte en Visión?", ["Un ser creado con vibranio, JARVIS y la Gema de la Mente", "Ultrón mismo", "Tony Stark", "Wanda Maximoff"], 0],
+    ["¿Qué país africano es la fuente principal de vibranio?", ["Wakanda", "Genosha", "Madripoor", "Sokovia"], 0],
+    ["¿Qué le pasa a Pietro Maximoff?", ["Muere salvando a Clint y a un niño", "Se une a Ultrón", "Se convierte en villano permanente", "Pierde sus poderes"], 0],
+    ["¿Dónde ocurre la batalla final contra Ultrón?", ["Sokovia", "Nueva York", "Wakanda", "Asgard"], 0],
+    ["¿Quién se pone el Guantelete en la escena post-créditos?", ["Thanos", "Ultrón", "Thor", "El Coleccionista"], 0],
+    ["¿Por qué es clave la creación de Visión?", ["Se convierte en portador de la Gema de la Mente, vital contra Thanos", "No tiene relevancia", "Se destruye al final", "Se une a Ultrón"], 0]
+  ],
+  "antman-1": [
+    ["¿Qué tecnología usa Scott Lang para encogerse?", ["El traje Ant-Man de Hank Pym", "Nanotecnología de Stark", "Magia asgardiana", "Un suero experimental"], 0],
+    ["¿Quién quiere vender la tecnología de encogimiento?", ["Darren Cross / Yellowjacket", "Justin Hammer", "Aldrich Killian", "Ivan Vanko"], 0],
+    ["¿Quién es la hija de Hank Pym?", ["Hope van Dyne", "Janet van Dyne", "Cassie Lang", "Maggie"], 0],
+    ["¿Dónde queda atrapada la esposa de Hank años atrás?", ["En el Reino Cuántico", "En otra dimensión asgardiana", "En prisión", "Nunca desaparece"], 0],
+    ["¿A qué escala llega Scott para derrotar a Cross?", ["Escala subatómica", "Solo tamaño hormiga", "Tamaño molecular grande", "No cambia de tamaño"], 0],
+    ["¿Qué relación tiene Scott con Cassie Lang?", ["Es su hija", "Es su sobrina", "Es su hermana", "No tiene relación"], 0],
+    ["¿Quién le muestra a Hope su propio traje al final?", ["Hank Pym", "Scott Lang", "Falcon", "Tony Stark"], 0],
+    ["¿A quién enfrenta Scott en la escena post-créditos?", ["A Falcon y Capitán América", "A Iron Man", "A Nick Fury", "A Ultrón"], 0],
+    ["¿Cómo se llama la empresa rival de Pym?", ["Cross Technological Enterprises", "Stark Industries", "Hammer Industries", "Oscorp"], 0],
+    ["¿Por qué es importante el traje de la Avispa mostrado al final?", ["Prepara la introducción de Hope como la Avispa en futuras películas", "No tiene relevancia", "Se pierde para siempre", "Pertenece a otro personaje"], 0]
+  ],
+  "civil-war": [
+    ["¿Qué detona los Acuerdos de Sokovia?", ["Daños colaterales de los Vengadores en varias misiones", "Un ataque de Thanos", "La creación de Ultrón", "Un ataque de HYDRA"], 0],
+    ["¿Quién apoya la supervisión gubernamental de los Vengadores?", ["Iron Man", "Capitán América", "Hawkeye", "Ant-Man"], 0],
+    ["¿Quién manipula el conflicto por venganza personal?", ["Zemo", "Cráneo Rojo", "Ultrón", "Killmonger"], 0],
+    ["¿Qué secreto revela Zemo sobre Bucky?", ["Que asesinó a los padres de Tony bajo control mental", "Que trabaja para HYDRA actualmente", "Que mató a Peggy Carter", "Que es un impostor"], 0],
+    ["¿Qué joven héroe debuta reclutado por Tony?", ["Spider-Man / Peter Parker", "Ant-Man", "Black Panther", "Ms. Marvel"], 0],
+    ["¿Quién debuta como Black Panther?", ["T'Challa", "Killmonger", "Okoye", "M'Baku"], 0],
+    ["¿Cómo terminan divididos los Vengadores?", ["Entre apoyar a Iron Man o al Capitán América", "Todos apoyan a Iron Man", "Todos apoyan al Capitán América", "Ninguno toma partido"], 0],
+    ["¿Qué le pasa al brazo de Bucky en el enfrentamiento con Tony?", ["Es destruido por Iron Man", "Se lo quita él mismo", "Se lo cura Wakanda", "No sufre daños"], 0],
+    ["¿Dónde termina refugiándose Bucky?", ["En Wakanda", "En Sokovia", "En la cárcel", "En Asgard"], 0],
+    ["¿Por qué es tan importante esta ruptura para el UCM?", ["Los deja fracturados justo antes de la amenaza de Thanos", "Los hace más fuertes", "No tiene consecuencias", "Termina en reconciliación inmediata"], 0]
+  ],
+  "dr-strange-1": [
+    ["¿Qué le pasa a las manos de Stephen Strange?", ["Quedan dañadas en un accidente automovilístico", "Nacen así", "Las pierde en batalla", "Se las quita un villano"], 0],
+    ["¿A dónde viaja Strange buscando una cura?", ["Katmandú, Nepal", "Wakanda", "Asgard", "Egipto"], 0],
+    ["¿Quién entrena a Strange en las artes místicas?", ["La Anciana", "Karl Mordo", "Wong", "El Dr. West"], 0],
+    ["¿Qué villano quiere traer a Dormammu?", ["Kaecilius", "Mordo", "Wong", "Baron Mordo"], 0],
+    ["¿Con qué atrapa Strange a Dormammu en un bucle?", ["El Ojo de Agamotto, una Gema del Infinito", "El Libro de Vishanti", "La Capa de Levitación", "El báculo de la Anciana"], 0],
+    ["¿Qué objeto se vuelve su compañera icónica?", ["La Capa de Levitación", "El Ojo de Agamotto", "El anillo de Sling", "Un báculo mágico"], 0],
+    ["¿En qué se convierte Mordo al final?", ["En alguien que quita poderes a hechiceros", "En un villano cósmico", "En aliado de Dormammu", "En el nuevo Hechicero Supremo"], 0],
+    ["¿A quién visita Strange en la escena post-créditos?", ["A Thor", "A Iron Man", "A Bruce Banner", "A Nick Fury"], 0],
+    ["¿Para qué necesita ayudar a Thor?", ["Para encontrar a Odín", "Para detener a Loki", "Para negociar con Asgard", "Para buscar a Jane Foster"], 0],
+    ["¿Por qué es importante Strange como Hechicero Supremo?", ["Se vuelve clave para enfrentar amenazas místicas y multiversales", "No tiene relevancia futura", "Pierde sus poderes al final", "Se convierte en villano"], 0]
+  ],
+  "gotg-2": [
+    ["¿Quién es el padre biológico de Peter Quill?", ["Ego, un Celestial", "Yondu", "Thanos", "El Coleccionista"], 0],
+    ["¿Qué planea hacer Ego con el universo?", ["Expandir su propia consciencia y consumir todo", "Venderlo a Thanos", "Protegerlo", "Dárselo a los Ravagers"], 0],
+    ["¿Quién crio y protegió a Peter con amor genuino?", ["Yondu", "Ego", "Nebula", "Gamora"], 0],
+    ["¿Cómo muere Yondu?", ["Sacrificándose para salvar a Peter en el espacio", "En batalla contra Ego", "A manos de Rocket", "No muere"], 0],
+    ["¿Qué relación mejoran Gamora y Nebula?", ["Su relación de hermanas, antes rota", "Se vuelven enemigas", "No tienen relación", "Se hacen enemigas de inmediato"], 0],
+    ["¿Quién emerge del capullo de Groot?", ["Baby Groot", "Un nuevo Rocket", "Un Celestial bebé", "Adam Warlock"], 0],
+    ["¿Qué crea Ayesha como venganza?", ["Un ser perfecto llamado Adam", "Un ejército de Sovereign", "Una nueva arma", "Nada, se rinde"], 0],
+    ["¿A qué facción pertenece Ayesha?", ["Los Sovereign", "Los Kree", "Los Ravagers", "Los Nova Corps"], 0],
+    ["¿Quién queda a cargo de los Ravagers tras Yondu?", ["Stakar Ogord y los Ravagers originales", "Rocket", "Nebula", "Nadie"], 0],
+    ["¿Por qué es importante el capullo de Adam Warlock?", ["Prepara la llegada de un personaje cósmico poderoso al UCM", "No tiene relevancia", "Ya se reveló completamente", "Es solo decorativo"], 0]
+  ],
+  "spiderman-homecoming": [
+    ["¿Cómo obtiene Peter sus poderes?", ["La picadura de una araña genéticamente alterada", "Un accidente propio de laboratorio", "Nace con ellos", "Se los da Tony Stark"], 0],
+    ["¿Quién es el villano que vende armas alienígenas?", ["Adrian Toomes / Vulture", "Norman Osborn", "Mysterio", "El Duende Verde"], 0],
+    ["¿Quién le da a Peter su traje mejorado?", ["Tony Stark", "Nick Fury", "Happy Hogan", "Él mismo lo construye"], 0],
+    ["¿Qué relación tiene el villano con la novia de Peter?", ["Es el padre de Liz Allan", "Es su hermano", "Es su tío", "No tiene relación"], 0],
+    ["¿Qué grupo quiere unir Peter con desesperación?", ["Los Vengadores", "La Liga de la Justicia", "Los Guardianes", "Los X-Men"], 0],
+    ["¿Qué decide Tony sobre Peter y los Vengadores?", ["Que todavía no está listo para unirse de tiempo completo", "Que se una inmediatamente", "Que abandone ser Spider-Man", "Que se mude a la Torre Stark"], 0],
+    ["¿Quién descubre la identidad secreta de Peter?", ["Ned Leeds", "Flash Thompson", "Happy Hogan", "MJ"], 0],
+    ["¿Dónde ocurre el clímax final?", ["En un avión de carga robado", "En Nueva York", "En Wakanda", "En el espacio"], 0],
+    ["¿Qué chiste rompe la cuarta pared en la escena post-créditos?", ["El Capitán América hablando de paciencia", "Iron Man haciendo un cameo", "Nick Fury regañando a Peter", "Ninguno, no hay escena"], 0],
+    ["¿Por qué es importante la relación Tony-Peter?", ["Sienta las bases del arco emocional de Peter en futuras películas", "No tiene relevancia futura", "Termina mal de inmediato", "Tony lo abandona"], 0]
+  ],
+  "thor-3": [
+    ["¿Quién es la hermana villana de Thor?", ["Hela, la diosa de la muerte", "Sif", "Angela", "Enchantress"], 0],
+    ["¿Qué le pasa a Mjolnir?", ["Es destruido por Hela", "Se pierde para siempre", "Se vuelve invencible", "Nunca aparece"], 0],
+    ["¿En qué planeta queda atrapado Thor?", ["Sakaar", "Sovereign", "Xandar", "Vormir"], 0],
+    ["¿Quién gobierna ese planeta de forma excéntrica?", ["El Gran Maestro", "El Coleccionista", "Ego", "Thanos"], 0],
+    ["¿Contra quién debe pelear Thor como 'campeón'?", ["Hulk", "Loki", "Valquiria", "Surtur"], 0],
+    ["¿Quién es la guerrera caída que se une a Thor?", ["Valquiria", "Sif", "Hela", "Angela"], 0],
+    ["¿Quién causa la destrucción final de Asgard (Ragnarok)?", ["Surtur, el demonio de fuego", "Hela", "Loki", "Thanos"], 0],
+    ["¿Qué pierde Thor en batalla contra Hela?", ["Un ojo", "Un brazo", "Su martillo solamente", "La memoria"], 0],
+    ["¿A dónde se dirigen los sobrevivientes asgardianos al final?", ["Hacia la Tierra, en una nave", "De vuelta a Asgard reconstruido", "A Sakaar", "A Vormir"], 0],
+    ["¿Qué revela la nave interceptada en la escena post-créditos?", ["Es la nave de Thanos, anticipando Infinity War", "Es una nave de rescate amistosa", "Es la nave del Gran Maestro", "No tiene relevancia"], 0]
+  ],
+  "black-panther-1": [
+    ["¿Qué le da a Black Panther su fuerza sobrehumana?", ["Una hierba en forma de corazón potenciada por vibranio", "Un suero experimental", "Magia ancestral", "Tecnología alienígena"], 0],
+    ["¿Quién reclama el trono desafiando a T'Challa?", ["Erik Killmonger", "M'Baku", "W'Kabi", "Zuri"], 0],
+    ["¿Qué relación tiene Killmonger con la familia real?", ["Es primo de T'Challa, hijo de N'Jobu", "Es su hermano", "No tiene relación", "Es su tío"], 0],
+    ["¿Quién es la hermana genio de T'Challa?", ["Shuri", "Nakia", "Okoye", "Ramonda"], 0],
+    ["¿Qué quiere hacer Killmonger con la tecnología de vibranio?", ["Armar a oprimidos alrededor del mundo", "Venderla al mejor postor", "Destruirla", "Dársela a la ONU"], 0],
+    ["¿Quién lidera a las Dora Milaje?", ["Okoye", "Nakia", "Shuri", "Ramonda"], 0],
+    ["¿Qué decide T'Challa sobre el aislamiento de Wakanda?", ["Terminarlo y compartir su tecnología con el mundo", "Reforzarlo aún más", "Dejarlo igual", "Destruir Wakanda"], 0],
+    ["¿Dónde establece T'Challa el primer centro de ayuda de Wakanda?", ["En Oakland, California", "En Nueva York", "En Ginebra", "En Londres"], 0],
+    ["¿A quién encuentra Shuri en la escena post-créditos?", ["A Bucky Barnes", "A Steve Rogers", "A Sam Wilson", "A Natasha Romanoff"], 0],
+    ["¿Por qué es importante que Wakanda se abra al mundo?", ["Se convierte en un aliado tecnológico clave para futuras batallas", "No tiene consecuencias", "Wakanda es destruida poco después", "Se cierra de nuevo inmediatamente"], 0]
+  ],
+  "infinity-war": [
+    ["¿Qué busca reunir Thanos?", ["Las seis Gemas del Infinito", "Ejércitos alienígenas", "Aliados en la Tierra", "Armas de destrucción masiva"], 0],
+    ["¿A quién sacrifica Thanos por la Gema del Alma?", ["A Gamora, su hija adoptiva", "A Nebula", "A Loki", "A Vision"], 0],
+    ["¿Quién muere protegiendo la Gema de la Mente de Visión?", ["Vision", "Gamora", "Loki", "Heimdall"], 0],
+    ["¿Quiénes más mueren al inicio de la película?", ["Loki y Heimdall", "Solo Loki", "Solo Heimdall", "Thor"], 0],
+    ["¿Qué intentan en Wakanda para salvar a Visión?", ["Extraer la Gema de la Mente sin matarlo", "Esconderlo", "Destruir la Gema con él dentro", "Enviarlo al espacio"], 0],
+    ["¿Qué hace Thanos al conseguir las seis Gemas?", ["Chasquea los dedos y elimina la mitad de la vida", "Destruye la Tierra", "Se vuelve inmortal sin más", "Libera a todos los villanos"], 0],
+    ["¿Quiénes se desintegran al final?", ["Spider-Man, Black Panther y varios Guardianes", "Solo Iron Man", "Ningún héroe desaparece", "Solo los villanos"], 0],
+    ["¿A quién contacta Nick Fury antes de desintegrarse?", ["A Capitana Marvel", "A Thor", "A Doctor Strange", "A nadie"], 0],
+    ["¿Qué revela el sacrificio de Gamora sobre Thanos?", ["Que sí siente amor genuino, pese a todo", "Que la odia", "Que no siente nada", "Que la traiciona sin dudar"], 0],
+    ["¿Por qué el final es un punto de inflexión total?", ["Establece la mayor pérdida posible, motivando toda la trama de Endgame", "Termina con Thanos derrotado", "No tiene consecuencias duraderas", "Es solo un sueño"], 0]
+  ],
+  "antman-2": [
+    ["¿Qué misión emprenden Hank, Hope y Scott?", ["Rescatar a Janet van Dyne del Reino Cuántico", "Detener a Thanos", "Crear un nuevo traje", "Buscar vibranio"], 0],
+    ["¿Quién es la villana con poderes de intangibilidad?", ["Ghost / Ava Starr", "Sonny Burch", "Bill Foster", "Elihas Starr"], 0],
+    ["¿Por qué está Scott bajo arresto domiciliario?", ["Por los eventos de Civil War", "Por robar en Wakanda", "Por atacar a Iron Man", "Por vender secretos"], 0],
+    ["¿Cuánto estuvo Janet atrapada en el Reino Cuántico?", ["Décadas", "Solo unos días", "Unas horas", "Nunca estuvo atrapada"], 0],
+    ["¿Qué necesita curar Ghost?", ["Su inestabilidad molecular", "Una enfermedad terminal", "Ceguera", "Pérdida de memoria"], 0],
+    ["¿Quién ayudó a crear la condición de Ghost originalmente?", ["El padre de Bill Foster, ex-socio de Hank", "Hank Pym mismo", "Thanos", "S.H.I.E.L.D."], 0],
+    ["¿Qué le pasa a Scott cuando el trío se desintegra?", ["Queda atrapado dentro del Reino Cuántico", "Se desintegra también", "Escapa a tiempo", "No pasa nada"], 0],
+    ["¿Qué evento externo causa esa desintegración?", ["El chasquido de Thanos en Infinity War", "Un ataque de Ghost", "Un accidente científico", "La muerte de Ant-Man"], 0],
+    ["¿Qué tratamiento le ofrecen a Ghost al final?", ["Curarla con energía cuántica de Janet", "Encerrarla de por vida", "Matarla", "Nada, la abandonan"], 0],
+    ["¿Por qué es crucial que Scott quede atrapado?", ["Explica su ausencia durante el chasquido y su regreso clave en Endgame", "No tiene relevancia", "Muere ahí atrapado", "Sale sin consecuencias"], 0]
+  ],
+  "captain-marvel": [
+    ["¿Qué le da a Carol sus poderes cósmicos?", ["La energía de un motor experimental en un accidente", "Nace con ellos", "Un experimento Kree deliberado", "Una Gema del Infinito"], 0],
+    ["¿Con qué facción cree luchar al inicio?", ["Los Kree, contra los Skrulls", "Los Skrulls, contra los Kree", "S.H.I.E.L.D., contra HYDRA", "Los Nova Corps"], 0],
+    ["¿Quién es su mentora manipuladora Kree?", ["Yon-Rogg", "Talos", "Nick Fury", "Ronan"], 0],
+    ["¿Qué verdad descubre sobre los Skrulls?", ["Que son refugiados, no invasores malvados", "Que ya conquistaron la Tierra", "Que no existen", "Que son aliados de Thanos"], 0],
+    ["¿Cómo pierde Fury el ojo?", ["Un arañazo de su gato Goose (un Flerken)", "En batalla con Ronan", "En un accidente de auto", "No lo pierde en esta película"], 0],
+    ["¿Qué idea le da Carol a Fury para un futuro equipo?", ["Los Vengadores", "La Iniciativa Kree", "Los Guardianes", "S.H.I.E.L.D. Especial"], 0],
+    ["¿Con qué contacta Fury a Carol al final de Infinity War?", ["Un buscapersonas modificado", "Un teléfono satelital", "Una nave Kree", "Un holograma"], 0],
+    ["¿A dónde decide ir Carol al final?", ["A ayudar a los Skrulls a encontrar un nuevo hogar", "Se queda en la Tierra", "Regresa con los Kree", "Desaparece sin explicación"], 0],
+    ["¿Qué es Goose en realidad?", ["Un Flerken", "Un gato normal", "Un ave Kree", "Un robot"], 0],
+    ["¿Por qué es importante el poder de Carol?", ["La convierte en una de las armas más poderosas contra Thanos en Endgame", "No tiene relevancia futura", "Pierde sus poderes al final", "Se une a Thanos"], 0]
+  ],
+  "endgame": [
+    ["¿Cómo idean un plan tras la derrota de Thanos?", ["Viajando en el tiempo para recolectar las Gemas del pasado", "Pidiéndole ayuda a Thanos", "Con una nueva arma", "Con magia únicamente"], 0],
+    ["¿Quién descubre cómo usar el Reino Cuántico para viajar en el tiempo?", ["Scott Lang, junto con Tony y Bruce", "Doctor Strange", "Thor", "Nebula"], 0],
+    ["¿Quién se sacrifica en Vormir por la Gema del Alma?", ["Natasha Romanoff", "Clint Barton", "Ambos se ofrecen, pero Natasha muere", "Tony Stark"], 0],
+    ["¿Quién usa el Guantelete para revertir el chasquido?", ["Hulk / Bruce Banner", "Iron Man", "Doctor Strange", "Thor"], 0],
+    ["¿Cómo llega Thanos del pasado a la batalla final?", ["A través de una Nebula alterada del pasado", "Viaja en el tiempo él mismo", "Lo trae Loki", "No llega, solo su ejército"], 0],
+    ["¿Quién derrota finalmente a Thanos?", ["Iron Man, sacrificando su vida", "Capitán América", "Thor", "Capitana Marvel"], 0],
+    ["¿Qué hace Steve Rogers con las Gemas al final?", ["Las devuelve a sus líneas temporales de origen", "Las destruye", "Se queda con ellas", "Se las da a Thanos"], 0],
+    ["¿Qué decide hacer Steve después?", ["Quedarse a vivir en el pasado con Peggy", "Volver de inmediato", "Convertirse en villano", "Morir en batalla"], 0],
+    ["¿A quién le entrega Steve su escudo?", ["A Sam Wilson / Falcon", "A Bucky Barnes", "A Natasha", "A Peter Parker"], 0],
+    ["¿Por qué el sacrificio de Tony es tan definitorio?", ["Marca el fin de la Saga del Infinito y el inicio de una nueva generación", "No tiene consecuencias duraderas", "Tony sigue apareciendo con normalidad", "Revive poco después"], 0]
+  ],
+  "far-from-home": [
+    ["¿A qué continente viaja Peter de vacaciones?", ["Europa", "Asia", "África", "América del Sur"], 0],
+    ["¿Quién se presenta como héroe de otra Tierra?", ["Mysterio / Quentin Beck", "Norman Osborn", "Doctor Octopus", "Vulture"], 0],
+    ["¿Qué verdad se revela sobre los Elementales?", ["Son ilusiones creadas con drones y tecnología", "Son reales de otro universo", "Son creaciones de Stark", "Son de S.H.I.E.L.D."], 0],
+    ["¿Qué tecnología de Stark manipula Mysterio?", ["Los lentes E.D.I.T.H.", "El traje de Iron Man", "JARVIS", "Los reactores de arco"], 0],
+    ["¿Qué significa E.D.I.T.H.?", ["'Even Dead I'm The Hero'", "'Enhanced Defense Intelligence Tech Helper'", "'Extremely Dangerous Iron Tech Hub'", "No significa nada"], 0],
+    ["¿Quién ayuda a Peter a limpiar su nombre?", ["Happy Hogan y sus amigos", "Nick Fury solamente", "Nadie", "Tony Stark revive"], 0],
+    ["¿Qué revela Jameson en la escena post-créditos?", ["La identidad secreta de Spider-Man", "La muerte de Mysterio", "Un nuevo villano", "La existencia de los Skrulls"], 0],
+    ["¿Quiénes son en realidad 'Fury' y 'Hill' en la película?", ["Talos y Soren, skrulls disfrazados", "Los verdaderos Fury y Hill", "Clones robóticos", "Viajeros en el tiempo"], 0],
+    ["¿Dónde está el verdadero Fury?", ["En una nave espacial Skrull", "En la Tierra, escondido", "Muerto", "En otra dimensión"], 0],
+    ["¿Por qué es importante la revelación de la identidad de Peter?", ["Cambia por completo su vida y prepara el conflicto siguiente", "No tiene consecuencias", "Se olvida rápidamente", "Nadie le cree a Jameson"], 0]
+  ],
+  "wandavision": [
+    ["¿En qué género de TV está atrapada la realidad de Wanda?", ["Sitcoms clásicas de distintas décadas", "Telenovelas", "Reality shows", "Noticieros"], 0],
+    ["¿Qué pueblo controla Wanda?", ["Westview", "Sokovia", "Hell's Kitchen", "Fairview"], 0],
+    ["¿Qué verdad esconde 'Visión' dentro de la realidad creada?", ["Es una recreación mental; el verdadero está muerto", "Es el verdadero Visión revivido", "Es un impostor de S.W.O.R.D.", "Es Wanda disfrazada"], 0],
+    ["¿Quién manipula a Wanda desde las sombras?", ["Agatha Harkness ('Agnes')", "Mónica Rambeau", "Directora Hayward", "Pietro (falso)"], 0],
+    ["¿Qué agencia investiga los eventos de Westview?", ["S.W.O.R.D.", "S.H.I.E.L.D.", "HYDRA", "A.I.M."], 0],
+    ["¿Qué gemelos crea Wanda dentro de la realidad?", ["Billy y Tommy", "Pietro y Lorna", "Franklin y Valeria", "Los Maximoff originales"], 0],
+    ["¿Qué libro de magia oscura estudia Wanda al final?", ["El Darkhold", "El Libro de Vishanti", "El Necronomicón", "El Grimorio de Agatha"], 0],
+    ["¿Qué escucha Wanda en la escena final?", ["Las voces de sus hijos pidiendo ayuda", "La voz de Visión", "La voz de Thanos", "Nada, todo está en paz"], 0],
+    ["¿Qué le pasa a los habitantes reales de Westview?", ["Sufren mientras son forzados a actuar sus roles", "No sienten nada", "Mueren todos", "Se van libremente"], 0],
+    ["¿Por qué es clave que Wanda quede estudiando el Darkhold?", ["Deja claro que va a seguir buscando a sus hijos a toda costa", "No tiene relevancia futura", "Ella nunca vuelve a usar magia oscura", "Destruye el libro de inmediato"], 0]
+  ],
+  "falcon-ws": [
+    ["¿Con qué lucha Sam al inicio?", ["Si debe aceptar el escudo del Capitán América", "Si debe retirarse", "Si debe unirse a HYDRA", "Si debe abandonar a Bucky"], 0],
+    ["¿Quién es nombrado nuevo Capitán América por el gobierno?", ["John Walker", "Sam Wilson", "Bucky Barnes", "Zemo"], 0],
+    ["¿Qué grupo busca un mundo sin fronteras?", ["Los Flag Smashers", "HYDRA", "Los Vengadores Secretos", "Los Serpent Society"], 0],
+    ["¿Qué suero usa Walker para volverse más fuerte?", ["El suero del supersoldado robado", "Extremis", "Vibranio líquido", "Ninguno"], 0],
+    ["¿Qué villano ayuda a Sam y Bucky pese a su pasado?", ["Zemo", "Cráneo Rojo", "Justin Hammer", "Batroc"], 0],
+    ["¿Qué le cuesta el título a Walker?", ["Matar brutalmente a un Flag Smasher con el escudo", "Rendirse en batalla", "Traicionar a HYDRA", "Nada, lo mantiene"], 0],
+    ["¿Quién se convierte oficialmente en el nuevo Capitán América?", ["Sam Wilson", "John Walker", "Bucky Barnes", "Nadie"], 0],
+    ["¿Quién le da a Sam un escudo actualizado?", ["Bucky, con ayuda de Wakanda", "Tony Stark", "Shuri en persona", "T'Challa"], 0],
+    ["¿Quién se revela como la 'Power Broker'?", ["Sharon Carter", "John Walker", "Zemo", "Val (Valentina)"], 0],
+    ["¿Por qué es importante que Sam acepte ser Capitán América?", ["Redefine el legado del personaje con un nuevo héroe", "No tiene relevancia", "Renuncia poco después", "El escudo se pierde para siempre"], 0]
+  ],
+  "loki-1": [
+    ["¿Por qué es capturado Loki al inicio?", ["Por robar el Teseracto y alterar la línea temporal sagrada", "Por atacar la TVA directamente", "Por matar a Mobius", "Por aliarse con Thanos"], 0],
+    ["¿Qué organización vigila la Línea Temporal Sagrada?", ["La TVA", "S.H.I.E.L.D.", "HYDRA", "El Concilio de Vigilancia"], 0],
+    ["¿Quién recluta a Loki para cazar una variante?", ["Mobius M. Mobius", "Ravonna Renslayer", "Miss Minutes", "El Vigilante"], 0],
+    ["¿Quién es la variante femenina de Loki?", ["Sylvie", "Lady Loki (mismo personaje)", "Ravonna", "Hela"], 0],
+    ["¿Quién controla realmente la TVA según descubren?", ["'Aquel que Permanece'", "Loki mismo", "Nadie, no tiene creador", "Thanos"], 0],
+    ["¿Qué decide hacer Sylvie con esa figura?", ["Matarlo, liberando el multiverso", "Aliarse con él", "Perdonarlo sin condiciones", "Encerrarlo de por vida"], 0],
+    ["¿Qué consecuencia tiene matarlo?", ["Se ramifica en incontables líneas, generando variantes de Kang", "No pasa nada", "Se restaura el orden anterior", "El multiverso desaparece"], 0],
+    ["¿Qué encuentra Loki al volver a la TVA al final?", ["Que ya no lo reconocen y hay una estatua de un desconocido", "Que todo sigue igual", "Que la TVA fue destruida", "Que Sylvie está con él"], 0],
+    ["¿Qué revela 'Aquel que Permanece' sobre sí mismo?", ["Que existen incontables variantes suyas, algunas mucho más peligrosas", "Que es completamente inofensivo", "Que ya está muerto", "Que no tiene ningún poder real"], 0],
+    ["¿Por qué el final de temporada es tan importante?", ["Desata la Saga del Multiverso al liberar variantes de Kang", "Cierra el multiverso para siempre", "No tiene consecuencias", "Loki muere definitivamente"], 0]
+  ],
+  "black-widow": [
+    ["¿Con qué falsa familia se crio Natasha?", ["Con Alexei (Guardián Rojo) y Melina", "Con su familia biológica real", "Sola, sin familia", "Con S.H.I.E.L.D. desde bebé"], 0],
+    ["¿Quién es la 'hermana' de Natasha en esa familia?", ["Yelena Belova", "Melina Vostokoff", "Ava Starr", "Sharon Carter"], 0],
+    ["¿Qué programa controla mentalmente a las viudas negras?", ["La Habitación Roja, con feromonas de control", "HYDRA directamente", "El Soldado de Invierno", "Ninguno"], 0],
+    ["¿Quién dirige la Habitación Roja?", ["El General Dreykov", "Alexei", "Melina", "Taskmaster"], 0],
+    ["¿Quién está detrás de la máscara de Taskmaster?", ["Antonia Dreykov, hija del General", "Alexei", "Melina", "Un robot sin identidad"], 0],
+    ["¿Qué logran liberar al derrotar a Dreykov?", ["A todas las viudas controladas mentalmente", "Nada, fracasan", "Solo a Melina", "Solo a sí mismas"], 0],
+    ["¿Cuándo transcurre esta historia en la línea temporal?", ["Antes de Infinity War, tras Civil War", "Después de Endgame", "Durante Endgame", "Antes del primer Avengers"], 0],
+    ["¿Quién contacta a Yelena al final?", ["Valentina Allegra de Fontaine", "Nick Fury", "Alexei", "Melina"], 0],
+    ["¿A quién visita Yelena en la escena post-créditos?", ["A Natasha, en su tumba", "A su madre Melina", "A Alexei", "A nadie"], 0],
+    ["¿Por qué es importante el nuevo objetivo que le dan a Yelena?", ["Prepara su búsqueda de Clint Barton, clave para Hawkeye", "No tiene relevancia futura", "Yelena se retira del espionaje", "Es solo una broma"], 0]
+  ],
+  "whatif-1": [
+    ["¿Quién narra y observa los universos alternativos?", ["El Vigilante", "Loki", "Kang", "Doctor Strange"], 0],
+    ["¿Qué regla debe seguir el Vigilante al observar?", ["No interferir, solo observar", "Ayudar siempre que pueda", "Destruir universos peligrosos", "Informar a la TVA"], 0],
+    ["¿Quién se convierte en Capitana Carter en un episodio?", ["Peggy Carter", "Sharon Carter", "Maria Hill", "Natasha Romanoff"], 0],
+    ["¿Qué universo muestra a T'Challa como Star-Lord?", ["Uno donde los Ravagers secuestran al T'Challa niño", "Uno donde Wakanda conquista la galaxia", "Uno donde T'Challa nunca nace", "Ninguno"], 0],
+    ["¿Qué pasa en la Tierra en el universo 'zombi'?", ["Un virus del Quantum Realm propaga zombis", "Es destruida por completo", "Es conquistada por Thanos", "Nada cambia"], 0],
+    ["¿Quién se vuelve villano cósmico tras la muerte de Tony en un universo alternativo?", ["Ultrón, con cuerpo de vibranio", "Loki", "Killmonger", "Thanos mismo"], 0],
+    ["¿Qué decide hacer el Vigilante al final, rompiendo su regla?", ["Reunir un equipo de variantes contra Ultrón", "No hacer nada", "Destruir todos los universos", "Unirse a Ultrón"], 0],
+    ["¿A quiénes recluta para su equipo?", ["A Capitana Carter, Star-Lord T'Challa, Killmonger, entre otros", "Solo a Thanos", "A nadie", "A un ejército de Skrulls"], 0],
+    ["¿Qué representa el multiverso mostrado aquí?", ["Universos completamente separados de la línea principal", "La misma línea temporal exacta", "Solo sueños de los personajes", "Simulaciones de la TVA"], 0],
+    ["¿Por qué es importante esta serie para el multiverso del UCM?", ["Establece visualmente el concepto de infinitas variantes", "No tiene relevancia real", "Es pura comedia sin consecuencias", "Contradice el multiverso de las películas"], 0]
+  ],
+  "shang-chi": [
+    ["¿Qué legado oculta el padre de Shang-Chi?", ["Es líder de la organización de los Diez Anillos", "Es un simple empresario", "Es agente de S.H.I.E.L.D.", "Es el Mandarín de películas anteriores"], 0],
+    ["¿Qué le dan a Xu Wenwu poder e inmortalidad?", ["Diez anillos místicos", "Un cetro alienígena", "Una Gema del Infinito", "Vibranio puro"], 0],
+    ["¿Qué nombre usa Shang-Chi para esconderse?", ["Shaun", "Sean", "Kevin", "Aldrich"], 0],
+    ["¿Qué pueblo místico busca proteger Xu Wenwu?", ["Ta Lo", "Wakanda", "Kamar-Taj", "Nueva Asgard"], 0],
+    ["¿Qué criatura maligna intenta liberar por error?", ["El Devorador de Almas", "Dormammu", "Surtur", "Un dragón sin nombre"], 0],
+    ["¿Quién es la hermana de Shang-Chi con su propia red clandestina?", ["Xialing", "Katy", "Ying Li", "Ying Nan"], 0],
+    ["¿Qué dragón ayuda en la batalla final?", ["El Gran Protector (dragón dorado)", "Fin Fang Foom", "Un dragón sin nombre", "Ninguno"], 0],
+    ["¿Qué le pasa a Xu Wenwu al final?", ["Muere sacrificándose al darse cuenta de su error", "Escapa", "Se vuelve bueno y vive feliz", "Es encerrado de por vida"], 0],
+    ["¿A quién le entregan los diez anillos para estudio?", ["A Wong, Capitana Marvel y Bruce Banner", "A Doctor Strange solo", "A Nick Fury", "A nadie, se pierden"], 0],
+    ["¿Por qué es importante la señal que emiten los anillos?", ["Sugiere un origen desconocido y potencialmente cósmico", "No tiene relevancia", "Se revela de inmediato", "Los anillos dejan de funcionar"], 0]
+  ],
+  "eternals": [
+    ["¿Quién creó a los Eternals?", ["Los Celestiales, para proteger a la humanidad de los Desviantes", "Thanos, como sus soldados", "S.H.I.E.L.D., en secreto", "Se crearon a sí mismos"], 0],
+    ["¿Qué verdad descubren sobre su verdadera misión?", ["Preparar el nacimiento de un nuevo Celestial en la Tierra", "Destruir la Tierra", "Ser enemigos de los Celestiales", "No existe ninguna misión"], 0],
+    ["¿Quién crea tecnología manipulando materia?", ["Phastos", "Ikaris", "Druig", "Sersi"], 0],
+    ["¿Quién traiciona al grupo por lealtad a los Celestiales?", ["Ikaris", "Sersi", "Thena", "Gilgamesh"], 0],
+    ["¿Qué habilidad de Sersi resulta clave al final?", ["Transformar la materia", "Control mental", "Fuerza sobrehumana extrema", "Viajar en el tiempo"], 0],
+    ["¿Qué le pasa a Ikaris al final?", ["Vuela hacia el sol y muere", "Se une completamente a Sersi", "Es encarcelado", "Escapa sin consecuencias"], 0],
+    ["¿Quién llega a ayudar en la escena post-créditos?", ["Eros (Starfox), hermano de Thanos", "Thanos mismo", "Adam Warlock", "Nadie"], 0],
+    ["¿Qué personaje se revela como el Caballero Negro?", ["Dane Whitman, con la Espada de Ébano", "Ikaris", "Gilgamesh", "Druig"], 0],
+    ["¿Qué condición sufre Thena?", ["Mahd Wy'ry, que confunde sus recuerdos", "Ninguna condición", "Pierde sus poderes por completo", "Se vuelve inmortal de otra forma"], 0],
+    ["¿Por qué son importantes los Celestiales para el UCM ahora?", ["Elevan la escala cósmica de amenazas y personajes futuros", "No tienen relevancia", "Desaparecen para siempre", "Es un evento aislado sin consecuencias"], 0]
+  ],
+  "hawkeye": [
+    ["¿Qué joven arquera se cruza con Clint?", ["Kate Bishop", "Yelena Belova", "Maya López", "Laura Barton"], 0],
+    ["¿Qué identidad usó Clint que ahora lo persigue?", ["Ronin", "El Vengador Fantasma", "El Cazador", "Nunca usó otra identidad"], 0],
+    ["¿Quién es el líder mafioso vinculado al pasado de Clint?", ["Kingpin / Wilson Fisk", "Maya López", "El Duende", "Bullseye"], 0],
+    ["¿Qué relación tiene Kate con la organización Sloan?", ["Su madre está involucrada con ellos", "Es su hermana secreta", "Trabaja para ellos", "No tiene relación"], 0],
+    ["¿Quién llega buscando venganza contra Clint?", ["Yelena Belova", "Maya López", "Kingpin", "Laura Barton"], 0],
+    ["¿Quién le revela a Yelena la verdad sobre Natasha?", ["Kate Bishop", "Kingpin", "Maya López", "Nadie"], 0],
+    ["¿Qué personaje sordo debuta en esta serie?", ["Maya López / Echo", "Kate Bishop", "Yelena Belova", "Laura Barton"], 0],
+    ["¿Qué le pasa a Kingpin al final?", ["Es confrontado y baleado por Maya", "Muere definitivamente en pantalla", "Escapa sin consecuencias", "Se rinde pacíficamente"], 0],
+    ["¿Quién resulta ser la esposa de Clint con un pasado como agente?", ["Laura Barton", "Kate Bishop", "Yelena Belova", "Maya López"], 0],
+    ["¿Por qué es importante el vínculo entre Kate y Clint?", ["Prepara a Kate como posible sucesora de Hawkeye", "No tiene relevancia futura", "Kate abandona el arco", "Clint se retira sin legado"], 0]
+  ],
+  "no-way-home": [
+    ["¿Por qué le pide Peter ayuda mágica a Strange?", ["Para que el mundo olvide que es Spider-Man", "Para viajar en el tiempo", "Para derrotar a Mysterio otra vez", "Para obtener nuevos poderes"], 0],
+    ["¿Qué sale mal con el hechizo?", ["Peter lo interrumpe, atrayendo villanos de otros universos", "Nunca funciona", "Strange se niega a lanzarlo", "No sale mal nada"], 0],
+    ["¿Qué villanos de otros universos aparecen?", ["Doctor Octopus, Duende Verde, entre otros", "Solo el Duende Verde", "Ninguno, son ilusiones", "Solo villanos nuevos"], 0],
+    ["¿Qué decide hacer Peter con los villanos?", ["Intentar curarlos de sus condiciones", "Matarlos", "Encerrarlos para siempre", "Ignorarlos"], 0],
+    ["¿Quién muere durante el clímax?", ["La tía May", "MJ", "Ned", "Happy Hogan"], 0],
+    ["¿Qué sacrificio final hace Peter?", ["Pedirle a Strange que borre el recuerdo de su identidad de todos", "Renunciar a ser Spider-Man", "Irse a otro universo", "Nada, se resuelve solo"], 0],
+    ["¿Qué otros Spider-Man ayudan a Peter?", ["Versiones interpretadas por Tobey Maguire y Andrew Garfield", "Ninguno, pelea solo", "Solo un Spider-Man", "Miles Morales"], 0],
+    ["¿Qué simbionte llega brevemente al UCM en la escena post-créditos?", ["Venom, con Eddie Brock", "Carnage", "Riot", "Ninguno"], 0],
+    ["¿Qué recuerda el mundo sobre Peter al final?", ["Nada, olvidan que es Spider-Man y a Peter Parker", "Todo sigue igual", "Solo olvidan que es Spider-Man", "Recuerdan todo perfectamente"], 0],
+    ["¿Por qué este sacrificio es tan significativo?", ["Lo deja completamente solo, marcando su nuevo camino", "No cambia nada realmente", "Recupera todo poco después", "Se vuelve millonario como compensación"], 0]
+  ],
+  "moon-knight": [
+    ["¿Qué condición comparte el protagonista con su otra identidad?", ["Trastorno de identidad disociativa", "Amnesia total", "Esquizofrenia sin personalidades", "Ninguna condición real"], 0],
+    ["¿De qué dios es avatar Marc Spector?", ["Khonshu, dios de la venganza", "Ra, dios del sol", "Anubis, dios de la muerte", "Horus, dios del cielo"], 0],
+    ["¿Quién busca liberar a la diosa Ammit?", ["Arthur Harrow", "Layla El-Faouly", "Khonshu mismo", "Steven Grant"], 0],
+    ["¿Qué busca hacer Ammit si es liberada?", ["Juzgar y castigar a la humanidad antes de que delinca", "Proteger a la humanidad", "Destruir solo a los dioses", "Nada, es pacífica"], 0],
+    ["¿Quién es Layla en relación a Marc/Steven?", ["Su esposa", "Su hermana", "Su enemiga", "Su médica"], 0],
+    ["¿En qué se convierte Layla hacia el final?", ["En un avatar de la diosa Taweret", "En una nueva Moon Knight", "En villana", "En una simple espectadora"], 0],
+    ["¿Qué tercer alter se revela al final?", ["Jake Lockley", "Steven Grant (ya conocido)", "Khonshu mismo", "Arthur Harrow"], 0],
+    ["¿Qué hace Jake Lockley con Harrow en la escena post-créditos?", ["Lo secuestra y lo ejecuta", "Lo libera", "Lo ayuda a escapar", "Nada, no vuelven a verse"], 0],
+    ["¿Cómo termina la relación de Marc con Khonshu?", ["Se libera de servirle, aunque queda ambiguo con Jake", "Sigue siendo su avatar sin dudas", "Khonshu muere", "Se vuelven enemigos declarados"], 0],
+    ["¿Por qué es relevante la existencia de dioses egipcios en el UCM?", ["Expande el universo a nuevos panteones y mitologías", "No tiene relevancia", "Contradice a los dioses nórdicos", "Se explica como ciencia, no magia"], 0]
+  ],
+  "dr-strange-2": [
+    ["¿Quién es América Chávez?", ["Una joven que puede viajar entre universos", "Wanda Maximoff", "Clea", "Sara Wolfe"], 0],
+    ["¿Quién es la villana principal en esta película?", ["Wanda Maximoff, poseída por el Darkhold", "Mordo", "Clea", "La Anciana"], 0],
+    ["¿Qué busca lograr Wanda con el poder de América?", ["Viajar a un universo donde puede estar con sus hijos", "Destruir el multiverso", "Conquistar la Tierra", "Revivir a Visión"], 0],
+    ["¿Qué libro maligno corrompe a quien lo usa demasiado?", ["El Darkhold", "El Libro de Vishanti", "El Necronomicón", "El Libro de los Muertos"], 0],
+    ["¿Dónde ve Strange una versión corrupta de sí mismo?", ["Earth-838, con un Strange Supremo malvado", "En su propio universo", "En Sakaar", "En Ta Lo"], 0],
+    ["¿Quiénes son los Illuminati que aparecen?", ["Héroes variantes como Mr. Fantástico y Capitana Carter", "Los mismos Vengadores de siempre", "Villanos exclusivamente", "No aparece ningún grupo"], 0],
+    ["¿Qué le pasa a Wanda al final?", ["Parece morir, arrepentida de sus acciones", "Se vuelve heroína permanente", "Escapa sin consecuencias", "Se une a Strange"], 0],
+    ["¿Qué efecto secundario sufre Strange por magia prohibida?", ["Le crece un tercer ojo", "Pierde la memoria", "Envejece rápidamente", "Ninguno"], 0],
+    ["¿Quién contacta a Strange al final?", ["Clea", "Wanda", "América Chávez", "Mordo"], 0],
+    ["¿Por qué es importante la incursión multiversal mencionada?", ["Sugiere el colapso de universos, central en la Saga del Multiverso", "No tiene relevancia real", "Se resuelve por completo aquí", "Es solo una amenaza menor"], 0]
+  ],
+  "ms-marvel": [
+    ["¿De dónde saca Kamala sus poderes?", ["Un brazalete heredado de su familia", "Una araña radiactiva", "Un accidente de laboratorio", "Nace con ellos"], 0],
+    ["¿A qué país está ligado el origen del brazalete?", ["Pakistán, durante la Partición de India", "India moderna", "Egipto antiguo", "Wakanda"], 0],
+    ["¿Qué grupo busca el brazalete de Kamala?", ["Los ClanDestinos", "HYDRA", "Los Diez Anillos", "A.I.M."], 0],
+    ["¿Quién es el mejor amigo que la apoya?", ["Bruno", "Zoe", "Kamran", "Aamir"], 0],
+    ["¿Qué chico nuevo tiene conexión con los ClanDestinos?", ["Kamran", "Bruno", "Aamir", "Nadie nuevo"], 0],
+    ["¿Qué antepasada tuvo poderes similares?", ["Su bisabuela Aisha", "Su madre", "Su tía", "Nadie más"], 0],
+    ["¿Qué organización contacta a Kamala al final?", ["S.A.B.E.R./Nick Fury", "S.H.I.E.L.D. clásico", "Los Vengadores directamente", "Nadie"], 0],
+    ["¿Qué origen alternativo de sus poderes se insinúa a futuro?", ["Un posible origen mutante", "Que son completamente Kree", "Que son magia pura", "Que provienen de Wakanda"], 0],
+    ["¿Qué le pasa a la relación con Kamran al descubrir la verdad?", ["Se rompe su confianza", "Se hacen novios felices para siempre", "No cambia nada", "Se vuelve su aliado permanente"], 0],
+    ["¿Por qué es importante Kamala para el futuro del UCM?", ["Se integra a un futuro equipo de jóvenes héroes", "No tiene relevancia futura", "Pierde sus poderes al final", "Se convierte en villana"], 0]
+  ],
+  "thor-4": [
+    ["¿Qué villano caza y mata dioses?", ["Gorr, el Carnicero de Dioses", "Hela", "Surtur", "Malekith"], 0],
+    ["¿Con qué arma logra Gorr su poder?", ["La Espada Necrosable", "Mjolnir robado", "Un cetro Kree", "Magia propia sin arma"], 0],
+    ["¿Quién empuña los fragmentos de Mjolnir?", ["Jane Foster, la Poderosa Thor", "Valquiria", "Sif", "Loki"], 0],
+    ["¿Qué enfermedad enfrenta Jane en su vida civil?", ["Cáncer en etapa avanzada", "Una lesión de guerra", "Ceguera progresiva", "Ninguna"], 0],
+    ["¿A quiénes secuestra Gorr para atraer a los dioses?", ["A los niños de Nueva Asgard", "A los hijos de Zeus", "A ningún niño", "A los hijos de Valquiria"], 0],
+    ["¿Qué dios olímpico humilla Thor?", ["Zeus", "Hércules", "Apolo", "Poseidón"], 0],
+    ["¿Qué le pasa a Jane al final?", ["Muere por su enfermedad, pese a usar el martillo", "Se cura por completo", "Se vuelve inmortal", "Se une a Gorr"], 0],
+    ["¿Qué le concede Thor a Gorr al final?", ["Usar el Hacha del Amor Eterno para revivir a su hija", "Perdonarlo sin condiciones", "Matarlo de inmediato", "Nada"], 0],
+    ["¿A quién adopta Thor como su hija?", ["A Amor, la hija de Gorr", "A ninguna niña", "A un hijo de Jane", "A una asgardiana huérfana"], 0],
+    ["¿Quién envía a su hijo contra Thor en la escena post-créditos?", ["Zeus envía a Hércules", "Nadie, no hay escena", "Hela regresa", "Odín regresa"], 0]
+  ],
+  "i-am-groot": [
+    ["¿Qué formato tienen los episodios?", ["Cortos cómicos con un Groot pequeño", "Episodios de una hora", "Una película completa", "Documentales"], 0],
+    ["¿Con quién pasa más tiempo Groot?", ["Rocket", "Star-Lord", "Gamora", "Drax"], 0],
+    ["¿Qué tipo de travesuras suele hacer?", ["Explorar cosas peligrosas de forma inocente", "Pelear seriamente contra villanos", "Enseñar lecciones morales complejas", "Ninguna"], 0],
+    ["¿Esta serie es esencial para entender Vol. 3?", ["No, son historias cortas independientes", "Sí, es esencial", "Sí, presenta al villano principal", "Sí, mata a un personaje clave"], 0],
+    ["¿En qué etapa de Groot se sitúan?", ["Entre Vol. 2 y Vol. 3, cuando es pequeño", "Cuando ya es adulto", "Antes de conocer a los Guardianes", "Después de morir en Infinity War"], 0],
+    ["¿Qué tono predomina?", ["Humor tierno y liviano", "Drama intenso", "Terror", "Acción bélica"], 0],
+    ["¿Groot habla más allá de su frase característica?", ["No, sigue diciendo variaciones de 'Yo soy Groot'", "Sí, habla con oraciones completas", "Sí, pero solo en inglés", "No emite sonido"], 0],
+    ["¿Qué suele investigar con curiosidad?", ["Sistemas eléctricos de la nave", "Portales dimensionales", "Armas alienígenas letales", "Ninguno"], 0],
+    ["¿Altera la línea temporal principal?", ["No, son viñetas paralelas", "Sí, cambia el destino de Groot", "Sí, presenta un villano cósmico", "Sí, mata a Rocket"], 0],
+    ["¿Por qué vale la pena verlos igual?", ["Profundizan el vínculo entre Groot y Rocket antes de Vol. 3", "Son obligatorios para Endgame", "Presentan pistas sobre Thanos", "Revelan el origen de las Gemas"], 0]
+  ],
+  "she-hulk": [
+    ["¿Cómo obtiene Jennifer los poderes de Hulk?", ["Una transfusión de sangre de emergencia con Bruce", "Radiación gamma directa", "Un accidente propio", "Nace con ellos"], 0],
+    ["¿A qué se dedica Jennifer además de ser heroína?", ["Es abogada de casos superhumanos", "Es doctora", "Es periodista", "Es agente de S.H.I.E.L.D."], 0],
+    ["¿Cómo controla Jennifer su transformación comparada con Bruce?", ["La controla con mucha más facilidad desde el inicio", "Le cuesta igual que a Bruce", "Nunca la controla", "Se niega a transformarse"], 0],
+    ["¿Qué villano de antaño reaparece rehabilitado?", ["Emil Blonsky / Abominación", "Cráneo Rojo", "Ivan Vanko", "Justin Hammer"], 0],
+    ["¿Qué grupo de internet acosa a Jennifer?", ["Los Intelligencia", "HYDRA", "Los ClanDestinos", "Ningún grupo"], 0],
+    ["¿Qué rompe la cuarta pared en el final de temporada?", ["Jennifer confronta a K.E.V.I.N., la IA que escribe los guiones", "Un crossover con otra franquicia", "Un final trágico convencional", "Nada especial"], 0],
+    ["¿Qué le pide Jennifer al 'sistema'?", ["Un final más satisfactorio y menos genérico", "Que la maten", "Que la casen", "Que pierda sus poderes"], 0],
+    ["¿Qué personaje ciego hace un cameo?", ["Matt Murdock / Daredevil", "Frank Castle", "Wilson Fisk", "Elektra"], 0],
+    ["¿Cómo es el tono de esta serie comparado con el resto del UCM?", ["Comedia legal con humor autoconsciente", "Drama serio sin humor", "Terror", "Acción bélica pura"], 0],
+    ["¿Por qué es relevante el regreso de Daredevil aquí?", ["Confirma su reincorporación activa al UCM", "No tiene relevancia futura", "Es su única aparición para siempre", "Contradice su historia posterior"], 0]
+  ],
+  "werewolf": [
+    ["¿Qué maldición esconde Jack Russell?", ["Es un hombre lobo", "Es un vampiro", "Tiene poderes psíquicos", "Ninguna maldición"], 0],
+    ["¿En qué tipo de evento participa?", ["Una cacería secreta de monstruos por una reliquia", "Un torneo de superhéroes", "Una boda", "Un juicio"], 0],
+    ["¿Quién es su aliada cazadora?", ["Elsa Bloodstone", "Layla El-Faouly", "Yelena Belova", "Nadie"], 0],
+    ["¿Qué reliquia buscan en la competencia?", ["La Piedra de Sangre (Bloodstone)", "Una Gema del Infinito", "El Darkhold", "Mjolnir"], 0],
+    ["¿En qué formato visual está filmado?", ["Blanco y negro, estilo terror clásico", "Animación", "3D estereoscópico", "Found footage"], 0],
+    ["¿Qué tono predomina?", ["Terror gótico con humor oscuro", "Comedia familiar", "Acción sin terror", "Drama romántico"], 0],
+    ["¿Qué personaje sorprende apareciendo al final?", ["Man-Thing", "Ghost Rider", "Blade", "Morbius"], 0],
+    ["¿Este especial expande el UCM hacia qué género?", ["El terror y lo sobrenatural", "La ciencia ficción pura", "El realismo", "La comedia romántica"], 0],
+    ["¿Qué gana Jack al ganar la competencia?", ["La Piedra de Sangre", "Dinero", "Un puesto de liderazgo", "Nada, pierde"], 0],
+    ["¿Por qué es interesante para el tono futuro del UCM?", ["Demuestra que Marvel puede explorar el terror dentro de su universo", "No tiene relevancia", "Es el último especial", "Elimina el terror para siempre"], 0]
+  ],
+  "wakanda-forever": [
+    ["¿Qué evento enfrenta Wakanda al inicio?", ["La muerte de su rey T'Challa", "Una invasión extranjera", "La pérdida del vibranio", "Una guerra civil"], 0],
+    ["¿Qué potencia submarina entra en conflicto?", ["Talokan, liderada por Namor", "Atlantis clásica", "Los Kree oceánicos", "Los Nova Corps"], 0],
+    ["¿Qué habilidades tiene Namor?", ["Fuerza sobrehumana y capacidad de volar", "Solo respirar bajo el agua", "Control mental", "Invisibilidad"], 0],
+    ["¿Quién crea un nuevo traje de Black Panther?", ["Shuri", "Okoye", "Ramonda", "M'Baku"], 0],
+    ["¿Qué joven científica es clave para hallar vibranio?", ["Riri Williams", "Val Richards", "Betty Ross", "Darcy Lewis"], 0],
+    ["¿Quién muere defendiendo a Wakanda?", ["La Reina Ramonda", "Shuri", "Okoye", "M'Baku"], 0],
+    ["¿Qué decide Shuri al enfrentar a Namor?", ["Perdonarle la vida, rompiendo el ciclo de venganza", "Matarlo sin dudar", "Aliarse con él en secreto", "Huir del conflicto"], 0],
+    ["¿Qué pacto logran Wakanda y Talokan?", ["Una alianza secreta de no agresión", "Guerra total permanente", "La destrucción de Talokan", "Ninguno"], 0],
+    ["¿Qué se revela sobre el hijo de T'Challa?", ["Fue criado en Haití, también se llama T'Challa", "Nunca existió", "Es el nuevo Namor", "Murió con su padre"], 0],
+    ["¿Por qué es importante Riri Williams a futuro?", ["Se convierte en Ironheart, con su propia armadura", "No tiene relevancia futura", "Se muda a Wakanda permanentemente", "Pierde el interés en tecnología"], 0]
+  ],
+  "gotg-holiday": [
+    ["¿Qué buscan hacer Drax y Mantis?", ["Darle el mejor regalo de Navidad a Peter", "Traicionarlo", "Ignorar la Navidad", "Pelear contra un villano cósmico"], 0],
+    ["¿A quién intentan 'secuestrar' con buenas intenciones?", ["A Kevin Bacon", "A un villano", "A un familiar de Peter", "A nadie"], 0],
+    ["¿Qué tono tiene este especial?", ["Comedia navideña ligera", "Terror", "Drama trágico", "Acción bélica intensa"], 0],
+    ["¿Qué vínculo se profundiza entre Drax y Mantis?", ["Su amistad y cuidado mutuo", "Se vuelven enemigos", "Se enamoran románticamente", "No interactúan"], 0],
+    ["¿Este especial tiene consecuencias en la trama de Vol. 3?", ["No, es una historia ligera independiente", "Sí, presenta al villano principal", "Sí, mata a un Guardián", "Sí, revela el origen de Rocket"], 0],
+    ["¿Dónde se ambienta gran parte de la historia?", ["En la Tierra, EE.UU.", "En Xandar", "En Sakaar", "En Knowhere"], 0],
+    ["¿Qué buscan entender Drax y Mantis?", ["El significado de la Navidad", "La política terrestre", "La ciencia humana", "El idioma humano"], 0],
+    ["¿Quién no participa activamente en planear la sorpresa?", ["Peter Quill (es la sorpresa)", "Drax", "Mantis", "Groot"], 0],
+    ["¿Cuál es el resultado del plan?", ["Un regalo torpe pero entrañable", "Un fracaso total", "Un regalo perfecto sin errores", "Terminan peleados"], 0],
+    ["¿Por qué vale la pena este especial?", ["Aporta calidez emocional antes de los eventos duros de Vol. 3", "Es obligatorio para la trama principal", "Presenta un nuevo villano clave", "Cambia el destino del universo"], 0]
+  ],
+  "quantumania": [
+    ["¿Dónde queda atrapada la familia Lang-Van Dyne?", ["El Reino Cuántico", "Sakaar", "Un universo espejo", "Ta Lo"], 0],
+    ["¿Quién gobierna esa dimensión?", ["Kang el Conquistador", "Thanos", "Ultron", "El Alto Evolucionador"], 0],
+    ["¿Por qué está Kang exiliado ahí?", ["Otras variantes de sí mismo lo desterraron", "Eligió vivir ahí por gusto", "Nunca estuvo exiliado", "Lo encerraron los Vengadores"], 0],
+    ["¿Qué secreto oculta Janet sobre su tiempo atrapada?", ["Que conoció y luego traicionó a Kang", "Que nunca conoció a nadie", "Que ella encerró a Kang", "Que no recuerda nada"], 0],
+    ["¿Cómo logran vencer a Kang?", ["Uniendo fuerzas con los rebeldes del Reino Cuántico", "Escapando sin pelear", "Con ayuda de los Vengadores", "Con ayuda de Wakanda"], 0],
+    ["¿Qué le pasa a esta variante de Kang al final?", ["Es aparentemente destruido, aunque existen más variantes", "Escapa triunfante", "Se vuelve aliado de los héroes", "Muere sin dejar variantes"], 0],
+    ["¿Qué descubren Loki y Mobius en la escena post-créditos?", ["Que múltiples variantes de Kang se reúnen en consejo", "Que Kang ya fue derrotado en todas partes", "Que la TVA fue destruida", "Nada relevante"], 0],
+    ["¿Qué nuevo rol asume Cassie Lang?", ["Se involucra activamente como heroína", "Se mantiene alejada del peligro", "Se vuelve villana", "Desaparece de la trama"], 0],
+    ["¿Por qué es significativo que existan múltiples Kangs?", ["Anticipa una guerra multiversal contra distintas versiones del villano", "Significa que solo hay un Kang", "No tiene relevancia", "Se resuelve por completo aquí"], 0],
+    ["¿Por qué esta película es clave para la Saga del Multiverso?", ["Presenta a Kang como el gran antagonista central tras Thanos", "No tiene relación con la saga", "Introduce a Thanos de regreso", "Cierra el arco de Kang por completo"], 0]
+  ],
+  "gotg-3": [
+    ["¿A quién intentan salvar los Guardianes?", ["A Rocket, gravemente herido", "A Star-Lord", "A Groot", "A Gamora"], 0],
+    ["¿Quién creó a Rocket mediante experimentación forzada?", ["El Alto Evolucionador", "Thanos", "Ego", "Ronan"], 0],
+    ["¿Qué busca lograr el Alto Evolucionador?", ["Crear una sociedad 'perfecta' mediante evolución forzada", "Conquistar la galaxia con armas", "Revivir a los muertos", "Viajar en el tiempo"], 0],
+    ["¿Qué versión de Gamora acompaña a los Guardianes?", ["Una variante del pasado, sin recuerdos de su relación con Peter", "La Gamora original", "Ninguna, no aparece", "Una Gamora robot"], 0],
+    ["¿Qué debe aceptar Peter sobre esta Gamora?", ["Debe dejarla ir y seguir adelante", "Obligarla a quedarse", "Perder la memoria también él", "Volverse villano por despecho"], 0],
+    ["¿Qué deciden los Guardianes al final?", ["Separarse, tomando caminos distintos", "Permanecer juntos sin cambios", "Disolverse sin razón", "Unirse a los Vengadores de inmediato"], 0],
+    ["¿Quién queda a cargo del liderazgo de los nuevos Guardianes?", ["Rocket", "Star-Lord", "Nebula", "Mantis"], 0],
+    ["¿A dónde regresa Peter Quill al final?", ["A la Tierra, a visitar a su abuelo", "Se queda en el espacio para siempre", "A Wakanda", "A Sakaar"], 0],
+    ["¿Qué nuevos personajes se unen al grupo?", ["Adam Warlock y otros rescatados del Alto Evolucionador", "Ningún personaje nuevo", "Solo villanos capturados", "Personajes de otra franquicia"], 0],
+    ["¿Por qué es importante el final de esta trilogía?", ["Cierra el arco original de los Guardianes y abre paso a una nueva formación", "No tiene relevancia futura", "Termina con la muerte de todo el equipo", "Revive a Thanos"], 0]
+  ],
+  "secret-invasion": [
+    ["¿Qué raza descubre Fury infiltrada en la Tierra?", ["Los Skrulls", "Los Kree", "Los Chitauri", "Los Celestiales"], 0],
+    ["¿Qué habilidad los hace peligrosos como infiltrados?", ["Cambiar de forma y suplantar identidades", "Volar sin límites", "Control mental", "Fuerza descomunal"], 0],
+    ["¿Quién lidera la facción rebelde de Skrulls?", ["Gravik", "Talos", "Soren", "G'iah"], 0],
+    ["¿Por qué se rebelan estos Skrulls?", ["Se sienten traicionados tras años esperando un hogar prometido", "Quieren esclavizar a la humanidad sin motivo", "Actúan por orden de Thanos", "No tienen motivo"], 0],
+    ["¿Quién muere trágicamente cercano a Fury?", ["Talos", "Maria Hill", "Ambos, Talos y Maria Hill", "Solo Gravik"], 0],
+    ["¿Qué reevalúa Fury tras estos eventos?", ["Su lugar y confianza en las instituciones", "Retirarse por completo", "Aliarse con los Skrulls rebeldes", "Nada"], 0],
+    ["¿Qué gana G'iah al consumir sangre de superhumanos?", ["Múltiples poderes combinados de golpe", "Ningún poder nuevo", "Solo volar", "Inmortalidad total"], 0],
+    ["¿Qué relación tiene G'iah con Talos?", ["Es su hija", "Es su hermana", "No tiene relación", "Es su enemiga"], 0],
+    ["¿Qué conecta esta serie con el final de Ms. Marvel?", ["El contacto de S.A.B.E.R. por la crisis Skrull", "Nada relacionado", "Una invitación a unirse a los Skrulls", "Una amenaza directa de Gravik"], 0],
+    ["¿Por qué es importante esta crisis para Fury a futuro?", ["Lo deja más cauteloso ante amenazas encubiertas", "No tiene relevancia", "Se retira definitivamente", "Se resuelve sin ninguna pérdida"], 0]
+  ],
+  "loki-2": [
+    ["¿Qué enfrenta la TVA al inicio de la temporada?", ["El colapso de la línea temporal sagrada", "Un nuevo villano externo", "La invasión Skrull", "Un ataque de Thanos"], 0],
+    ["¿Qué habilidad clave desarrolla Loki?", ["Deslizarse entre líneas temporales a voluntad", "Volar sin ayuda", "Invisibilidad total", "Control mental"], 0],
+    ["¿Qué variante de Kang intenta estabilizar el sistema?", ["Victor Timely", "Ravonna Renslayer", "Miss Minutes", "Ninguna"], 0],
+    ["¿Qué decide hacer Loki para salvar el multiverso?", ["Sacrificarse, sosteniendo todas las líneas temporales", "Destruir la TVA por completo", "Unirse a Kang", "Huir de todos"], 0],
+    ["¿En qué se convierte Loki al asumir ese rol?", ["En el 'Dios de las Historias'", "En un villano cósmico", "En un simple espectador", "En el nuevo Vigilante"], 0],
+    ["¿Cómo termina la relación entre Loki y Mobius?", ["Se consolida como amistad genuina", "Se rompe por completo", "Se vuelven enemigos", "No cambia en nada"], 0],
+    ["¿Qué pasa con Sylvie tras la temporada 1?", ["Continúa su propio camino, distanciada de Loki", "Muere en esta temporada", "Se reconcilia de inmediato", "Se convierte en villana"], 0],
+    ["¿La TVA sigue existiendo al final?", ["Sí, protegida por el sacrificio de Loki", "No, es destruida por completo", "Sí, exactamente igual que antes", "No, nunca más se menciona"], 0],
+    ["¿Qué tipo de final tiene esta temporada?", ["Contemplativo y filosófico, centrado en el sacrificio de Loki", "Una gran batalla explosiva", "Un cliffhanger sin resolución", "Una comedia ligera"], 0],
+    ["¿Por qué es importante el sacrificio final de Loki?", ["Evita que las líneas temporales colapsen entre sí", "No tiene relevancia real", "Destruye el multiverso definitivamente", "Revive a todas las variantes de Kang"], 0]
+  ],
+  "the-marvels": [
+    ["¿Qué anomalía conecta a las tres protagonistas?", ["Una anomalía cuántica que las hace intercambiar lugares al usar poderes", "Un hechizo de Wanda", "Un experimento de HYDRA", "Nada las conecta"], 0],
+    ["¿Quiénes son las tres heroínas?", ["Carol Danvers, Kamala Khan y Mónica Rambeau", "Carol, Natasha y Wanda", "Kamala, Yelena y Mónica", "Carol, Yelena y Kamala"], 0],
+    ["¿Qué villana Kree busca venganza contra Carol?", ["Dar-Benn", "Yon-Rogg", "Ronan", "Minn-Erva"], 0],
+    ["¿Qué usa Dar-Benn para salvar su planeta natal?", ["Saltos entre agujeros de gusano que dañan otros mundos", "Un ejército masivo", "Tecnología Skrull", "Magia oscura"], 0],
+    ["¿Qué relación tiene Mónica con Carol?", ["Es como su sobrina/ahijada, hija de su mejor amiga", "Es su hermana biológica", "No tienen relación", "Es su enemiga"], 0],
+    ["¿Qué compañero peculiar de Fury reaparece?", ["Goose, el Flerken", "Un nuevo gato distinto", "Ningún animal", "Un robot asistente"], 0],
+    ["¿Cómo derrotan a Dar-Benn?", ["Coordinando sus poderes entrelazados en vez de pelear por separado", "Cada una pelea sola", "Huyendo del conflicto", "Con ayuda de los Vengadores"], 0],
+    ["¿Qué le pasa a Mónica al final?", ["Queda varada en un universo alternativo", "Muere en batalla", "Pierde sus poderes", "Se vuelve villana"], 0],
+    ["¿Quién llega a reclutar a Kamala en la escena post-créditos?", ["Una variante de Kamala de otro universo", "Nick Fury", "Carol Danvers", "Nadie"], 0],
+    ["¿Por qué es importante esa escena post-créditos?", ["Sugiere la formación de un futuro equipo de jóvenes héroes", "No tiene relevancia", "Cierra el arco de Kamala por completo", "Presenta a un villano nuevo"], 0]
+  ],
+  "whatif-2": [
+    ["¿Qué sigue explorando esta temporada?", ["Universos alternativos con giros inesperados", "Solo la línea temporal principal", "Documentales sobre el UCM", "Precuelas obligatorias"], 0],
+    ["¿Quién es la figura narrativa central de la serie?", ["El Vigilante", "Kang", "Loki", "Mephisto"], 0],
+    ["¿Estas historias afectan la línea temporal principal?", ["No, son universos separados", "Sí, cambian el destino de Los Vengadores", "Sí, revelan el final de la Saga del Multiverso", "Sí, presentan al villano siguiente"], 0],
+    ["¿Qué libertad narrativa ofrece el formato?", ["Explorar 'qué hubiera pasado si' sin restricciones", "Ninguna libertad adicional", "Solo continuidad estricta", "Solo tragedias obligatorias"], 0],
+    ["¿Mantiene el estilo de animación en 3D?", ["Sí", "No, cambia a live-action", "No, se vuelve un cómic", "Sí, pero en 2D"], 0],
+    ["¿Qué tipo de personajes suelen aparecer?", ["Héroes y villanos ya establecidos, explorados distinto", "Solo personajes completamente nuevos", "Solo villanos", "Ningún personaje conocido"], 0],
+    ["¿Qué rol cumple dentro del ecosistema del multiverso?", ["Sigue alimentando la idea de infinitas posibilidades", "Ninguno, es aislada", "Reemplaza el concepto de multiverso", "Cierra el multiverso"], 0],
+    ["¿Es obligatorio verla para entender las películas?", ["No, pero enriquece el contexto del multiverso", "Sí, es esencial para Vengadores: Doomsday", "Sí, presenta a Kang directamente", "Sí, mata a un Vengador"], 0],
+    ["¿Qué tono predomina en general?", ["Varía entre comedia, drama y tragedia", "Es siempre uniforme y serio", "Es siempre cómico", "Es siempre trágico"], 0],
+    ["¿Por qué sigue siendo relevante para el multiverso?", ["Refuerza visualmente la escala e infinitud del multiverso", "No tiene relevancia", "Contradice el multiverso de las películas", "Cierra el concepto para siempre"], 0]
+  ],
+  "echo": [
+    ["¿Quién es la protagonista, ya vista en Hawkeye?", ["Maya López / Echo", "Kate Bishop", "Yelena Belova", "Kamala Khan"], 0],
+    ["¿Qué característica define a Maya López?", ["Es sorda de nacimiento", "Es ciega", "No tiene piernas", "Tiene visión de rayos X"], 0],
+    ["¿A qué comunidad regresa Maya?", ["Su comunidad indígena Choctaw", "Una comunidad urbana cualquiera", "Wakanda", "Ninguna en particular"], 0],
+    ["¿Con qué organización criminal está ligado su pasado?", ["La organización de Kingpin", "HYDRA", "Los Diez Anillos", "A.I.M."], 0],
+    ["¿Qué habilidad especial tiene sin poderes evidentes?", ["Memoria fotográfica para imitar movimientos de pelea", "Fuerza sobrehumana", "Vuelo", "Control mental"], 0],
+    ["¿Qué villano de Hawkeye reaparece?", ["Kingpin / Wilson Fisk", "Ronin", "Yelena Belova", "Nadie regresa"], 0],
+    ["¿Qué revela la escena post-créditos sobre Kingpin?", ["Que sobrevivió al disparo y se recupera en secreto", "Que murió definitivamente", "Que perdió la memoria", "Que se retiró del crimen"], 0],
+    ["¿Qué papel juega la familia de Maya en su desarrollo?", ["Es central, ayudándola a reconectar con su identidad", "No tiene importancia", "Todos la rechazan", "No tiene familia"], 0],
+    ["¿La serie profundiza en temas de identidad cultural?", ["Sí, centra su historia en la herencia indígena de Maya", "No, es solo acción pura", "No, ignora ese aspecto", "Sí, pero de otra cultura"], 0],
+    ["¿Por qué es importante la recuperación de Kingpin?", ["Prepara su regreso como villano central en Daredevil: Born Again", "No tiene relevancia futura", "Significa que nunca más aparecerá", "Contradice su historia en Hawkeye"], 0]
+  ],
+  "deadpool-wolverine": [
+    ["¿Qué le dio a Deadpool su factor de curación descontrolado?", ["Un programa que buscaba curar su cáncer terminal", "Nació con él", "Un accidente de laboratorio ajeno", "Una mordida de mutante"], 0],
+    ["¿A quién recluta Deadpool para una misión crucial?", ["A una versión reticente de Wolverine", "A Spider-Man", "A los X-Men clásicos", "A Los Vengadores"], 0],
+    ["¿Qué organización lo busca para una misión?", ["La TVA (Autoridad de Variación Temporal)", "S.H.I.E.L.D.", "HYDRA", "Los Illuminati"], 0],
+    ["¿En qué lugar transcurre gran parte de la película?", ["El Vacío", "Sakaar", "El Reino Cuántico", "Ta Lo"], 0],
+    ["¿Qué villana busca su poder en el Vacío?", ["Cassandra Nova", "Lady Deathstrike", "Mística", "Jean Grey oscura"], 0],
+    ["¿Qué tono cómico mantiene la película?", ["Humor autoconsciente, violento y con ruptura de la cuarta pared", "Drama serio sin humor", "Comedia familiar sin violencia", "Terror puro"], 0],
+    ["¿Qué franquicia se integra al UCM con esta película?", ["El universo de X-Men de Fox", "Los 4 Fantásticos de Fox (parcialmente)", "Ambas, X-Men y elementos de Fox", "Ninguna, es independiente"], 0],
+    ["¿Cómo evoluciona la relación entre Deadpool y Wolverine?", ["Pasan de rivales forzados a aliados genuinos", "Siguen siendo enemigos hasta el final", "Se odian sin evolución", "Nunca se encuentran"], 0],
+    ["¿Qué contiene la extensa escena post-créditos?", ["Bloopers y tributos a actores de películas anteriores de X-Men", "Una escena que anticipa la secuela", "Nada, termina sin extras", "Un anuncio de otra película"], 0],
+    ["¿Por qué es importante para la integración de personajes de Fox?", ["Formaliza su llegada al multiverso principal de Marvel Studios", "No tiene relevancia real", "Los mantiene completamente separados", "Elimina esos personajes"], 0]
+  ],
+  "agatha": [
+    ["¿Qué busca recuperar Agatha Harkness?", ["Su magia, perdida tras enfrentar a Wanda", "Su juventud", "Su hijo", "Su reputación social"], 0],
+    ["¿Qué camino peligroso recorre junto a un grupo de brujas?", ["El Camino de las Brujas (Witches' Road)", "El Sendero Dorado", "La Ruta del Vacío", "El Círculo de Fuego"], 0],
+    ["¿Quién es 'Teen', el joven que la acompaña?", ["Se revela ser Billy Maximoff, hijo de Wanda", "Un aprendiz sin relación con Wanda", "Otro Mephisto", "Un clon de Visión"], 0],
+    ["¿Qué nombre adopta Billy hacia el final?", ["Billy Kaplan", "Tommy Maximoff", "Wiccan Prime", "Vision Jr."], 0],
+    ["¿Qué reflejan las pruebas del Camino de las Brujas?", ["Los mayores miedos y secretos de cada bruja", "Son simples acertijos sin riesgo", "No hay pruebas reales", "Solo hay una prueba física"], 0],
+    ["¿Qué le pasa a algunas brujas del grupo?", ["Mueren enfrentando las pruebas", "Todas sobreviven sin problema", "Se vuelven inmortales", "Abandonan sin consecuencias"], 0],
+    ["¿Qué relación tiene esta serie con WandaVision?", ["Es una secuela directa centrada en Agatha", "No tiene relación", "Ocurre mucho antes", "Contradice completamente esa serie"], 0],
+    ["¿Qué habilidad muestra Billy relacionada con Wanda?", ["Una conexión similar a la magia del caos de su madre", "Ninguna habilidad mágica", "Solo fuerza física", "Control mental básico"], 0],
+    ["¿Cómo termina la relación Agatha-Billy?", ["Con un vínculo de mentoría, pese a la naturaleza compleja de Agatha", "Agatha lo traiciona sin razón", "Nunca se separan físicamente", "Billy la abandona de inmediato"], 0],
+    ["¿Por qué es importante revelar que 'Teen' es Billy Maximoff?", ["Confirma que el hijo de Wanda sobrevivió y prepara su rol como Wiccan", "No tiene relevancia futura", "Significa que Wanda nunca tuvo hijos", "Cierra el linaje de Wanda para siempre"], 0]
+  ],
+  "whatif-3": [
+    ["¿Qué sigue caracterizando esta temporada?", ["Explorar nuevas variantes de héroes y villanos ya conocidos", "Contar una sola historia lineal", "Ser un documental", "Ser una precuela obligatoria"], 0],
+    ["¿Quién sigue siendo la figura narrativa central?", ["El Vigilante", "Kang", "Loki", "Mephisto"], 0],
+    ["¿Estas historias impactan directamente las películas en curso?", ["No, siguen siendo universos separados", "Sí, cambian el destino de Los Vengadores", "Sí, revelan el final de la saga", "Sí, presentan al villano siguiente"], 0],
+    ["¿Qué libertad narrativa sigue ofreciendo el formato?", ["Finales y giros que no podrían pasar en las películas principales", "Ninguna libertad adicional", "Solo continuidad estricta", "Solo tragedias obligatorias"], 0],
+    ["¿Sigue usando animación en 3D?", ["Sí", "No, cambia a live-action", "No, se vuelve un cómic", "Sí, pero en 2D"], 0],
+    ["¿Qué tipo de personajes suelen aparecer?", ["Héroes y villanos ya establecidos en el UCM", "Solo personajes completamente nuevos", "Solo villanos sin héroes", "Ningún personaje conocido"], 0],
+    ["¿Qué rol cumple dentro del multiverso más grande del UCM?", ["Sigue alimentando la idea de infinitas posibilidades narrativas", "Ninguno, es aislada", "Reemplaza el concepto de multiverso", "Cierra el multiverso"], 0],
+    ["¿Es necesario verla para entender las películas principales?", ["No es obligatorio, pero enriquece el contexto", "Sí, es esencial para Doomsday", "Sí, presenta a Kang directamente", "Sí, mata a un Vengador"], 0],
+    ["¿Qué tono predomina en general?", ["Varía entre comedia, drama y tragedia según el episodio", "Es siempre uniforme y serio", "Es siempre cómico", "Es siempre trágico"], 0],
+    ["¿Por qué sigue siendo relevante para entender el multiverso?", ["Refuerza visualmente la escala e infinitud del multiverso del UCM", "No tiene relevancia", "Contradice el multiverso de las películas", "Cierra el concepto para siempre"], 0]
+  ],
+  "brave-new-world": [
+    ["¿Quién asume el manto de Capitán América sin el suero?", ["Sam Wilson", "Bucky Barnes", "John Walker", "Joaquín Torres"], 0],
+    ["¿Qué conspiración enfrenta Sam en esta película?", ["Una relacionada con el nuevo Presidente Thaddeus Ross", "Una invasión alienígena directa", "Un ataque de HYDRA", "Una crisis multiversal"], 0],
+    ["¿En qué cargo político está ahora Ross?", ["Presidente de los Estados Unidos", "Secretario de Defensa únicamente", "Senador", "Alcalde de Nueva York"], 0],
+    ["¿Quién adopta el nombre de Halcón sucediendo a Sam?", ["Joaquín Torres", "Bucky Barnes", "John Walker", "Nadie lo sucede"], 0],
+    ["¿En qué se transforma Ross bajo ciertas circunstancias?", ["En una versión Hulk de sí mismo (Red Hulk)", "En un robot", "En un skrull", "En nada"], 0],
+    ["¿Qué define la identidad de Sam sin ser supersoldado?", ["Su habilidad y determinación, no una fuerza heredada", "Un suero secreto que sí recibe", "Poderes cósmicos nuevos", "Tecnología alienígena"], 0],
+    ["¿Qué villano de películas anteriores del Hulk reaparece?", ["Samuel Sterns / el Líder", "Abominación", "Ivan Vanko", "Justin Hammer"], 0],
+    ["¿A quién visita Sam en La Balsa en la escena post-créditos?", ["A Samuel Sterns", "A Ross", "A Bucky", "A nadie"], 0],
+    ["¿Qué advertencia le da Sterns a Sam?", ["Que existen otros mundos y hay más que proteger que un solo planeta", "Que Ross es un impostor", "Que HYDRA sigue activa", "Que debe renunciar al escudo"], 0],
+    ["¿Por qué es importante esa advertencia final?", ["Prepara una escala de amenazas mucho más grande y cósmica para el futuro", "No tiene relevancia", "Se refiere a un evento ya resuelto", "Es una simple broma sin peso"], 0]
+  ],
+  "daredevil-1": [
+    ["¿Qué le da a Matt Murdock sus sentidos sobrehumanos?", ["Un accidente con residuos químicos que lo dejó ciego", "Nace con ellos", "Un entrenamiento especial", "Tecnología de S.H.I.E.L.D."], 0],
+    ["¿A qué se dedica Matt de día?", ["Es abogado", "Es médico", "Es policía", "Es periodista"], 0],
+    ["¿Quién vuelve a tomar el control de Hell's Kitchen?", ["Wilson Fisk / Kingpin", "El Duende", "Bullseye", "Frank Castle"], 0],
+    ["¿Qué ambición política persigue Fisk?", ["Convertirse en alcalde de Nueva York", "Ser gobernador", "Ser presidente", "Ninguna, se mantiene en las sombras"], 0],
+    ["¿Quién es Karen Page en relación al pasado de Matt?", ["Una aliada y amiga cercana con historia compartida", "Una completa desconocida", "Su enemiga declarada", "Su hermana"], 0],
+    ["¿Qué dualidad enfrenta Matt constantemente?", ["Ser abogado que cree en la ley y vigilante que a veces la rompe", "Ser rico y pobre a la vez", "Ser ciego y vidente alternadamente", "Ninguna dualidad real"], 0],
+    ["¿Qué tono predomina en esta serie?", ["Más oscuro, violento y centrado en crimen urbano", "Ligero y familiar", "Cómico sin drama", "De ciencia ficción espacial"], 0],
+    ["¿Qué serie anterior conecta con la recuperación de Kingpin?", ["Hawkeye, donde Kingpin fue baleado", "Loki", "WandaVision", "Ninguna está conectada"], 0],
+    ["¿Cómo maneja Matt su identidad secreta frente a la ley?", ["Con cuidado extremo, dado el conflicto ético que representa", "Abiertamente, sin secreto", "No le importa en absoluto", "Renuncia a ser abogado"], 0],
+    ["¿Por qué es importante el ascenso político de Fisk como alcalde?", ["Le da poder institucional para enfrentar a Daredevil desde la legitimidad, clave para la siguiente temporada", "No tiene relevancia futura", "Fisk renuncia inmediatamente después", "Se resuelve sin ninguna consecuencia"], 0]
+  ],
+  "thunderbolts": [
+    ["¿Qué tipo de personajes conforman este grupo?", ["Antihéroes y exagentes con pasados turbios", "Héroes clásicos sin conflictos", "Villanos sin ninguna redención", "Civiles sin entrenamiento"], 0],
+    ["¿Quién reúne al grupo para una misión encubierta?", ["Valentina Allegra de Fontaine", "Nick Fury", "Thaddeus Ross", "Tony Stark"], 0],
+    ["¿Qué personajes conocidos integran este equipo?", ["Yelena Belova, Bucky Barnes y John Walker, entre otros", "Solo héroes completamente nuevos", "Solo Los Vengadores originales", "Ningún personaje conocido"], 0],
+    ["¿Qué objetivo oculto tiene Valentina?", ["Usarlos para sus propios fines políticos y de poder", "Protegerlos altruistamente", "Disolverlos de inmediato", "Entregarlos a la justicia"], 0],
+    ["¿Cómo evoluciona la relación entre los miembros?", ["Pasan de desconfiar entre sí a formar un equipo real", "Se odian sin cambios hasta el final", "Nunca se conocen entre sí", "Se separan de inmediato"], 0],
+    ["¿Qué nuevo nombre les da Valentina hacia el final?", ["Los 'New Avengers'", "Los Thunderbolts (se mantiene igual)", "Los Vengadores Oscuros", "Los Illuminati"], 0],
+    ["¿Qué anuncia la escena post-créditos?", ["Una nave interdimensional con el símbolo de los 4 Fantásticos", "Un ataque de Kang", "El regreso de Thanos", "Ninguna amenaza nueva"], 0],
+    ["¿Dónde queda instalado el nuevo equipo?", ["En una torre similar a la de los Vengadores", "En Wakanda", "En el espacio", "No tienen base fija"], 0],
+    ["¿Qué conflicto interno resuelve Yelena en esta película?", ["Encontrar sentido y propósito más allá de ser una asesina entrenada", "Vengarse de Clint Barton", "Aliarse con Kingpin", "Retirarse por completo"], 0],
+    ["¿Por qué es importante la formación de este equipo para el UCM?", ["Prepara una nueva generación de héroes justo antes de los 4 Fantásticos y Doomsday", "No tiene relevancia futura", "El equipo se disuelve de inmediato", "Ross los declara ilegales a todos"], 0]
+  ],
+  "ironheart": [
+    ["¿Qué habilidad excepcional tiene Riri Williams?", ["Es una genio de la ingeniería y la tecnología", "Tiene poderes mágicos innatos", "Es telépata", "Tiene fuerza sobrehumana de nacimiento"], 0],
+    ["¿En qué se inspira Riri para su primera armadura?", ["En la armadura de Iron Man", "En la tecnología de Wakanda", "En el traje de Ant-Man", "En diseños alienígenas"], 0],
+    ["¿Qué tipo de fuerzas enfrenta, combinadas de forma poco común?", ["Magia y alta tecnología juntas", "Solo tecnología pura", "Solo magia pura", "Amenazas puramente políticas"], 0],
+    ["¿Quién es el misterioso personaje ligado al crimen con quien se involucra?", ["Parker Robbins (futuro Encapuchado)", "Norman Osborn", "Wilson Fisk", "Justin Hammer"], 0],
+    ["¿Construye su armadura con respaldo total de una gran corporación?", ["No, en gran parte lo hace por su cuenta", "Sí, con respaldo total de Stark Industries", "Sí, con respaldo de Wakanda", "Sí, con apoyo del gobierno"], 0],
+    ["¿Qué la distingue de Tony Stark en su enfoque?", ["Su juventud y origen desde la comunidad, sin los recursos de Stark", "Nada, son idénticos", "Ella no construye nada", "Ella odia la tecnología"], 0],
+    ["¿Qué papel cumplió Riri en Wakanda Forever?", ["Ayudó a detectar vibranio fuera de Wakanda", "No tiene aparición previa", "Fue una villana en esa película", "Fue una Dora Milaje"], 0],
+    ["¿Qué conflicto central enfrenta sobre su talento?", ["Usarlo para el bien o el beneficio personal", "No existe tal conflicto", "Se resuelve antes de empezar", "No tiene relevancia"], 0],
+    ["¿Qué tono mezcla esta serie, poco común en el UCM?", ["Ciencia ficción tecnológica con fantasía urbana", "Comedia pura sin drama", "Terror puro", "Documental"], 0],
+    ["¿Por qué es importante el desarrollo de Riri como Ironheart?", ["La posiciona como posible sucesora tecnológica en futuras historias", "No tiene relevancia futura", "Abandona la tecnología al final", "Se revela como villana definitiva"], 0]
+  ],
+  "fantastic-four": [
+    ["¿Cómo obtiene el equipo sus poderes?", ["Radiación cósmica durante un viaje espacial", "Un accidente de laboratorio en la Tierra", "Un experimento militar", "Nacen con ellos"], 0],
+    ["¿Qué poder tiene Reed Richards?", ["Elasticidad extrema", "Invisibilidad", "Control del fuego", "Fuerza rocosa"], 0],
+    ["¿Qué poder desarrolla Sue Storm?", ["Invisibilidad y campos de fuerza", "Elasticidad", "Fuerza sobrehumana", "Control del fuego"], 0],
+    ["¿Qué poder tiene Johnny Storm?", ["Puede envolverse en fuego y volar", "Puede volverse invisible", "Puede leer mentes", "Puede teletransportarse"], 0],
+    ["¿En qué se convierte Ben Grimm?", ["En un ser de piel rocosa y fuerza descomunal (la Mole)", "En un ser invisible", "En un ser de fuego", "No sufre cambio físico"], 0],
+    ["¿Qué tipo de amenaza deben enfrentar como equipo?", ["Una amenaza cósmica que pone en riesgo la Tierra", "Un villano puramente terrestre", "Una guerra entre naciones", "Un problema exclusivamente familiar"], 0],
+    ["¿En qué estética se presenta esta versión de la historia?", ["Retro-futurista de mediados del siglo XX", "El presente realista actual", "Un futuro lejano", "La Edad Media"], 0],
+    ["¿Qué relación central los define más allá de ser colegas?", ["Son una familia unida", "No tienen relación personal", "Son completos desconocidos", "Son rivales encubiertos"], 0],
+    ["¿Quién nace como hijo del equipo, relevante a futuro?", ["Franklin Richards, hijo de Reed y Sue", "Ningún hijo aparece", "Un clon de Ben Grimm", "Un robot asistente"], 0],
+    ["¿Quién observa a Franklin al final sosteniendo una máscara icónica?", ["Una figura encapuchada con la máscara del Doctor Doom", "Nadie, no hay escena", "Un Skrull", "Kang el Conquistador"], 0]
+  ],
+  "eyes-wakanda": [
+    ["¿Qué recorre esta serie animada?", ["Distintas épocas de la historia de Wakanda", "Solo el presente de Wakanda", "El futuro lejano de Wakanda", "Historias fuera de Wakanda"], 0],
+    ["¿Qué tipo de personajes protagonizan los episodios?", ["Guerreros wakandianos de distintas eras históricas", "Solo la familia real actual", "Solo villanos externos", "Personajes sin relación con Wakanda"], 0],
+    ["¿Qué buscan proteger estos guerreros?", ["Reliquias valiosas de Wakanda", "Solo el territorio físico", "Riquezas personales", "Nada en particular"], 0],
+    ["¿La serie explora el pasado histórico de Wakanda?", ["Sí, antes de las películas de Black Panther", "No, ocurre después de esas películas", "No tiene relación temporal", "Ocurre en un futuro lejano"], 0],
+    ["¿Qué formato utiliza esta producción?", ["Serie animada", "Live-action", "Documental", "Cómic interactivo"], 0],
+    ["¿El tono es más histórico/dramático o cómico?", ["Más histórico y dramático", "Puramente cómico", "Terror puro", "Comedia romántica"], 0],
+    ["¿Qué importancia cultural tiene dentro del UCM?", ["Profundiza la rica historia y tradiciones de Wakanda", "Ninguna, es solo relleno", "Contradice la historia de las películas", "Elimina la cultura mostrada antes"], 0],
+    ["¿Los episodios están conectados directamente o son historias separadas?", ["Son historias separadas ambientadas en distintas épocas", "Es una sola historia continua", "No tienen estructura temporal", "Ocurren todas simultáneamente"], 0],
+    ["¿Qué tipo de amenazas enfrentan los guerreros?", ["Invasores o ladrones que buscan las reliquias de Wakanda", "Amenazas puramente internas", "Ninguna amenaza real", "Amenazas cósmicas de otra galaxia siempre"], 0],
+    ["¿Por qué es valiosa para entender mejor a Wakanda?", ["Enriquece el trasfondo histórico y cultural que sostiene a las películas", "No aporta nada relevante", "Contradice todo lo mostrado antes", "Reemplaza a las películas de Black Panther"], 0]
+  ],
+  "marvel-zombies": [
+    ["¿Qué transformó a la mayoría de los héroes en zombis?", ["Un virus propagado sin control", "Una maldición mágica", "Un experimento de HYDRA", "Una Gema del Infinito corrupta"], 0],
+    ["¿Qué heroína conocida aparece como sobreviviente principal?", ["Kamala Khan", "Carol Danvers", "Natasha Romanoff", "Wanda Maximoff"], 0],
+    ["¿Este universo zombi forma parte de la línea temporal principal?", ["No, es una realidad alternativa separada", "Sí, es completamente canon principal", "Sí, reemplaza la línea temporal principal", "Sí, es el futuro inevitable del UCM"], 0],
+    ["¿Qué género predomina, poco común en el UCM?", ["Terror y horror de zombis", "Comedia familiar", "Romance", "Documental"], 0],
+    ["¿Qué versiones zombificadas aparecen como amenazas?", ["Varios héroes convertidos en zombis peligrosos", "Ningún héroe conocido aparece así", "Solo villanos se convierten", "Solo civiles comunes"], 0],
+    ["¿Qué formato de animación usa esta serie?", ["Animación (similar a What If...?)", "Live-action", "Stop-motion", "Cómic estático"], 0],
+    ["¿Qué deben hacer los sobrevivientes para mantenerse con vida?", ["Evadir y combatir a los héroes zombificados", "Aliarse con los zombis", "Ignorar la amenaza", "Rendirse desde el inicio"], 0],
+    ["¿Esta historia tiene consecuencias directas en las películas principales?", ["No, es una historia paralela sin impacto directo", "Sí, cambia el destino de los Vengadores actuales", "Sí, presenta al villano de Doomsday", "Sí, elimina personajes de la línea principal"], 0],
+    ["¿Qué tono emocional predomina pese al terror?", ["Tensión y pérdida constante entre los sobrevivientes", "Humor ligero sin tensión", "Romance despreocupado", "Ninguna carga emocional"], 0],
+    ["¿Por qué es interesante dentro de la variedad de historias del UCM?", ["Demuestra la flexibilidad del multiverso para explorar géneros extremos", "No tiene valor narrativo", "Reemplaza el tono habitual para siempre", "Es idéntica a las películas principales"], 0]
+  ],
+  "wonder-man": [
+    ["¿Qué le da a Simon Williams su fuerza y resistencia?", ["Energía iónica de un programa científico", "Una mordida radiactiva", "Magia ancestral", "Tecnología alienígena"], 0],
+    ["¿A qué industria intenta entrar Simon?", ["Hollywood, como actor", "La política", "Las finanzas", "La medicina"], 0],
+    ["¿Qué conflicto interno enfrenta entre su pasado y presente?", ["Balancear su identidad de superhéroe con su nueva vida como actor", "Ninguno, vive en paz total", "Debe elegir entre dos ciudades", "Debe elegir entre dos familias"], 0],
+    ["¿A qué industria satiriza fuertemente el tono de la serie?", ["La industria del entretenimiento y Hollywood", "La industria militar", "La industria tecnológica", "La industria política"], 0],
+    ["¿Qué tan conocido es Simon dentro de la ficción del UCM?", ["Es relativamente nuevo, buscando reconocimiento", "Es ya extremadamente famoso", "Es un villano temido por todos", "No es conocido en absoluto"], 0],
+    ["¿Qué papel cumplen las relaciones personales de Simon?", ["Son centrales para entender sus motivaciones e inseguridades", "No tienen importancia", "No tiene relaciones personales", "Se ignoran por completo"], 0],
+    ["¿Qué distingue tonalmente a esta serie de otras más serias?", ["Un enfoque más satírico y con humor sobre la fama", "Un tono completamente trágico", "Ausencia total de humor", "Un enfoque puramente bélico"], 0],
+    ["¿Su origen se vincula a programas similares a otros personajes?", ["Sí, programas científicos similares", "No tiene ninguna conexión", "Es completamente ajeno al UCM", "Es un villano recurrente ya conocido"], 0],
+    ["¿Qué poderes secundarios podría tener más allá de la fuerza?", ["Resistencia y durabilidad mejoradas", "Control mental", "Viaje en el tiempo", "Invisibilidad"], 0],
+    ["¿Por qué podría ser relevante este personaje a futuro?", ["Podría integrarse a futuros equipos de héroes", "No tiene relevancia futura", "Se retira definitivamente al final", "Pierde sus poderes para siempre"], 0]
+  ],
+  "daredevil-2": [
+    ["¿Contra qué nuevo poder político lucha Matt en esta temporada?", ["Wilson Fisk como alcalde de Nueva York", "Un nuevo grupo criminal externo", "Una amenaza cósmica", "Un villano sin relación con Fisk"], 0],
+    ["¿Qué ventaja institucional tiene Fisk ahora?", ["El poder legítimo de la alcaldía", "Ningún poder nuevo", "Apoyo total de S.H.I.E.L.D.", "Vibranio de Wakanda"], 0],
+    ["¿Cómo afecta esto la forma en que Matt opera como Daredevil?", ["Debe ser más cuidadoso, ya que Fisk tiene legitimidad y recursos oficiales", "No cambia nada en absoluto", "Matt abandona ser Daredevil", "Matt se une a Fisk"], 0],
+    ["¿Qué aliados cercanos siguen apoyando a Matt?", ["Karen Page y otros aliados de Hell's Kitchen", "Nadie, actúa completamente solo", "Solo Los Vengadores", "Solo el gobierno"], 0],
+    ["¿Qué tensión ética sigue enfrentando Matt?", ["El conflicto entre la justicia legal y la justicia por mano propia", "No tiene ningún conflicto ético", "Ha dejado de ejercer como abogado", "Ha dejado de ser vigilante"], 0],
+    ["¿Se mantiene el tono oscuro de la primera temporada?", ["Sí, mantiene un tono oscuro centrado en el crimen urbano", "No, se vuelve una comedia ligera", "No, se convierte en ciencia ficción espacial", "No, pierde todo el drama"], 0],
+    ["¿Qué recursos usa Fisk para consolidar su poder?", ["Manipulación política e influencia institucional", "Solo violencia directa", "Magia oscura", "Tecnología alienígena"], 0],
+    ["¿Qué papel cumple Nueva York en esta temporada?", ["Es un escenario central en disputa entre la ley y el crimen organizado", "No tiene relevancia", "Es reemplazada por otra ciudad", "Desaparece de la trama"], 0],
+    ["¿Matt revela abiertamente su identidad secreta?", ["No, sigue protegiendo su doble vida", "Sí, la revela públicamente", "Sí, pero solo a Fisk", "Sí, pero por accidente sin consecuencias"], 0],
+    ["¿Por qué es importante el conflicto Fisk-Murdock para el UCM?", ["Demuestra que el UCM puede sostener historias de crimen político realista", "No tiene relevancia", "Se resuelve sin ningún conflicto real", "Es idéntico a cualquier otra historia"], 0]
+  ],
+  "punisher-special": [
+    ["¿Qué evento transformó a Frank Castle en el Punisher?", ["El asesinato de su familia", "Un experimento militar", "Una traición de S.H.I.E.L.D.", "Un accidente de laboratorio"], 0],
+    ["¿Frank tiene poderes sobrehumanos como otros héroes?", ["No, es un humano sin poderes, entrenado militarmente", "Sí, tiene fuerza sobrehumana", "Sí, tiene regeneración acelerada", "Sí, tiene visión de rayos X"], 0],
+    ["¿Qué código guía sus acciones violentas?", ["Su propio código de justicia letal contra criminales", "Las leyes convencionales sin excepciones", "Órdenes directas del gobierno", "Ningún código, actúa al azar"], 0],
+    ["¿Qué tipo de misión enfrenta en este especial?", ["Una última misión personal de gran peso emocional", "Una misión rutinaria sin importancia", "Una misión cósmica", "Una misión puramente cómica"], 0],
+    ["¿A qué género se acerca más el tono de este especial?", ["Thriller de acción violento y realista", "Comedia ligera", "Fantasía mágica", "Ciencia ficción espacial"], 0],
+    ["¿Frank suele trabajar en equipo de forma constante?", ["No, generalmente actúa solo, con alianzas puntuales", "Sí, siempre con los Vengadores", "Sí, siempre con Daredevil oficialmente", "Sí, lidera su propio equipo permanente"], 0],
+    ["¿Qué lo distingue moralmente de héroes como el Capitán América?", ["Su disposición a matar sin dudar como parte de su método", "Nada, son idénticos", "Frank nunca usa la violencia", "Frank sigue estrictamente la ley"], 0],
+    ["¿El especial profundiza en el trauma personal de Frank?", ["Sí, es un elemento central de su historia", "No, se ignora por completo", "No tiene ningún trauma", "Se resuelve por completo sin dejar huella"], 0],
+    ["¿Qué sugiere el título 'One Last Kill'?", ["Un cierre definitivo y personal para esta misión", "No tiene relación con la trama", "Es solo un título sin significado", "Que Frank se retira de la violencia para siempre"], 0],
+    ["¿Por qué es valioso incluir a Punisher en el UCM?", ["Amplía el espectro moral del universo hacia zonas grises más oscuras", "No aporta nada distinto a otros héroes", "Contradice por completo el tono del UCM", "Elimina la necesidad de otros vigilantes"], 0]
+  ],
+  "brand-new-day": [
+    ["¿En qué contexto está Nueva York en esta película?", ["Transformada tras los eventos multiversales recientes", "Sin ningún cambio respecto a antes", "Completamente destruida", "Abandonada por sus habitantes"], 0],
+    ["¿Qué nueva etapa enfrenta Peter Parker?", ["Una nueva etapa como Spider-Man en un mundo cambiado", "El retiro definitivo como héroe", "Perder sus poderes por completo", "Mudarse a otro país"], 0],
+    ["¿Peter sigue teniendo el recuerdo de sus seres queridos tras No Way Home?", ["No, sigue lidiando con las consecuencias de que lo olvidaran", "Sí, todos lo recuerdan perfectamente", "Sí, pero solo su tía May", "No tiene relación con eventos anteriores"], 0],
+    ["¿Qué usa Ned para intentar localizar a Peter en la escena post-créditos?", ["Una aplicación rastreadora", "Magia de Doctor Strange", "Ayuda de S.H.I.E.L.D.", "No lo busca"], 0],
+    ["¿Dónde termina encontrando esa búsqueda a Spider-Man?", ["Muy lejos de la Tierra, en el espacio", "En su casa de siempre", "En Wakanda", "En otro universo alterno"], 0],
+    ["¿Qué sugiere que Peter esté en el espacio al final?", ["Que su historia se conecta con eventos cósmicos más grandes del UCM", "Que decidió irse de vacaciones", "Que perdió la memoria", "Que es solo un sueño"], 0],
+    ["¿Peter sigue sin el apoyo de figuras como Tony Stark?", ["Sí, debe forjar su propio camino de forma más independiente", "No, Tony Stark vuelve a guiarlo", "No, deja de ser Spider-Man", "No, se une a otro mentor permanente"], 0],
+    ["¿Qué tono mantiene respecto a películas anteriores de Spider-Man?", ["Continúa el crecimiento personal y heroico de Peter", "Cambia a un tono de terror", "Se vuelve pura comedia sin drama", "Elimina el elemento de superhéroes"], 0],
+    ["¿La relación de Peter con MJ y Ned sigue siendo relevante?", ["Sí, sigue siendo parte importante de su vida", "No, corta todo lazo con ellos", "No, nunca los vuelve a ver", "No, se muda sin avisarles"], 0],
+    ["¿Por qué es significativo que Ned encuentre a Peter en el espacio?", ["Podría conectar la historia de Spider-Man con tramas cósmicas más amplias del UCM", "No tiene ninguna relevancia", "Es solo un error de la aplicación", "Confirma que Peter abandona la Tierra para siempre"], 0]
+  ]
+};
+
+// Orden cronológico (línea de tiempo del universo, no de estreno).
+// Los casos más conocidos donde difiere del orden de estreno:
+// Cap 1 (años 40), Capitana Marvel (1995), Guardianes Vol. 2 (semanas
+// después de la 1, no 3 años), Your Friendly Neighborhood Spider-Man
+// (antes de Homecoming), Black Widow (justo después de Civil War).
+// Los títulos de universos alternativos (What If, Marvel Zombies) y los
+// que transcurren en una Tierra distinta (Los 4 Fantásticos, hasta que
+// cruza en Doomsday) quedan agrupados al final, ya que no tienen un
+// lugar fijo en la línea temporal principal.
+const UNIVERSE_META = {
+  "marvel-clasico": { label: "Marvel Clásico Pre-UCM", color: "#A0522D", glow: "#D2A679" },
+  "xmen-fox": { label: "X-Men (Era Fox)", color: "#4A5568", glow: "#94A3B8" },
+  "fantastic-four-fox": { label: "Los 4 Fantásticos (Fox)", color: "#0EA5E9", glow: "#7DD3FC" },
+  "spiderman-sony": { label: "Spider-Man de Sony", color: "#B91C1C", glow: "#F87171" },
+  "venom-ssu": { label: "Universo Venom (SSU)", color: "#4C1D95", glow: "#A78BFA" },
+  "spiderverse-animado": { label: "Spider-Verse Animado", color: "#EC4899", glow: "#F9A8D4" },
+};
+
+const OTHER_UNIVERSES_ORDER = ["marvel-clasico", "xmen-fox", "fantastic-four-fox", "spiderman-sony", "venom-ssu", "spiderverse-animado"];
+
+const OTHER_DATA = [
+  // Marvel Clásico Pre-UCM
+  { id: "ov-blade", es: "Blade", en: "Blade", year: 1998, date: "1998-08-21", universe: "marvel-clasico" },
+  { id: "ov-blade-2", es: "Blade II", en: "Blade II", year: 2002, date: "2002-03-22", universe: "marvel-clasico" },
+  { id: "ov-daredevil-2003", es: "Daredevil", en: "Daredevil", year: 2003, date: "2003-02-14", universe: "marvel-clasico" },
+  { id: "ov-punisher-2004", es: "The Punisher", en: "The Punisher", year: 2004, date: "2004-04-16", universe: "marvel-clasico" },
+  { id: "ov-blade-trinity", es: "Blade: Trinity", en: "Blade Trinity", year: 2004, date: "2004-12-08", universe: "marvel-clasico" },
+  { id: "ov-elektra", es: "Elektra", en: "Elektra", year: 2005, date: "2005-01-14", universe: "marvel-clasico" },
+  { id: "ov-manthing", es: "Man-Thing", en: "Man-Thing", year: 2005, date: "2005-04-30", universe: "marvel-clasico" },
+  { id: "ov-ghostrider-1", es: "Ghost Rider", en: "Ghost Rider", year: 2007, date: "2007-02-16", universe: "marvel-clasico" },
+  { id: "ov-punisher-warzone", es: "Punisher: War Zone", en: "Punisher War Zone", year: 2008, date: "2008-12-05", universe: "marvel-clasico" },
+  { id: "ov-ghostrider-2", es: "Ghost Rider: Spirit of Vengeance", en: "Ghost Rider Spirit of Vengeance", year: 2012, date: "2012-02-17", universe: "marvel-clasico" },
+
+  // X-Men (Era Fox)
+  { id: "ov-xmen-1", es: "X-Men", en: "X-Men", year: 2000, date: "2000-07-14", universe: "xmen-fox" },
+  { id: "ov-xmen-2", es: "X2: X-Men United", en: "X2 X-Men United", year: 2003, date: "2003-05-02", universe: "xmen-fox" },
+  { id: "ov-xmen-3", es: "X-Men: The Last Stand", en: "X-Men The Last Stand", year: 2006, date: "2006-05-26", universe: "xmen-fox" },
+  { id: "ov-xmen-origins-wolverine", es: "X-Men Origins: Wolverine", en: "X-Men Origins Wolverine", year: 2009, date: "2009-05-01", universe: "xmen-fox" },
+  { id: "ov-xmen-first-class", es: "X-Men: First Class", en: "X-Men First Class", year: 2011, date: "2011-06-03", universe: "xmen-fox" },
+  { id: "ov-the-wolverine", es: "The Wolverine", en: "The Wolverine", year: 2013, date: "2013-07-26", universe: "xmen-fox" },
+  { id: "ov-xmen-dofp", es: "X-Men: Days of Future Past", en: "X-Men Days of Future Past", year: 2014, date: "2014-05-23", universe: "xmen-fox" },
+  { id: "ov-deadpool-1", es: "Deadpool", en: "Deadpool", year: 2016, date: "2016-02-12", universe: "xmen-fox" },
+  { id: "ov-xmen-apocalypse", es: "X-Men: Apocalypse", en: "X-Men Apocalypse", year: 2016, date: "2016-05-27", universe: "xmen-fox" },
+  { id: "ov-logan", es: "Logan", en: "Logan", year: 2017, date: "2017-03-03", universe: "xmen-fox" },
+  { id: "ov-deadpool-2", es: "Deadpool 2", en: "Deadpool 2", year: 2018, date: "2018-05-18", universe: "xmen-fox" },
+  { id: "ov-dark-phoenix", es: "Dark Phoenix", en: "Dark Phoenix", year: 2019, date: "2019-06-07", universe: "xmen-fox" },
+  { id: "ov-new-mutants", es: "New Mutants", en: "The New Mutants", year: 2020, date: "2020-08-28", universe: "xmen-fox" },
+
+  // Los 4 Fantásticos (Fox)
+  { id: "ov-ff-2005", es: "Fantastic Four", en: "Fantastic Four", year: 2005, date: "2005-07-08", universe: "fantastic-four-fox" },
+  { id: "ov-ff-silver-surfer", es: "Fantastic Four: Rise of the Silver Surfer", en: "Fantastic Four Rise of the Silver Surfer", year: 2007, date: "2007-06-15", universe: "fantastic-four-fox" },
+  { id: "ov-ff-2015", es: "Fantastic Four", en: "Fantastic Four", year: 2015, date: "2015-08-07", universe: "fantastic-four-fox" },
+
+  // Spider-Man de Sony (pre-UCM)
+  { id: "ov-spiderman-2002", es: "Spider-Man", en: "Spider-Man", year: 2002, date: "2002-05-03", universe: "spiderman-sony" },
+  { id: "ov-spiderman-2004", es: "Spider-Man 2", en: "Spider-Man 2", year: 2004, date: "2004-06-30", universe: "spiderman-sony" },
+  { id: "ov-spiderman-2007", es: "Spider-Man 3", en: "Spider-Man 3", year: 2007, date: "2007-05-04", universe: "spiderman-sony" },
+  { id: "ov-amazing-spiderman-1", es: "The Amazing Spider-Man", en: "The Amazing Spider-Man", year: 2012, date: "2012-07-03", universe: "spiderman-sony" },
+  { id: "ov-amazing-spiderman-2", es: "The Amazing Spider-Man 2", en: "The Amazing Spider-Man 2", year: 2014, date: "2014-05-02", universe: "spiderman-sony" },
+
+  // Universo Venom (SSU)
+  { id: "ov-venom-1", es: "Venom", en: "Venom", year: 2018, date: "2018-10-05", universe: "venom-ssu" },
+  { id: "ov-venom-2", es: "Venom: Let There Be Carnage", en: "Venom Let There Be Carnage", year: 2021, date: "2021-10-01", universe: "venom-ssu" },
+  { id: "ov-morbius", es: "Morbius", en: "Morbius", year: 2022, date: "2022-04-01", universe: "venom-ssu" },
+  { id: "ov-madame-web", es: "Madame Web", en: "Madame Web", year: 2024, date: "2024-02-14", universe: "venom-ssu" },
+  { id: "ov-venom-3", es: "Venom: The Last Dance", en: "Venom The Last Dance", year: 2024, date: "2024-10-25", universe: "venom-ssu" },
+  { id: "ov-kraven", es: "Kraven the Hunter", en: "Kraven the Hunter", year: 2024, date: "2024-12-13", universe: "venom-ssu" },
+
+  // Spider-Verse Animado
+  { id: "ov-spiderverse-1", es: "Spider-Man: Into the Spider-Verse", en: "Spider-Man Into the Spider-Verse", year: 2018, date: "2018-12-14", universe: "spiderverse-animado" },
+  { id: "ov-spiderverse-2", es: "Spider-Man: Across the Spider-Verse", en: "Spider-Man Across the Spider-Verse", year: 2023, date: "2023-06-02", universe: "spiderverse-animado" },
+  { id: "ov-spiderverse-3", es: "Spider-Man: Beyond the Spider-Verse", en: "Spider-Man Beyond the Spider-Verse", year: 2027, date: "2027-06-18", universe: "spiderverse-animado" },
+];
+
+const CHRON_ORDER = [
+  "cap-1", "captain-marvel", "iron-man", "hulk", "iron-man-2", "thor",
+  "avengers-1", "thor-2", "iron-man-3", "cap-2", "gotg-1", "gotg-2",
+  "avengers-2", "antman-1", "civil-war", "black-widow", "black-panther-1",
+  "spiderman-homecoming", "dr-strange-1", "thor-3", "antman-2",
+  "infinity-war", "endgame", "far-from-home", "wandavision", "falcon-ws",
+  "loki-1", "shang-chi", "eternals", "hawkeye", "no-way-home", "moon-knight",
+  "dr-strange-2", "ms-marvel", "thor-4", "i-am-groot", "she-hulk", "echo",
+  "secret-invasion", "loki-2", "quantumania", "the-marvels", "werewolf",
+  "wakanda-forever", "gotg-holiday", "gotg-3", "agatha", "deadpool-wolverine",
+  "brave-new-world", "daredevil-1", "thunderbolts", "ironheart",
+  "eyes-wakanda", "wonder-man", "daredevil-2", "punisher-special",
+  "brand-new-day", "visionquest",
+  "whatif-1", "whatif-2", "whatif-3", "marvel-zombies",
+  "fantastic-four", "doomsday", "secret-wars",
+].reduce(function (acc, id, i) { acc[id] = i; return acc; }, {});
+
+const WATCHED_KEY = "mcu-watched-v2";
+
+function isReleased(item) { return new Date() >= new Date(item.date + "T00:00:00"); }
+function buildBarSegments(done, summary, skip, total, mainColor) {
+  if (!total) return "";
+  const pct = function (n) { return (n / total) * 100; };
+  return '<div class="bar-seg" style="width:' + pct(done) + "%;background:" + mainColor + '"></div>' +
+    '<div class="bar-seg" style="width:' + pct(summary) + '%;background:' + SUMMARY_COLOR + '"></div>' +
+    '<div class="bar-seg" style="width:' + pct(skip) + '%;background:#4A4A5A"></div>';
+}
+function formatDate(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" });
+}
+function isResolved(status, id) { return status[id] === "watched" || status[id] === "skip" || status[id] === "summary"; }
+function phaseStats(status, phase) {
+  const items = DATA.filter((d) => d.phase === phase);
+  const released = items.filter(isReleased);
+  const done = released.filter((d) => status[d.id] === "watched");
+  const skip = released.filter((d) => status[d.id] === "skip");
+  const summary = released.filter((d) => status[d.id] === "summary");
+  const resolved = released.filter((d) => isResolved(status, d.id));
+  return {
+    total: items.length, released: released.length, done: done.length,
+    skip: skip.length, summary: summary.length, resolved: resolved.length,
+    complete: released.length > 0 && resolved.length === released.length,
+  };
+}
+function sagaComplete(status, saga) { return saga.phases.every((p) => phaseStats(status, p).complete); }
+function matchesFilter(item, filter) {
+  if (filter === "all") return true;
+  if (filter === "movie") return item.type === "movie";
+  if (filter === "series") return item.type === "series" || item.type === "special";
+  return true;
+}
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+/* ---------------------------------------------------------------------- */
+/* Pósters vía TMDb (búsqueda precisa por título + año, con pósters reales) */
+/* Necesitás tu propia API Key gratis de themoviedb.org (Settings > API).  */
+/* Pegala acá abajo. Sin key configurada, cae directo al respaldo de       */
+/* Wikipedia (menos preciso, pero mejor que nada).                        */
+/* ---------------------------------------------------------------------- */
+const TMDB_API_KEY = "0e5d79d586fade96033ce807a8ff9af8";
+const TMDB_IMG_BASE = "https://image.tmdb.org/t/p/w342";
+
+const POSTER_KEY = "mcu-posters-v8";
+let posters = {};
+
+// Ids puntuales a reintentar por una búsqueda mejorada, sin invalidar
+// el resto del caché (evita pedir todo de nuevo de golpe y saturar la API).
+const FORCE_REFETCH_IDS = [];
+
+function loadPosterCache() {
+  try { posters = JSON.parse(localStorage.getItem(POSTER_KEY) || "{}"); } catch (e) { posters = {}; }
+  FORCE_REFETCH_IDS.forEach(function (id) { delete posters[id]; });
+}
+function savePosterCache() { try { localStorage.setItem(POSTER_KEY, JSON.stringify(posters)); } catch (e) {} }
+
+async function fetchPosterWikipedia(item) {
+  const hint = (item.type === "series" || item.type === "special") ? "TV series" : (item.year + " film");
+  const q = encodeURIComponent(item.en + " " + hint);
+  const url = "https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=" + q +
+    "&gsrlimit=3&prop=pageimages&piprop=thumbnail&pithumbsize=300&format=json&origin=*";
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const pages = data && data.query && data.query.pages;
+    if (!pages) return null;
+    const sorted = Object.values(pages).sort(function (a, b) { return (a.index || 0) - (b.index || 0); });
+    for (const page of sorted) {
+      if (page.thumbnail && page.thumbnail.source) return page.thumbnail.source;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function fetchTMDbPoster(item, kind, attempt) {
+  attempt = attempt || 0;
+  const yearParam = kind === "movie" ? ("&primary_release_year=" + item.year) : ("&first_air_date_year=" + item.year);
+  const url = "https://api.themoviedb.org/3/search/" + kind + "?api_key=" + TMDB_API_KEY +
+    "&query=" + encodeURIComponent(item.en) + yearParam;
+  const res = await fetch(url);
+  if (res.status === 429 && attempt < 2) {
+    await new Promise(function (r) { setTimeout(r, 600 * (attempt + 1)); });
+    return fetchTMDbPoster(item, kind, attempt + 1);
+  }
+  if (!res.ok) return null;
+  const data = await res.json();
+  const results = (data && data.results) || [];
+  if (results.length === 0) return null;
+  const norm = function (s) { return (s || "").toLowerCase().replace(/[^a-z0-9]/g, ""); };
+  const target = norm(item.en);
+  const exact = results.find(function (r) {
+    const title = kind === "movie" ? r.title : r.name;
+    return norm(title) === target;
+  });
+  const best = exact || results[0];
+  return best.poster_path ? TMDB_IMG_BASE + best.poster_path : null;
+}
+
+async function fetchPoster(item) {
+  if (!TMDB_API_KEY || TMDB_API_KEY === "PEGA_TU_API_KEY_ACA") {
+    return fetchPosterWikipedia(item);
+  }
+  const primaryKind = item.type === "series" ? "tv" : item.type === "special" ? "tv" : "movie";
+  const secondaryKind = primaryKind === "movie" ? "tv" : "movie";
+  try {
+    const primary = await fetchTMDbPoster(item, primaryKind);
+    if (primary) return primary;
+    const secondary = await fetchTMDbPoster(item, secondaryKind);
+    if (secondary) return secondary;
+    return await fetchPosterWikipedia(item);
+  } catch (e) {
+    return await fetchPosterWikipedia(item);
+  }
+}
+
+async function fetchAllPosters(items, onEach, concurrency = 4) {
+  let cursor = 0;
+  async function worker() {
+    while (cursor < items.length) {
+      const item = items[cursor++];
+      const url = await fetchPoster(item);
+      onEach(item.id, url);
+    }
+  }
+  await Promise.all(new Array(Math.min(concurrency, items.length)).fill(0).map(worker));
+}
+
+let status = {};
+let filter = "all";
+let sortMode = "release";
+let collapsedPhases = {};
+let mainView = "ucm";
+let collapsedUniverses = {};
+
+const PREFS_KEY = "mcu-prefs-v1";
+function loadPrefs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PREFS_KEY) || "{}");
+    if (saved.filter) filter = saved.filter;
+    if (saved.sortMode) sortMode = saved.sortMode;
+    if (saved.collapsedPhases) collapsedPhases = saved.collapsedPhases;
+    if (saved.mainView) mainView = saved.mainView;
+    if (saved.collapsedUniverses) collapsedUniverses = saved.collapsedUniverses;
+  } catch (e) {}
+}
+function savePrefs() {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({
+      filter: filter, sortMode: sortMode, collapsedPhases: collapsedPhases,
+      mainView: mainView, collapsedUniverses: collapsedUniverses,
+    }));
+  } catch (e) {}
+}
+function toggleUniverseCollapse(universeKey) {
+  const willCollapse = !collapsedUniverses[universeKey];
+  collapsedUniverses = Object.assign({}, collapsedUniverses);
+  collapsedUniverses[universeKey] = willCollapse;
+  savePrefs();
+
+  const wrap = document.querySelector('.phase-grid-wrap[data-universe="' + universeKey + '"]');
+  const chevron = document.querySelector('.phase-head[data-universe="' + universeKey + '"] .phase-chevron');
+  if (chevron) chevron.classList.toggle("collapsed", willCollapse);
+  if (!wrap) return;
+
+  if (willCollapse) {
+    wrap.style.maxHeight = wrap.scrollHeight + "px";
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { wrap.style.maxHeight = "0px"; });
+    });
+  } else {
+    wrap.style.maxHeight = wrap.scrollHeight + "px";
+    wrap.addEventListener("transitionend", function handler(e) {
+      if (e.propertyName !== "max-height") return;
+      wrap.style.maxHeight = "none";
+      wrap.removeEventListener("transitionend", handler);
+    });
+  }
+}
+
+function togglePhaseCollapse(phaseNum) {
+  const willCollapse = !collapsedPhases[phaseNum];
+  collapsedPhases = Object.assign({}, collapsedPhases);
+  collapsedPhases[phaseNum] = willCollapse;
+  savePrefs();
+
+  const wrap = document.querySelector('.phase-grid-wrap[data-phase="' + phaseNum + '"]');
+  const chevron = document.querySelector('.phase-head[data-phase="' + phaseNum + '"] .phase-chevron');
+  if (chevron) chevron.classList.toggle("collapsed", willCollapse);
+  if (!wrap) return;
+
+  if (willCollapse) {
+    wrap.style.maxHeight = wrap.scrollHeight + "px";
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        wrap.style.maxHeight = "0px";
+      });
+    });
+  } else {
+    wrap.style.maxHeight = wrap.scrollHeight + "px";
+    wrap.addEventListener("transitionend", function handler(e) {
+      if (e.propertyName !== "max-height") return;
+      wrap.style.maxHeight = "none";
+      wrap.removeEventListener("transitionend", handler);
+    });
+  }
+}
+function syncControlButtons() {
+  document.querySelectorAll("#filters .mini-toggle").forEach(function (b) {
+    b.classList.toggle("active", b.dataset.filter === filter);
+  });
+  document.querySelectorAll("#sortToggle .mini-toggle").forEach(function (b) {
+    b.classList.toggle("active", b.dataset.sort === sortMode);
+  });
+  document.querySelectorAll("#viewToggle .mini-toggle").forEach(function (b) {
+    b.classList.toggle("active", b.dataset.view === mainView);
+  });
+}
+let detailId = null;
+let showPostCredits = false;
+let toastTimer = null;
+
+function loadState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(WATCHED_KEY) || "{}");
+    status = {};
+    Object.keys(raw).forEach(function (id) {
+      const v = raw[id];
+      if (v === true) status[id] = "watched";
+      else if (typeof v === "string") status[id] = v;
+    });
+  } catch (e) { status = {}; }
+}
+function saveState() { try { localStorage.setItem(WATCHED_KEY, JSON.stringify(status)); } catch (e) {} }
+
+function showToast(message, color) {
+  const el = document.getElementById("toast");
+  el.textContent = message;
+  el.style.border = "1px solid " + color;
+  el.style.color = color;
+  el.classList.add("show");
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.classList.remove("show"); }, 3200);
+}
+
+function setStatus(id, newStatus) {
+  const prevPhaseComplete = {};
+  const prevSagaComplete = {};
+  Object.keys(PHASES).forEach(function (p) { prevPhaseComplete[p] = phaseStats(status, Number(p)).complete; });
+  SAGAS.forEach(function (s) { prevSagaComplete[s.id] = sagaComplete(status, s); });
+
+  const next = Object.assign({}, status);
+  if (newStatus) next[id] = newStatus; else delete next[id];
+  status = next;
+  saveState();
+
+  SAGAS.forEach(function (s) {
+    if (!prevSagaComplete[s.id] && sagaComplete(status, s)) showToast("¡" + s.label + " completada!", "#D8B23A");
+  });
+  Object.keys(PHASES).forEach(function (p) {
+    const num = Number(p);
+    if (!prevPhaseComplete[p] && phaseStats(status, num).complete) {
+      showToast(PHASES[num].label + " completa", PHASES[num].color);
+    }
+  });
+
+  render();
+}
+
+let confirmCallback = null;
+function showConfirm(message, onConfirm) {
+  confirmCallback = onConfirm;
+  document.getElementById("confirmMessage").textContent = message;
+  document.getElementById("confirmBackdrop").classList.add("show");
+}
+function closeConfirm() {
+  confirmCallback = null;
+  document.getElementById("confirmBackdrop").classList.remove("show");
+}
+
+function resetProgress() {
+  showConfirm("¿Reiniciar todo tu progreso de visionado? Esto no se puede deshacer.", function () {
+    status = {};
+    saveState();
+    render();
+  });
+}
+
+function openDetail(id) {
+  detailId = id;
+  showPostCredits = false;
+  renderModal();
+}
+function closeDetail() {
+  detailId = null;
+  document.getElementById("modalBackdrop").classList.remove("show");
+}
+
+let statusPickerId = null;
+function findItemById(id) {
+  return DATA.find(function (d) { return d.id === id; }) || OTHER_DATA.find(function (d) { return d.id === id; });
+}
+
+function openStatusPicker(id) {
+  statusPickerId = id;
+  const item = findItemById(id);
+  document.getElementById("statusItemTitle").textContent = item ? item.es : "";
+  const current = status[id] || "";
+  document.querySelectorAll(".status-option[data-status]").forEach(function (b) {
+    b.classList.toggle("current", b.dataset.status === current);
+  });
+  document.getElementById("statusBackdrop").classList.add("show");
+}
+function closeStatusPicker() {
+  statusPickerId = null;
+  document.getElementById("statusBackdrop").classList.remove("show");
+}
+
+function renderModal() {
+  const backdrop = document.getElementById("modalBackdrop");
+  if (!detailId) { backdrop.classList.remove("show"); return; }
+  const item = DATA.find(function (d) { return d.id === detailId; });
+  if (!item) { backdrop.classList.remove("show"); return; }
+
+  document.getElementById("modalYear").textContent = item.year;
+  document.getElementById("modalTitle").textContent = item.es;
+  document.getElementById("modalSynopsis").textContent = item.synopsis || "";
+  document.getElementById("modalCharacters").innerHTML = (item.characters || [])
+    .map(function (c) { return '<span class="char-chip">' + escapeHtml(c) + "</span>"; })
+    .join("");
+
+  const pcSection = document.getElementById("postCreditsSection");
+  const pcBtn = document.getElementById("postCreditsBtn");
+  const pcText = document.getElementById("postCreditsText");
+  if (item.postCredits) {
+    pcSection.style.display = "block";
+    if (showPostCredits) {
+      pcBtn.style.display = "none";
+      pcText.style.display = "block";
+      pcText.textContent = item.postCredits;
+    } else {
+      pcBtn.style.display = "block";
+      pcText.style.display = "none";
+    }
+  } else {
+    pcSection.style.display = "none";
+  }
+
+  const quizSection = document.getElementById("quizLaunchSection");
+  quizSection.style.display = (QUIZZES[item.id] && QUIZZES[item.id].length) ? "block" : "none";
+
+  backdrop.classList.add("show");
+}
+
+const SVG_CAP = ' stroke-linecap="round" stroke-linejoin="round">';
+function typeIconSvg(type, color, size) {
+  if (type === "series") {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="1.5"' + SVG_CAP +
+      '<rect x="2" y="7" width="20" height="15" rx="2"/><path d="m17 2-5 5-5-5"/></svg>';
+  }
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="1.5"' + SVG_CAP +
+    '<rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg>';
+}
+const lockSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A9A" stroke-width="1.5"' + SVG_CAP +
+  '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+const checkSvg = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0A0B12" stroke-width="2.5"' + SVG_CAP + '<path d="M20 6 9 17l-5-5"/></svg>';
+const infoSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9C9D6" stroke-width="1.5"' + SVG_CAP +
+  '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="1" fill="#C9C9D6" stroke="none"/></svg>';
+const phaseGemSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="STROKECOLOR" stroke-width="1.5"' + SVG_CAP +
+  '<path d="M6 3h12l4 6-10 12L2 9Z"/></svg>';
+const skipSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9C9D6" stroke-width="2"' + SVG_CAP +
+  '<path d="M8 8l8 8M16 8l-8 8"/></svg>';
+const summarySvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0B12" stroke-width="2"' + SVG_CAP +
+  '<path d="M7 8h10M7 12h10M7 16h6"/></svg>';
+const chevronSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6B7D" stroke-width="2"' + SVG_CAP + '<path d="M6 9l6 6 6-6"/></svg>';
+
+function buildCardHtml(item) {
+  const rel = isReleased(item);
+  const st = status[item.id];
+  const isW = st === "watched";
+  const typeMeta = item.type ? TYPE_META[item.type] : null;
+  const poster = posters[item.id];
+
+  const typeBadge = (rel && typeMeta)
+    ? '<div class="type-badge" style="border:1px solid ' + typeMeta.color + '">' +
+      typeIconSvg(item.type, typeMeta.color, 9) + '<span style="color:' + typeMeta.color + '">' + typeMeta.label + '</span></div>'
+    : "";
+
+  const centerContent = rel
+    ? (poster
+        ? '<img src="' + poster + '" alt="" onerror="this.style.display=\'none\'; this.parentElement.dataset.broken=\'1\';" />'
+        : typeIconSvg(item.type, "rgba(237,235,227,0.55)", 20) +
+          '<span class="placeholder-title">' + escapeHtml(item.es) + "</span>")
+    : "";
+
+  const infoBtn = (st === "watched" || st === "summary") && item.synopsis
+    ? '<div class="info-btn" onclick="event.stopPropagation(); openDetail(\'' + item.id + '\')">' + infoSvg + "</div>"
+    : "";
+
+  const stamp = rel && st === "watched"
+    ? '<div class="stamp-overlay"><div class="stamp-circle" style="background:' + WATCHED_COLOR + ';box-shadow:0 0 10px ' + WATCHED_GLOW + '">' + checkSvg + "</div></div>"
+    : "";
+
+  const skipOverlay = rel && st === "skip"
+    ? '<div class="skip-overlay"><div class="skip-circle">' + skipSvg + "</div></div>"
+    : "";
+
+  const summaryOverlay = rel && st === "summary"
+    ? '<div class="summary-overlay"><div class="summary-circle">' + summarySvg + "</div></div>"
+    : "";
+
+  const lock = !rel
+    ? '<div class="lock-overlay">' + lockSvg + '<span class="lock-date">' + formatDate(item.date) + "</span></div>"
+    : "";
+
+  const borderColor = st === "watched" ? WATCHED_COLOR : st === "skip" ? "#3A3A48" : st === "summary" ? SUMMARY_COLOR : "#20212C";
+  const titleColor = !rel ? "#5A5A6C" : st === "skip" ? "#5A5A6C" : "#C9C9D6";
+
+  return '<button class="card" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
+    '<div class="poster-box" style="border:1px solid ' + borderColor + ';opacity:' + (rel ? 1 : 0.6) + '">' +
+    typeBadge + centerContent + infoBtn + stamp + skipOverlay + summaryOverlay + lock +
+    "</div>" +
+    '<p class="card-title" style="color:' + titleColor + '">' + escapeHtml(item.es) + "</p>" +
+    '<p class="card-year">' + item.year + "</p>" +
+    "</button>";
+}
+
+function renderOtherView() {
+  const released = OTHER_DATA.filter(isReleased);
+  const done = released.filter(function (d) { return status[d.id] === "watched"; });
+  const skipTotal = released.filter(function (d) { return status[d.id] === "skip"; });
+  const summaryTotal = released.filter(function (d) { return status[d.id] === "summary"; });
+
+  document.getElementById("count").innerHTML = done.length + '<span> / ' + released.length + " vistas</span>";
+  document.getElementById("overallBar").innerHTML = buildBarSegments(done.length, summaryTotal.length, skipTotal.length, released.length, WATCHED_COLOR);
+  const upcoming = OTHER_DATA.length - released.length;
+  document.getElementById("upcomingNote").textContent = upcoming > 0
+    ? upcoming + (upcoming > 1 ? " títulos todavía sin estrenar" : " título todavía sin estrenar")
+    : "";
+
+  function universeStats(universeKey) {
+    const items = OTHER_DATA.filter(function (d) { return d.universe === universeKey; });
+    const rel = items.filter(isReleased);
+    const doneItems = rel.filter(function (d) { return status[d.id] === "watched"; });
+    const skipItems = rel.filter(function (d) { return status[d.id] === "skip"; });
+    const summaryItems = rel.filter(function (d) { return status[d.id] === "summary"; });
+    return { total: items.length, released: rel.length, done: doneItems.length, skip: skipItems.length, summary: summaryItems.length };
+  }
+
+  const main = document.getElementById("main");
+  const blocksHtml = OTHER_UNIVERSES_ORDER.map(function (universeKey) {
+    const meta = UNIVERSE_META[universeKey];
+    const items = OTHER_DATA.filter(function (d) { return d.universe === universeKey; });
+    if (items.length === 0) return "";
+    const stats = universeStats(universeKey);
+    const collapsed = !!collapsedUniverses[universeKey];
+    const cardsHtml = items.map(buildCardHtml).join("");
+
+    return '<div class="phase-block">' +
+      '<div class="phase-head" data-universe="' + universeKey + '" onclick="toggleUniverseCollapse(\'' + universeKey + '\')" style="cursor:pointer;">' +
+      '<span class="phase-chevron' + (collapsed ? " collapsed" : "") + '">' + chevronSvg + "</span>" +
+      phaseGemSvg.replace("STROKECOLOR", meta.color) +
+      "<h3>" + meta.label + '</h3><span class="phase-count">' + stats.done + "/" + stats.total + "</span></div>" +
+      '<div class="phase-bar-outer">' + buildBarSegments(stats.done, stats.summary, stats.skip, stats.released, WATCHED_COLOR) + "</div>" +
+      '<div class="phase-grid-wrap" data-universe="' + universeKey + '" style="max-height:' + (collapsed ? "0px" : "none") + '">' +
+      '<div class="grid">' + cardsHtml + "</div></div>" +
+      "</div>";
+  }).join("");
+  main.innerHTML = '<section class="saga">' + blocksHtml + '</section>';
+}
+
+function render() {
+  if (mainView === "other") {
+    document.getElementById("gauge").style.display = "none";
+    document.getElementById("ucmControls").style.display = "none";
+    renderOtherView();
+    return;
+  }
+  document.getElementById("gauge").style.display = "";
+  document.getElementById("ucmControls").style.display = "";
+
+  const filtered = DATA.filter(function (d) { return matchesFilter(d, filter); });
+  const released = filtered.filter(isReleased);
+  const done = released.filter(function (d) { return status[d.id] === "watched"; });
+  const skipTotal = released.filter(function (d) { return status[d.id] === "skip"; });
+  const summaryTotal = released.filter(function (d) { return status[d.id] === "summary"; });
+
+  document.getElementById("count").innerHTML = done.length + '<span> / ' + released.length + " vistas</span>";
+  document.getElementById("overallBar").innerHTML = buildBarSegments(done.length, summaryTotal.length, skipTotal.length, released.length, WATCHED_COLOR);
+  const upcoming = filtered.length - released.length;
+  document.getElementById("upcomingNote").textContent = upcoming > 0
+    ? upcoming + (upcoming > 1 ? " títulos todavía sin estrenar" : " título todavía sin estrenar")
+    : "";
+
+  function gemSvg(color) {
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="1.5"' + SVG_CAP +
+      '<path d="M6 3h12l4 6-10 12L2 9Z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/></svg>';
+  }
+
+  const gauge = document.getElementById("gauge");
+  gauge.innerHTML = Object.keys(PHASES).map(function (p) {
+    const num = Number(p);
+    const meta = PHASES[num];
+    const stats = phaseStats(status, num);
+    const gpct = stats.released ? stats.done / stats.released : 0;
+    const bg = "radial-gradient(circle, " + meta.color + (stats.complete ? "" : "55") + " 0%, #15161F 72%)";
+    const glow = stats.complete ? "0 0 12px " + meta.glow : "none";
+    const border = gpct > 0 ? meta.color : "#2A2B38";
+    const iconColor = gpct > 0 ? meta.glow : "#4A4A5A";
+    return '<div class="gem-wrap" title="' + meta.label + '">' +
+      '<div class="gem" style="background:' + bg + ';box-shadow:' + glow + ';border-color:' + border + '">' +
+      gemSvg(iconColor) +
+      '</div><span class="gem-num">' + num + '</span></div>';
+  }).join("");
+
+  const main = document.getElementById("main");
+
+  if (sortMode === "chrono") {
+    const items = DATA.filter(function (d) { return matchesFilter(d, filter); })
+      .slice()
+      .sort(function (a, b) { return CHRON_ORDER[a.id] - CHRON_ORDER[b.id]; });
+    const cardsHtml = items.map(buildCardHtml).join("");
+    main.innerHTML = '<section class="saga"><div class="saga-head"><h2 class="display-font">Orden Cronológico</h2></div>' +
+      '<div class="grid">' + cardsHtml + "</div></section>";
+    return;
+  }
+
+  main.innerHTML = SAGAS.map(function (saga) {
+    const sagaHasVisibleItems = saga.phases.some(function (p) {
+      return DATA.filter(function (d) { return d.phase === p && matchesFilter(d, filter); }).length > 0;
+    });
+    if (!sagaHasVisibleItems) return "";
+
+    const complete = sagaComplete(status, saga);
+    const phasesHtml = saga.phases.map(function (phaseNum) {
+      const meta = PHASES[phaseNum];
+      const stats = phaseStats(status, phaseNum);
+      const items = DATA.filter(function (d) { return d.phase === phaseNum && matchesFilter(d, filter); });
+      if (items.length === 0) return "";
+      const collapsed = !!collapsedPhases[phaseNum];
+      const cardsHtml = items.map(buildCardHtml).join("");
+
+      return '<div class="phase-block">' +
+        '<div class="phase-head" data-phase="' + phaseNum + '" onclick="togglePhaseCollapse(' + phaseNum + ')" style="cursor:pointer;">' +
+        '<span class="phase-chevron' + (collapsed ? " collapsed" : "") + '">' + chevronSvg + "</span>" +
+        phaseGemSvg.replace("STROKECOLOR", meta.color) +
+        "<h3>" + meta.label + '</h3><span class="phase-count">' + stats.done + "/" + stats.total + "</span></div>" +
+        '<div class="phase-bar-outer">' + buildBarSegments(stats.done, stats.summary, stats.skip, stats.released, WATCHED_COLOR) + "</div>" +
+        '<div class="phase-grid-wrap" data-phase="' + phaseNum + '" style="max-height:' + (collapsed ? "0px" : "none") + '">' +
+        '<div class="grid">' + cardsHtml + "</div></div>" +
+        "</div>";
+    }).join("");
+
+    return '<section class="saga"><div class="saga-head"><h2 class="display-font">' + saga.label + "</h2>" +
+      (complete ? '<span class="saga-complete">completa</span>' : "") + "</div>" + phasesHtml + "</section>";
+  }).join("");
+}
+
+document.getElementById("resetBtn").addEventListener("click", resetProgress);
+document.getElementById("modalClose").addEventListener("click", closeDetail);
+document.getElementById("modalBackdrop").addEventListener("click", function (e) {
+  if (e.target.id === "modalBackdrop") closeDetail();
+});
+document.getElementById("statusBackdrop").addEventListener("click", function (e) {
+  if (e.target.id === "statusBackdrop") closeStatusPicker();
+});
+document.querySelectorAll(".status-option[data-status]").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    if (statusPickerId) setStatus(statusPickerId, btn.dataset.status || null);
+    closeStatusPicker();
+  });
+});
+document.getElementById("statusCancelBtn").addEventListener("click", closeStatusPicker);
+document.getElementById("confirmYesBtn").addEventListener("click", function () {
+  const cb = confirmCallback;
+  closeConfirm();
+  if (cb) cb();
+});
+document.getElementById("confirmNoBtn").addEventListener("click", closeConfirm);
+document.getElementById("confirmBackdrop").addEventListener("click", function (e) {
+  if (e.target.id === "confirmBackdrop") closeConfirm();
+});
+document.getElementById("postCreditsBtn").addEventListener("click", function () {
+  showPostCredits = true;
+  renderModal();
+});
+document.querySelectorAll("#filters .mini-toggle").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    filter = btn.dataset.filter;
+    document.querySelectorAll("#filters .mini-toggle").forEach(function (b) { b.classList.toggle("active", b === btn); });
+    savePrefs();
+    render();
+  });
+});
+document.querySelectorAll("#sortToggle .mini-toggle").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    sortMode = btn.dataset.sort;
+    document.querySelectorAll("#sortToggle .mini-toggle").forEach(function (b) { b.classList.toggle("active", b === btn); });
+    savePrefs();
+    render();
+  });
+});
+document.querySelectorAll("#viewToggle .mini-toggle").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    mainView = btn.dataset.view;
+    document.querySelectorAll("#viewToggle .mini-toggle").forEach(function (b) { b.classList.toggle("active", b === btn); });
+    savePrefs();
+    render();
+  });
+});
+
+let quizItemId = null;
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+function startQuiz(itemId) {
+  quizItemId = itemId;
+  quizIndex = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  document.getElementById("quizBackdrop").classList.add("show");
+  renderQuizQuestion();
+}
+
+function closeQuiz() {
+  quizItemId = null;
+  document.getElementById("quizBackdrop").classList.remove("show");
+}
+
+function retryQuiz() {
+  quizIndex = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const questions = QUIZZES[quizItemId] || [];
+  document.getElementById("quizBarInner").style.width = Math.round((quizIndex / questions.length) * 100) + "%";
+  document.getElementById("quizProgress").textContent = "Pregunta " + (quizIndex + 1) + " de " + questions.length;
+
+  const q = questions[quizIndex];
+  const body = document.getElementById("quizBody");
+  body.innerHTML = '<p class="quiz-question">' + escapeHtml(q[0]) + "</p>" +
+    q[1].map(function (opt, i) {
+      return '<button class="quiz-option" data-i="' + i + '" onclick="selectQuizAnswer(' + i + ')">' + escapeHtml(opt) + "</button>";
+    }).join("");
+}
+
+function selectQuizAnswer(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const questions = QUIZZES[quizItemId] || [];
+  const correct = questions[quizIndex][2];
+  if (i === correct) quizScore++;
+
+  const buttons = document.querySelectorAll("#quizBody .quiz-option");
+  buttons.forEach(function (btn, idx) {
+    if (idx === correct) btn.classList.add("correct");
+    else if (idx === i) btn.classList.add("incorrect");
+  });
+
+  const isLast = quizIndex === questions.length - 1;
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "quiz-next";
+  nextBtn.textContent = isLast ? "Ver resultado" : "Siguiente";
+  nextBtn.onclick = isLast ? showQuizResult : nextQuizQuestion;
+  document.getElementById("quizBody").appendChild(nextBtn);
+}
+
+function nextQuizQuestion() {
+  quizIndex++;
+  quizAnswered = false;
+  renderQuizQuestion();
+}
+
+function showQuizResult() {
+  const questions = QUIZZES[quizItemId] || [];
+  document.getElementById("quizBarInner").style.width = "100%";
+  document.getElementById("quizProgress").textContent = "Resultado";
+
+  let verdict;
+  if (quizScore === questions.length) verdict = "Perfecto. No se te escapó nada.";
+  else if (quizScore >= 8) verdict = "Prestaste muchísima atención.";
+  else if (quizScore >= 6) verdict = "Muy bien, te acordás de lo importante.";
+  else if (quizScore >= 4) verdict = "Nada mal, aunque algo se te escapó.";
+  else verdict = "Che, capaz conviene volver a verla.";
+
+  document.getElementById("quizBody").innerHTML =
+    '<p class="quiz-score">' + quizScore + "/" + questions.length + "</p>" +
+    '<p class="quiz-verdict">' + verdict + "</p>" +
+    '<div class="quiz-actions"><button id="quizRetryBtn" onclick="retryQuiz()">Reintentar</button>' +
+    '<button id="quizCloseBtn" onclick="closeQuiz()">Cerrar</button></div>';
+}
+
+document.getElementById("quizLaunchBtn").addEventListener("click", function () {
+  if (detailId) startQuiz(detailId);
+});
+document.getElementById("quizClose").addEventListener("click", closeQuiz);
+document.getElementById("quizBackdrop").addEventListener("click", function (e) {
+  if (e.target.id === "quizBackdrop") closeQuiz();
+});
+
+loadState();
+loadPosterCache();
+loadPrefs();
+syncControlButtons();
+render();
+
+const missingPosters = DATA.concat(OTHER_DATA).filter(function (d) { return isReleased(d) && !posters[d.id]; });
+if (missingPosters.length > 0) {
+  fetchAllPosters(missingPosters, function (id, url) {
+    posters[id] = url || "";
+    render();
+  }).then(savePosterCache);
+}
+</script>
+</body>
+</html>
