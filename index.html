@@ -149,6 +149,24 @@
   .phase-chevron { transition: transform .15s ease; flex-shrink: 0; }
   .phase-chevron.collapsed { transform: rotate(-90deg); }
   .phase-grid-wrap { overflow: hidden; transition: max-height .32s ease; }
+  #searchBackdrop { position: fixed; inset: 0; z-index: 52; background: #0A0B12; display: none; flex-direction: column; }
+  #searchBackdrop.show { display: flex; }
+  #searchTop { display: flex; gap: 10px; align-items: center; padding: max(14px, env(safe-area-inset-top)) 16px 10px; }
+  #searchInput { flex: 1; min-width: 0; font-size: 16px; font-family: inherit; color: #EDEBE3; background: #13141D; border: 1px solid #262735; border-radius: 10px; padding: 10px 12px; outline: none; -webkit-appearance: none; appearance: none; }
+  #searchInput:focus { border-color: #3A3A48; }
+  #searchCloseBtn { background: none; border: none; color: #8A8A9A; font-size: 14px; cursor: pointer; padding: 6px 2px; }
+  #searchResults { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 4px 16px max(24px, env(safe-area-inset-bottom)); }
+  .search-hint, .search-count { color: #5A5A6C; font-size: 12px; margin: 10px 2px; }
+  .search-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 8px; margin-bottom: 8px; background: #12131B; border: 1px solid #20212C; border-radius: 10px; color: inherit; cursor: pointer; }
+  .search-row-locked { opacity: 0.55; }
+  @keyframes flashCard { 0%, 65% { box-shadow: 0 0 0 3px #F3E7C9, 0 0 20px rgba(243,231,201,0.5); } 100% { box-shadow: 0 0 0 0 rgba(243,231,201,0); } }
+  .card.flash .poster-box { animation: flashCard 2.2s ease-out; }
+  .search-thumb { width: 40px; height: 60px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: #1C1D28; }
+  .search-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .search-thumb img.blurred { filter: blur(6px); }
+  .search-info { flex: 1; min-width: 0; }
+  .search-title { font-size: 14px; color: #EDEBE3; margin: 0 0 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .search-meta { font-size: 11px; color: #6B6B7D; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -164,7 +182,10 @@
       <button class="mini-toggle" data-view="other">Otros Universos</button>
       <button class="mini-toggle" data-view="podium">🏆 Podio</button>
     </div>
-    <button id="blurEyeBtn" style="background:none; border:none; padding:2px; cursor:pointer; color:#6B6B7D; display:flex;"></button>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button id="searchBtn" aria-label="Buscar" style="background:none; border:none; padding:2px; cursor:pointer; color:#6B6B7D; display:flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button id="blurEyeBtn" style="background:none; border:none; padding:2px; cursor:pointer; color:#6B6B7D; display:flex;"></button>
+    </div>
   </div>
   <div class="gauge" id="gauge"></div>
   <div class="stat-row">
@@ -229,6 +250,14 @@
     <div id="quizBar"><div id="quizBarInner"></div></div>
     <div id="quizBody"></div>
   </div>
+</div>
+
+<div id="searchBackdrop">
+  <div id="searchTop">
+    <input id="searchInput" type="search" placeholder="Buscar título o personaje" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" />
+    <button id="searchCloseBtn">Cerrar</button>
+  </div>
+  <div id="searchResults"></div>
 </div>
 
 <div id="statusBackdrop">
@@ -2318,6 +2347,7 @@ function setRating(id, value) {
   saveRatings();
   document.getElementById("statusRatingWidget").innerHTML = buildRatingRow(id, ratings[id], 26);
   render();
+  refreshSearch();
 }
 function adjustRating(id, delta) {
   const current = ratings[id] || 0;
@@ -2473,6 +2503,7 @@ function setStatus(id, newStatus) {
   });
 
   render();
+  refreshSearch();
 }
 
 let confirmCallback = null;
@@ -2667,7 +2698,7 @@ function buildCardHtml(item) {
 
   const ratingBadge = ratings[item.id] ? '<span class="card-rating-inline">★ ' + ratings[item.id] + "</span>" : "";
 
-  return '<button class="card" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
+  return '<button class="card" data-id="' + item.id + '" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
     '<div class="poster-box" style="border:1px solid ' + borderColor + ';opacity:' + (rel ? 1 : 0.6) + '">' +
     typeBadge + centerContent + infoBtn + stamp + skipOverlay + summaryOverlay + lock +
     "</div>" +
@@ -3036,6 +3067,102 @@ document.getElementById("quizBackdrop").addEventListener("click", function (e) {
   if (e.target.id === "quizBackdrop") closeQuiz();
 });
 
+let searchOpen = false;
+function normSearch(s) {
+  return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+}
+function sectionLabelOf(item) {
+  if (item.phase && PHASES[item.phase]) return PHASES[item.phase].label;
+  if (item.universe && UNIVERSE_META[item.universe]) return UNIVERSE_META[item.universe].label;
+  return "";
+}
+function searchItems(query) {
+  const tokens = normSearch(query).split(" ").filter(Boolean);
+  if (!tokens.length) return null;
+  const tier1 = [], tier2 = [];
+  DATA.concat(OTHER_DATA).forEach(function (item) {
+    const title = normSearch(item.es + " " + item.en);
+    if (tokens.every(function (t) { return title.indexOf(t) !== -1; })) { tier1.push(item); return; }
+    const hay = title + " " + normSearch(sectionLabelOf(item) + " " + (item.characters || []).join(" "));
+    if (tokens.every(function (t) { return hay.indexOf(t) !== -1; })) tier2.push(item);
+  });
+  const byDate = function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; };
+  return tier1.sort(byDate).concat(tier2.sort(byDate));
+}
+function buildSearchRow(item) {
+  const rel = isReleased(item);
+  const st = status[item.id];
+  const poster = posters[item.id];
+  const blurred = blurUnwatched && !st;
+  let meta = item.year + " · " + sectionLabelOf(item);
+  if (!rel) {
+    meta = "Sale " + formatDate(item.date) + " · " + sectionLabelOf(item);
+  } else {
+    if (st === "watched") meta += ' · <span style="color:' + WATCHED_COLOR + '">Vista</span>';
+    else if (st === "summary") meta += ' · <span style="color:' + SUMMARY_COLOR + '">Solo resumen</span>';
+    else if (st === "skip") meta += " · Descartada";
+    if (ratings[item.id]) meta += ' · <span style="color:#F3E7C9">★ ' + ratings[item.id] + "</span>";
+  }
+  const thumb = (rel && poster) ? '<img src="' + poster + '" alt=""' + (blurred ? ' class="blurred"' : "") + " />" : "";
+  return '<button class="search-row' + (rel ? '' : ' search-row-locked') + '" onclick="goToItem(\'' + item.id + '\')">' +
+    '<div class="search-thumb">' + thumb + "</div>" +
+    '<div class="search-info"><p class="search-title">' + escapeHtml(item.es) + '</p><p class="search-meta">' + meta + "</p></div>" +
+    "</button>";
+}
+function renderSearchResults() {
+  const box = document.getElementById("searchResults");
+  const res = searchItems(document.getElementById("searchInput").value);
+  if (res === null) { box.innerHTML = '<p class="search-hint">Escribí un título, un personaje o una sección.</p>'; return; }
+  if (res.length === 0) { box.innerHTML = '<p class="search-hint">Sin resultados.</p>'; return; }
+  const shown = res.slice(0, 40);
+  box.innerHTML = '<p class="search-count">' + res.length + (res.length === 1 ? " resultado" : " resultados") + (res.length > 40 ? " (mostrando 40)" : "") + "</p>" +
+    shown.map(buildSearchRow).join("");
+}
+function refreshSearch() { if (searchOpen) renderSearchResults(); }
+function goToItem(id) {
+  const item = findItemById(id);
+  if (!item) return;
+  closeSearch();
+  const isOther = !DATA.some(function (d) { return d.id === id; });
+  mainView = isOther ? "other" : "ucm";
+  if (!isOther) {
+    if (!matchesFilter(item, filter)) filter = "all";
+    if (collapsedPhases[item.phase]) { collapsedPhases = Object.assign({}, collapsedPhases); collapsedPhases[item.phase] = false; }
+  } else if (collapsedUniverses[item.universe]) {
+    collapsedUniverses = Object.assign({}, collapsedUniverses); collapsedUniverses[item.universe] = false;
+  }
+  syncControlButtons();
+  savePrefs();
+  render();
+  requestAnimationFrame(function () {
+    const el = document.querySelector('.card[data-id="' + id + '"]');
+    if (!el) return;
+    if (typeof el.scrollIntoView === "function") {
+      try { el.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { el.scrollIntoView(); }
+    }
+    el.classList.add("flash");
+    setTimeout(function () { el.classList.remove("flash"); }, 2200);
+  });
+}
+
+function openSearch() {
+  searchOpen = true;
+  document.getElementById("searchBackdrop").classList.add("show");
+  document.body.style.overflow = "hidden";
+  renderSearchResults();
+  document.getElementById("searchInput").focus();
+}
+function closeSearch() {
+  searchOpen = false;
+  document.getElementById("searchBackdrop").classList.remove("show");
+  document.body.style.overflow = "";
+  document.getElementById("searchInput").blur();
+}
+document.getElementById("searchBtn").addEventListener("click", openSearch);
+document.getElementById("searchCloseBtn").addEventListener("click", closeSearch);
+document.getElementById("searchInput").addEventListener("input", renderSearchResults);
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && searchOpen) closeSearch(); });
+
 loadState();
 loadPosterCache();
 loadPrefs();
@@ -3048,6 +3175,7 @@ if (missingPosters.length > 0) {
   fetchAllPosters(missingPosters, function (id, url) {
     posters[id] = url || "";
     render();
+    refreshSearch();
   }).then(savePosterCache);
 }
 </script>
