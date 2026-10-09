@@ -211,6 +211,13 @@
       <button class="mini-toggle" data-sort="chrono">Cronológico</button>
     </div>
   </div>
+  <div class="controls-row" id="podiumControls" style="display:none;">
+    <div class="control-group" id="podiumFilter">
+      <button class="mini-toggle active" data-pf="all">Todo</button>
+      <button class="mini-toggle" data-pf="ucm">UCM</button>
+      <button class="mini-toggle" data-pf="other">Otros Universos</button>
+    </div>
+  </div>
 </header>
 
 <main id="main"></main>
@@ -2332,6 +2339,7 @@ let filter = "all";
 let sortMode = "release";
 let collapsedPhases = {};
 let mainView = "ucm";
+let podiumFilter = "all";
 let collapsedUniverses = {};
 let blurUnwatched = true;
 let ratings = {};
@@ -2371,6 +2379,7 @@ function loadPrefs() {
     if (saved.mainView) mainView = saved.mainView;
     if (saved.collapsedUniverses) collapsedUniverses = saved.collapsedUniverses;
     if (typeof saved.blurUnwatched === "boolean") blurUnwatched = saved.blurUnwatched;
+    if (saved.podiumFilter === "all" || saved.podiumFilter === "ucm" || saved.podiumFilter === "other") podiumFilter = saved.podiumFilter;
   } catch (e) {}
 }
 function savePrefs() {
@@ -2378,6 +2387,7 @@ function savePrefs() {
     localStorage.setItem(PREFS_KEY, JSON.stringify({
       filter: filter, sortMode: sortMode, collapsedPhases: collapsedPhases,
       mainView: mainView, collapsedUniverses: collapsedUniverses, blurUnwatched: blurUnwatched,
+      podiumFilter: podiumFilter,
     }));
   } catch (e) {}
 }
@@ -2451,6 +2461,9 @@ function syncControlButtons() {
   });
   document.querySelectorAll("#viewToggle .mini-toggle").forEach(function (b) {
     b.classList.toggle("active", b.dataset.view === mainView);
+  });
+  document.querySelectorAll("#podiumFilter .mini-toggle").forEach(function (b) {
+    b.classList.toggle("active", b.dataset.pf === podiumFilter);
   });
   updateBlurEyeIcon();
 }
@@ -2736,8 +2749,9 @@ function buildPodiumRow(item, rank) {
 }
 
 function renderPodiumView() {
-  const all = DATA.concat(OTHER_DATA);
-  const rated = all.filter(function (d) { return ratings[d.id] > 0; });
+  const pool = podiumFilter === "ucm" ? DATA : podiumFilter === "other" ? OTHER_DATA : DATA.concat(OTHER_DATA);
+  const totalRated = DATA.concat(OTHER_DATA).filter(function (d) { return ratings[d.id] > 0; }).length;
+  const rated = pool.filter(function (d) { return ratings[d.id] > 0; });
   rated.sort(function (a, b) { return ratings[b.id] - ratings[a.id]; });
 
   document.getElementById("count").innerHTML = rated.length + '<span> título' + (rated.length === 1 ? "" : "s") + " calificado" + (rated.length === 1 ? "" : "s") + "</span>";
@@ -2746,7 +2760,10 @@ function renderPodiumView() {
 
   const main = document.getElementById("main");
   if (rated.length === 0) {
-    main.innerHTML = '<section class="saga"><p style="color:#5A5A6C; text-align:center; padding: 60px 20px; font-size:14px;">Todavía no calificaste nada. Marcá algo como "Vista" y ponele estrellas para que aparezca acá.</p></section>';
+    const msg = totalRated > 0
+      ? "Todavía no calificaste nada en " + (podiumFilter === "ucm" ? "el UCM" : "Otros Universos") + "."
+      : 'Todavía no calificaste nada. Marcá algo como "Vista" y ponele estrellas para que aparezca acá.';
+    main.innerHTML = '<section class="saga"><p style="color:#5A5A6C; text-align:center; padding: 60px 20px; font-size:14px;">' + msg + "</p></section>";
     return;
   }
 
@@ -2802,17 +2819,20 @@ function render() {
   if (mainView === "other") {
     document.getElementById("gauge").style.display = "none";
     document.getElementById("ucmControls").style.display = "none";
+    document.getElementById("podiumControls").style.display = "none";
     renderOtherView();
     return;
   }
   if (mainView === "podium") {
     document.getElementById("gauge").style.display = "none";
     document.getElementById("ucmControls").style.display = "none";
+    document.getElementById("podiumControls").style.display = "";
     renderPodiumView();
     return;
   }
   document.getElementById("gauge").style.display = "";
   document.getElementById("ucmControls").style.display = "";
+  document.getElementById("podiumControls").style.display = "none";
 
   const filtered = DATA.filter(function (d) { return matchesFilter(d, filter); });
   const released = filtered.filter(isReleased);
@@ -2955,6 +2975,16 @@ document.getElementById("blurEyeBtn").addEventListener("click", function () {
   updateBlurEyeIcon();
   savePrefs();
   render();
+});
+
+document.querySelectorAll("#podiumFilter .mini-toggle").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    podiumFilter = btn.dataset.pf;
+    podiumEditing = null;
+    syncControlButtons();
+    savePrefs();
+    render();
+  });
 });
 
 let quizItemId = null;
