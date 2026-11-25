@@ -358,6 +358,21 @@
   #searchInput { background: #10142A; color: var(--text); }
   #searchInput::placeholder { color: var(--dim); }
 
+  /* ===== Quiz de cada título: pantalla completa, mismo estilo que el modo quiz ===== */
+  #quizBackdrop { align-items: stretch; justify-content: center; background: radial-gradient(circle, rgba(255,255,255,.055) 1px, transparent 1.3px) 0 0/8px 8px, var(--bg); }
+  #quizBox { max-width: 520px; max-height: none; height: 100%; display: flex; flex-direction: column; background: transparent; border: 0; box-shadow: none; animation: none;
+    padding: max(14px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); overflow-y: auto; }
+  @media (min-width: 640px) { #quizBox { border: 0; box-shadow: none; } }
+  #quizHeader { margin-bottom: 10px; }
+  #quizProgress { font-size: 22px; color: var(--text); }
+  #quizClose { padding: 6px; background: var(--panel-2); color: var(--text); border: 1.5px solid var(--ink); }
+  #quizBar { height: 10px; margin-bottom: 14px; }
+  .surv-score small { font-size: .4em; color: var(--muted); text-shadow: none; margin-left: 4px; }
+  .quiz-dots { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .quiz-dots span { width: 26px; height: 26px; display: grid; place-items: center; font-size: 13px; font-weight: 700; border: 1.5px solid var(--ink); }
+  .quiz-dots .ok { background: var(--paper); color: #000; }
+  .quiz-dots .ko { background: var(--panel); color: var(--dim); border-style: dashed; }
+
   /* ===== Modo quiz ===== */
   .survival-btn { font-family: Bangers, cursive; font-size: 13px; letter-spacing: .06em; padding: 3px 9px 2px; background: var(--accent); color: #000; border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); cursor: pointer; }
   .survival-btn:active { transform: translate(2px, 2px); box-shadow: none; }
@@ -502,7 +517,7 @@
   <div id="quizBox">
     <div id="quizHeader">
       <span id="quizProgress"></span>
-      <button id="quizClose"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A9AAC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <button id="quizClose" aria-label="Cerrar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     <div id="quizBar"><div id="quizBarInner"></div></div>
     <div id="quizBody"></div>
@@ -3808,11 +3823,14 @@ function retryQuiz() {
   quizIndex = 0;
   quizScore = 0;
   quizAnswered = false;
+  quizResults = [];
   renderQuizQuestion();
 }
 
+let quizResults = [];
 function renderQuizQuestion() {
   const questions = QUIZZES[quizItemId] || [];
+  if (quizIndex === 0) quizResults = [];
   document.getElementById("quizBarInner").style.width = Math.round((quizIndex / questions.length) * 100) + "%";
   document.getElementById("quizProgress").textContent = "Pregunta " + (quizIndex + 1) + " de " + questions.length;
 
@@ -3821,11 +3839,25 @@ function renderQuizQuestion() {
   quizCurrentOptions = result.shuffled;
   quizCurrentCorrect = result.correct;
 
-  const body = document.getElementById("quizBody");
-  body.innerHTML = '<p class="quiz-question">' + escapeHtml(q[0]) + "</p>" +
-    quizCurrentOptions.map(function (opt, i) {
-      return '<button class="quiz-option" data-i="' + i + '" onclick="selectQuizAnswer(' + i + ')">' + escapeHtml(opt) + "</button>";
-    }).join("");
+  const item = findItemById(quizItemId), poster = posters[quizItemId];
+  const diff = q[3] || "media";
+  const diffLabel = { media: "Media", dificil: "Difícil", experto: "Experto" }[diff] || "Media";
+  document.getElementById("quizBody").innerHTML =
+    '<div class="surv-q">' +
+      '<div class="surv-hero">' +
+        (poster ? '<img class="surv-hero-bg" src="' + poster + '" alt="" />' : "") +
+        '<span class="surv-poster">' + (poster ? '<img src="' + poster + '" alt="" />' : "") + "</span>" +
+        '<span class="surv-from"><small>Quiz</small><b>' + escapeHtml(item ? item.es : "") + "</b>" +
+          (q[3] ? '<span class="surv-diff d-' + diff + '">' + diffBolts(diff) + diffLabel + "</span>" : "") + "</span>" +
+      "</div>" +
+      '<div class="surv-question"><p>' + escapeHtml(q[0]) + "</p></div>" +
+      '<div class="surv-options">' +
+        quizCurrentOptions.map(function (opt, i) {
+          return '<button class="surv-opt" onclick="selectQuizAnswer(' + i + ')"><span class="surv-letter">' + "ABCD"[i] + "</span><span>" + escapeHtml(opt) + "</span></button>";
+        }).join("") +
+      "</div>" +
+      '<div class="surv-stamp bng" id="quizStamp">¡Bien!</div>' +
+    "</div>";
 }
 
 function selectQuizAnswer(i) {
@@ -3833,20 +3865,22 @@ function selectQuizAnswer(i) {
   quizAnswered = true;
   const questions = QUIZZES[quizItemId] || [];
   const correct = quizCurrentCorrect;
-  if (i === correct) quizScore++;
+  const ok = i === correct;
+  if (ok) quizScore++;
+  quizResults.push(ok);
 
-  const buttons = document.querySelectorAll("#quizBody .quiz-option");
-  buttons.forEach(function (btn, idx) {
-    if (idx === correct) btn.classList.add("correct");
-    else if (idx === i) btn.classList.add("incorrect");
-  });
+  const buttons = document.querySelectorAll("#quizBody .surv-opt");
+  buttons.forEach(function (b) { b.disabled = true; });
+  buttons[correct].classList.add("correct");
+  if (ok) { const st = document.getElementById("quizStamp"); if (st) st.classList.add("show"); }
+  else buttons[i].classList.add("incorrect");
 
   const isLast = quizIndex === questions.length - 1;
-  const nextBtn = document.createElement("button");
-  nextBtn.className = "quiz-next";
-  nextBtn.textContent = isLast ? "Ver resultado" : "Siguiente";
-  nextBtn.onclick = isLast ? showQuizResult : nextQuizQuestion;
-  document.getElementById("quizBody").appendChild(nextBtn);
+  const item = quizItemId;
+  setTimeout(function () {
+    if (quizItemId !== item || !document.getElementById("quizBackdrop").classList.contains("show")) return;
+    if (isLast) showQuizResult(); else nextQuizQuestion();
+  }, ok ? 800 : 1700);
 }
 
 function nextQuizQuestion() {
@@ -3867,11 +3901,18 @@ function showQuizResult() {
   else if (quizScore >= 4) verdict = "Nada mal, aunque algo se te escapó.";
   else verdict = "Che, capaz conviene volver a verla.";
 
+  const item = findItemById(quizItemId);
   document.getElementById("quizBody").innerHTML =
-    '<p class="quiz-score">' + quizScore + "/" + questions.length + "</p>" +
-    '<p class="quiz-verdict">' + verdict + "</p>" +
-    '<div class="quiz-actions"><button id="quizRetryBtn" onclick="retryQuiz()">Reintentar</button>' +
-    '<button id="quizCloseBtn" onclick="closeQuiz()">Cerrar</button></div>';
+    '<div class="surv-home">' +
+      '<p class="surv-kicker">' + escapeHtml(item ? item.es : "") + "</p>" +
+      '<div class="surv-score bng">' + quizScore + '<small>/' + questions.length + "</small></div>" +
+      '<p class="surv-sub">' + verdict + "</p>" +
+      '<div class="quiz-dots">' + quizResults.map(function (r, i) {
+        return '<span class="' + (r ? "ok" : "ko") + '" title="Pregunta ' + (i + 1) + '">' + (r ? "✓" : "✕") + "</span>";
+      }).join("") + "</div>" +
+      '<button class="surv-primary" onclick="retryQuiz()">Reintentar</button>' +
+      '<button class="surv-secondary wide" onclick="closeQuiz()">Cerrar</button>' +
+    "</div>";
 }
 
 document.getElementById("quizLaunchBtn").addEventListener("click", function () {
