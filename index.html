@@ -3244,12 +3244,6 @@ function openUniverse(key) {
   universeJustOpened = true;
   render();
   universeJustOpened = false;
-  if (otherOpen) {
-    const panel = document.getElementById("universePanel");
-    if (panel) requestAnimationFrame(function () {
-      try { panel.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { panel.scrollIntoView(); }
-    });
-  }
 }
 
 function renderOtherView() {
