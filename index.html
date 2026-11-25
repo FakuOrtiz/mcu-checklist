@@ -397,6 +397,30 @@
   .surv-code-input { flex: 1; min-width: 0; font-family: Bangers, cursive; font-size: 18px; letter-spacing: .12em; text-align: center; padding: 5px 6px 3px; background: #10142A; color: var(--text); border: 1.5px solid var(--ink); border-radius: 0; text-transform: uppercase; outline: none; }
   .surv-warn { margin: 0; font-size: 12.5px; line-height: 1.45; color: #FFE7A8; }
   .surv-q { display: flex; flex-direction: column; gap: 4px; padding-top: 4px; }
+  /* pantalla de pregunta */
+  .surv-q { position: relative; gap: 0; }
+  .surv-hero { position: relative; overflow: hidden; display: flex; gap: 14px; align-items: center; padding: 14px; margin-bottom: 14px; background: #0B0D1A; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .surv-hero-bg { position: absolute; inset: -20px; width: calc(100% + 40px); height: calc(100% + 40px); object-fit: cover; filter: blur(14px) brightness(.38) saturate(1.2); }
+  .surv-hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1.3px) 0 0/7px 7px; pointer-events: none; }
+  .surv-hero > *:not(.surv-hero-bg) { position: relative; z-index: 1; }
+  .surv-hero .surv-poster { width: 84px; }
+  .surv-hero .surv-from b { font-size: 16px; text-shadow: 1px 1px 0 #000; }
+  .surv-hero .surv-from small { color: #C9CCE6; }
+  .surv-question { padding: 14px 14px 12px; margin-bottom: 14px; background: var(--panel); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .surv-question p { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.38; color: var(--text); }
+  .surv-options { display: flex; flex-direction: column; gap: 10px; }
+  .surv-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 10px 12px 10px 10px; background: var(--panel-2); color: var(--text); border: 1.5px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 14px; line-height: 1.3; cursor: pointer; transition: transform .1s ease, box-shadow .1s ease, background .15s ease; }
+  .surv-opt:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+  .surv-opt:disabled { cursor: default; }
+  .surv-letter { width: 28px; height: 28px; flex-shrink: 0; display: grid; place-items: center; font-family: Bangers, cursive; font-size: 16px; letter-spacing: 0; background: #10142A; color: var(--accent); border: 1.5px solid var(--ink); }
+  .surv-opt.correct { background: var(--paper); color: #000; }
+  .surv-opt.correct .surv-letter { background: #000; color: var(--paper); }
+  .surv-opt.incorrect { background: var(--panel); color: var(--dim); text-decoration: line-through; border-style: dashed; animation: survShake .4s ease; }
+  .surv-opt.incorrect .surv-letter { color: var(--dim); }
+  @keyframes survShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .surv-stamp { position: absolute; top: 34px; right: 10px; z-index: 3; font-size: 30px; letter-spacing: .05em; color: #000; background: var(--accent); border: 2.5px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 4px 12px 1px; transform: rotate(8deg) scale(0); opacity: 0; pointer-events: none; }
+  .surv-stamp.show { animation: survStamp .45s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+  @keyframes survStamp { to { transform: rotate(8deg) scale(1); opacity: 1; } }
   .surv-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
   .surv-poster { width: 76px; aspect-ratio: 2 / 3; flex-shrink: 0; background: #0B0D1A; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); overflow: hidden; display: block; }
   .surv-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -3687,14 +3711,21 @@ function renderSurvivalQuestion() {
   s.answered = false;
   document.getElementById("survivalBody").innerHTML =
     '<div class="surv-q">' +
-      '<div class="surv-meta">' +
+      // cabecera tipo cine: póster difuminado de fondo + póster nítido y datos encima
+      '<div class="surv-hero">' +
+        (poster ? '<img class="surv-hero-bg" src="' + poster + '" alt="" />' : "") +
         '<span class="surv-poster">' + (poster ? '<img src="' + poster + '" alt="" />' : "") + "</span>" +
         '<span class="surv-from"><small>Pregunta ' + (s.i + 1) + "</small>" +
           "<b>" + escapeHtml(item ? item.es : "") + "</b>" +
           '<span class="surv-diff d-' + q.diff + '">' + diffBolts(q.diff) + diffLabel + "</span></span>" +
       "</div>" +
-      '<p class="quiz-question">' + escapeHtml(q.question) + "</p>" +
-      q.options.map(function (o, k) { return '<button class="quiz-option" onclick="answerSurvival(' + k + ')">' + escapeHtml(o) + "</button>"; }).join("") +
+      '<div class="surv-question"><p>' + escapeHtml(q.question) + "</p></div>" +
+      '<div class="surv-options">' +
+        q.options.map(function (o, k) {
+          return '<button class="surv-opt" onclick="answerSurvival(' + k + ')"><span class="surv-letter">' + "ABCD"[k] + "</span><span>" + escapeHtml(o) + "</span></button>";
+        }).join("") +
+      "</div>" +
+      '<div class="surv-stamp bng" id="survStamp">¡Bien!</div>' +
     "</div>";
 }
 // Dificultad por cantidad de rayos (no por color): media ⚡, difícil ⚡⚡, experto ⚡⚡⚡.
@@ -3708,9 +3739,12 @@ function answerSurvival(k) {
   if (!s || s.answered) return;
   s.answered = true;
   const q = s.seq[s.i];
-  const btns = document.querySelectorAll("#survivalBody .quiz-option");
+  const btns = document.querySelectorAll("#survivalBody .surv-opt");
+  btns.forEach(function (b) { b.disabled = true; });
   btns[q.correct].classList.add("correct");
   if (k === q.correct) {
+    const stamp = document.getElementById("survStamp");
+    if (stamp) stamp.classList.add("show");
     s.streak++; s.i++;
     document.getElementById("survivalHeading").innerHTML = "Racha: " + s.streak + (s.code ? ' <span class="surv-code-tag">' + s.code + "</span>" : "");
     setTimeout(function () { if (survival === s) renderSurvivalQuestion(); }, 750);
