@@ -95,8 +95,11 @@
   .brand-name { font-family: Bangers, cursive; font-size: 13px; letter-spacing: .06em; color: var(--text); text-shadow: 1px 1px 0 #000; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .brand-count { font-size: 10px; color: #E4E6F5; text-shadow: 1px 1px 0 #000; }
   .brand-bar { width: 100%; height: 6px; display: flex; overflow: hidden; background: rgba(10,12,28,.75); border: 1.5px solid var(--ink); margin-top: 3px; }
-  .back-btn { display: inline-flex; align-items: center; gap: 5px; font-family: Bangers, cursive; font-size: 13px; letter-spacing: .06em; color: #C9CCE6; background: var(--panel-2); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); padding: 3px 10px 2px 7px; cursor: pointer; margin-bottom: 12px; }
-  .back-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+  .brand-tile.active { outline: 2.5px solid var(--paper); outline-offset: 2px; }
+  .brand-tile.active::after { content: ""; position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--paper); }
+  .universe-page { scroll-margin-top: 12px; margin-top: 22px; }
+  .universe-page.fresh { animation: panelIn .28s ease; }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(8px); } }
   .universe-page .brand-cover { margin: 0 0 14px; height: 96px; }
   .universe-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
   .universe-head h2 { font-size: 21px; margin: 0; color: var(--text); }
@@ -2823,6 +2826,7 @@ function loadPrefs() {
     if (saved.collapsedPhases) collapsedPhases = saved.collapsedPhases;
     if (saved.mainView) mainView = saved.mainView;
     if (saved.collapsedUniverses) collapsedUniverses = saved.collapsedUniverses;
+    if (typeof saved.otherOpen === "string") otherOpen = saved.otherOpen;
     if (typeof saved.blurUnwatched === "boolean") blurUnwatched = saved.blurUnwatched;
     if (saved.podiumFilter === "all" || saved.podiumFilter === "ucm" || saved.podiumFilter === "other") podiumFilter = saved.podiumFilter;
   } catch (e) {}
@@ -2831,7 +2835,7 @@ function savePrefs() {
   try {
     localStorage.setItem(PREFS_KEY, JSON.stringify({
       filter: filter, sortMode: sortMode, collapsedPhases: collapsedPhases,
-      mainView: mainView, collapsedUniverses: collapsedUniverses, blurUnwatched: blurUnwatched,
+      mainView: mainView, collapsedUniverses: collapsedUniverses, blurUnwatched: blurUnwatched, otherOpen: otherOpen,
       podiumFilter: podiumFilter,
     }));
   } catch (e) {}
@@ -3236,22 +3240,22 @@ function universeStats(universeKey) {
   return { items: items, total: items.length, released: rel.length, done: count("watched"), skip: count("skip"), summary: count("summary") };
 }
 
-// Otros Universos: un mosaico de estudios; al tocar uno se abre la página de ese universo.
+// Otros Universos: mosaico de estudios; al tocar uno, su contenido se abre debajo (tocarlo otra vez lo cierra).
 let otherOpen = null;
+let universeJustOpened = false; // anima el panel solo al abrirlo, no en cada re-render
 function openUniverse(key) {
-  otherOpen = key;
-  try { history.pushState({ universe: key }, ""); } catch (e) {}
+  otherOpen = otherOpen === key ? null : key;
+  savePrefs();
+  universeJustOpened = true;
   render();
-  window.scrollTo(0, 0);
+  universeJustOpened = false;
+  if (otherOpen) {
+    const panel = document.getElementById("universePanel");
+    if (panel) requestAnimationFrame(function () {
+      try { panel.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { panel.scrollIntoView(); }
+    });
+  }
 }
-function closeUniverse() {
-  if (history.state && history.state.universe) { history.back(); return; }
-  otherOpen = null;
-  render();
-}
-window.addEventListener("popstate", function () {
-  if (otherOpen && !(history.state && history.state.universe)) { otherOpen = null; render(); }
-});
 
 function renderOtherView() {
   const released = OTHER_DATA.filter(isReleased);
@@ -3268,32 +3272,32 @@ function renderOtherView() {
 
   const main = document.getElementById("main");
 
-  if (otherOpen && UNIVERSE_META[otherOpen]) {
+  if (otherOpen && !UNIVERSE_META[otherOpen]) otherOpen = null;
+  let panelHtml = "";
+  if (otherOpen) {
     const meta = UNIVERSE_META[otherOpen];
     const b = UNIVERSE_BRANDS[otherOpen];
     const st = universeStats(otherOpen);
-    main.innerHTML = '<section class="saga universe-page">' +
-      '<button class="back-btn" onclick="closeUniverse()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Otros universos</button>' +
+    panelHtml = '<div class="universe-page' + (universeJustOpened ? " fresh" : "") + '" id="universePanel">' +
       '<div class="brand-cover" style="' + brandStyle(otherOpen) + '">' +
         (b ? '<img src="' + b.logo + '" alt="' + b.alt + '" />' : "") + "</div>" +
       '<div class="universe-head"><h2 class="display-font">' + meta.label + '</h2><span class="phase-count">' + groupCountLabel(st.done, st.total) + "</span></div>" +
       '<div class="phase-bar-outer">' + buildBarSegments(st.done, st.summary, st.skip, st.released, WATCHED_COLOR) + "</div>" +
       '<div class="grid universe-grid">' + st.items.map(buildCardHtml).join("") + "</div>" +
-      "</section>";
-    return;
+      "</div>";
   }
 
   main.innerHTML = '<section class="saga"><div class="brand-grid">' + OTHER_UNIVERSES_ORDER.map(function (key) {
     const b = UNIVERSE_BRANDS[key];
     const st = universeStats(key);
     if (!st.total) return "";
-    return '<button class="brand-tile" style="' + brandStyle(key) + '" onclick="openUniverse(\'' + key + '\')">' +
+    return '<button class="brand-tile' + (otherOpen === key ? " active" : "") + '" style="' + brandStyle(key) + '" onclick="openUniverse(\'' + key + '\')">' +
       '<span class="brand-logo">' + (b ? '<img src="' + b.logo + '" alt="' + b.alt + '" />' : "") + "</span>" +
       '<span class="brand-name">' + (b ? b.short : UNIVERSE_META[key].label) + "</span>" +
       '<span class="brand-count">' + st.done + " de " + st.total + "</span>" +
       '<span class="brand-bar">' + buildBarSegments(st.done, st.summary, st.skip, st.released, WATCHED_COLOR) + "</span>" +
       "</button>";
-  }).join("") + "</div></section>";
+  }).join("") + "</div>" + panelHtml + "</section>";
 }
 
 function brandStyle(universeKey) {
@@ -3447,7 +3451,6 @@ document.querySelectorAll("#sortToggle .mini-toggle").forEach(function (btn) {
 document.querySelectorAll("#viewToggle .mini-toggle").forEach(function (btn) {
   btn.addEventListener("click", function () {
     mainView = btn.dataset.view;
-    otherOpen = null;
     document.querySelectorAll("#viewToggle .mini-toggle").forEach(function (b) { b.classList.toggle("active", b === btn); });
     savePrefs();
     render();
@@ -3644,9 +3647,8 @@ function goToItem(id) {
   if (!isOther) {
     if (!matchesFilter(item, filter)) filter = "all";
     if (collapsedPhases[item.phase]) { collapsedPhases = Object.assign({}, collapsedPhases); collapsedPhases[item.phase] = false; }
-  } else if (otherOpen !== item.universe) {
+  } else {
     otherOpen = item.universe;
-    try { history.pushState({ universe: item.universe }, ""); } catch (e) {}
   }
   syncControlButtons();
   savePrefs();
