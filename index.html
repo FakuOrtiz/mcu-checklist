@@ -267,15 +267,14 @@
   .order-arrow:active { transform: translate(2px, 2px); box-shadow: none; }
   .order-arrow:disabled { opacity: .3; cursor: default; box-shadow: none; }
   #orderList { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px 4px 6px 2px; overscroll-behavior: contain; }
-  .order-row { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 8px; background: #fff; border: 1.5px solid var(--ink); position: relative; transition: transform .15s ease, box-shadow .15s ease; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: pan-y; cursor: grab; }
-  .order-row.lifting { transform: scale(1.02); }
+  .order-row { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 8px; background: #fff; border: 1.5px solid var(--ink); position: relative; transition: transform .15s ease, box-shadow .15s ease; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
   .order-row.dragging { transition: none; z-index: 2; box-shadow: 4px 6px 0 var(--ink); background: #FFFDF5; }
   .order-pos { width: 30px; flex-shrink: 0; text-align: center; font-family: Bangers, cursive; font-size: 22px; color: #111; }
   .order-thumb { width: 34px; height: 51px; flex-shrink: 0; background: #0B0D1A; border: 1.5px solid var(--ink); overflow: hidden; }
   .order-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .order-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.25; }
   .order-title small { display: block; font-size: 10.5px; font-weight: 400; color: #666; }
-  .order-handle { padding: 10px 6px; color: #111; display: flex; pointer-events: none; }
+  .order-handle { padding: 12px 8px; margin: -6px -4px -6px 0; color: #111; display: flex; cursor: grab; touch-action: none; }
   .order-row.dragging .order-handle { cursor: grabbing; }
   #orderDoneBtn { margin-top: 10px; font-family: Bangers, cursive; font-size: 18px; letter-spacing: .06em; padding: 7px 0 5px; background: var(--accent); color: #000; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; }
   .podium-hint { font-size: 11px; color: var(--dim); text-align: center; margin: 16px 0 0; }
@@ -3409,10 +3408,8 @@ function saveLevelOrder() {
   ids.forEach(function (id, i) { tiebreak[id] = { r: orderLevel, o: i }; });
   saveTiebreak();
 }
-// Arrastre: con el mouse arranca al instante; con el dedo, después de dejarlo apoyado un momento
-// (así un deslizamiento rápido sigue moviendo la lista).
+// Arrastre desde las tres barritas; el resto de la fila deja desplazar la lista normalmente.
 (function () {
-  const HOLD_MS = 220;
   let drag = null, pending = null;
   const list = function () { return document.getElementById("orderList"); };
   function relabel(order) {
@@ -3428,13 +3425,12 @@ function saveLevelOrder() {
     try { row.setPointerCapture(pointerId); } catch (err) {}
     if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
   }
+  // se arrastra solo desde las tres barritas, al instante (con dedo o mouse)
   document.addEventListener("pointerdown", function (e) {
-    const row = e.target.closest && e.target.closest("#orderList .order-row");
-    if (!row || drag) return;
-    if (e.pointerType === "mouse") { e.preventDefault(); begin(row, e.clientY, e.pointerId); return; }
-    row.classList.add("lifting");
-    pending = { row: row, x: e.clientX, y: e.clientY, id: e.pointerId,
-      timer: setTimeout(function () { row.classList.remove("lifting"); begin(row, pending.y, pending.id); pending = null; }, HOLD_MS) };
+    const handle = e.target.closest && e.target.closest("#orderList .order-handle");
+    if (!handle || drag) return;
+    e.preventDefault();
+    begin(handle.closest(".order-row"), e.clientY, e.pointerId);
   });
   function cancelPending() {
     if (!pending) return;
