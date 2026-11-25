@@ -168,7 +168,9 @@
   #statusMeta { margin: 6px 0 14px; display: flex; flex-wrap: wrap; gap: 6px; }
   .meta-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: var(--text); background: var(--panel-2); border: 1.5px solid var(--ink); padding: 3px 8px; }
   .meta-chip .fr { margin: 0; }
-  #statusRatingWidget { display: flex; justify-content: center; margin: 4px 0 10px; }
+  #statusRatingWidget { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 4px 0 10px; }
+  .rate-step { width: 30px; height: 30px; flex-shrink: 0; display: grid; place-items: center; background: var(--panel-2); color: var(--text); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); cursor: pointer; padding: 0; }
+  .rate-step:active { transform: translate(2px, 2px); box-shadow: none; }
   #statusRatingWidget .star-rating { gap: 6px; }
   .date-chip { position: relative; display: flex; align-items: center; justify-content: center; gap: 7px; width: fit-content; margin: 0 auto; padding: 5px 12px; cursor: pointer;
     font-size: 12.5px; font-weight: 600; color: var(--text); background: var(--panel-2); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
@@ -2889,11 +2891,19 @@ function loadRatings() {
   try { ratings = JSON.parse(localStorage.getItem(RATINGS_KEY) || "{}"); } catch (e) { ratings = {}; }
 }
 function saveRatings() { try { localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings)); } catch (e) {} }
+// Estrellas del menú: grandes, con botones para restar o sumar media estrella.
+function buildMenuRating(id) {
+  const step = function (delta, label, path) {
+    return '<button class="rate-step" aria-label="' + label + '" onclick="event.stopPropagation(); adjustRating(\x27' + id + '\x27, ' + delta + ')">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="' + path + '"/></svg></button>';
+  };
+  return step(-0.5, "Media estrella menos", "M5 12h14") + buildStarRating(id, ratings[id], 34, true) + step(0.5, "Media estrella más", "M12 5v14M5 12h14");
+}
 function setRating(id, value) {
   ratings = Object.assign({}, ratings);
   ratings[id] = value;
   saveRatings();
-  document.getElementById("statusRatingWidget").innerHTML = buildStarRating(id, ratings[id], 36, true);
+  document.getElementById("statusRatingWidget").innerHTML = buildMenuRating(id);
   render();
   refreshSearch();
 }
@@ -3160,7 +3170,7 @@ function openStatusPicker(id) {
   const ratingSection = document.getElementById("statusRatingSection");
   if (current === "watched") {
     ratingSection.style.display = "block";
-    document.getElementById("statusRatingWidget").innerHTML = buildStarRating(id, ratings[id], 36, true);
+    document.getElementById("statusRatingWidget").innerHTML = buildMenuRating(id);
     const dateInput = document.getElementById("statusWatchDate");
     dateInput.value = watchDates[id] || "";
     dateInput.max = todayIso();
