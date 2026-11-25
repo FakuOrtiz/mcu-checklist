@@ -534,7 +534,7 @@ const DATA = [
   { id: "ironheart", es: "Ironheart", en: "Ironheart", year: 2025, date: "2025-06-24", type: "series", phase: 5,
     synopsis: "Riri Williams, una genio de la ingeniería que construyó su primera armadura desde cero inspirada en la de Iron Man, la perfecciona mientras enfrenta fuerzas que combinan magia y alta tecnología.",
     characters: ["Riri Williams / Ironheart", "Parker Robbins"] },
-  { id: "fantastic-four", es: "Los 4 Fantásticos: Primeros Pasos", en: "The Fantastic Four First Steps", year: 2025, date: "2025-07-25", type: "movie", phase: 6,
+  { id: "fantastic-four", es: "Los 4 Fantásticos: Primeros Pasos", en: "The Fantastic Four First Steps", year: 2025, date: "2025-07-25", tmdbId: 617126, type: "movie", phase: 6,
     synopsis: "Un equipo de exploradores expuesto a radiación cósmica durante un viaje espacial obtiene poderes extraordinarios — elasticidad, invisibilidad, control del fuego y fuerza rocosa — y debe proteger la Tierra de una amenaza cósmica.",
     characters: ["Reed Richards", "Sue Storm", "Johnny Storm", "Ben Grimm"],
     postCredits: "Cuatro años después, mientras Sue le lee a su hijo Franklin, una figura encapuchada aparece sosteniendo la máscara plateada del Doctor Doom, observando al niño con interés." },
@@ -2010,7 +2010,7 @@ const OTHER_DATA = [
   { id: "ov-punisher-warzone", es: "Punisher: War Zone", en: "Punisher War Zone", year: 2008, date: "2008-12-05", universe: "marvel-clasico",
     synopsis: "Frank Castle sigue su cruzada sangrienta contra el crimen organizado de Nueva York, enfrentando al desfigurado Jigsaw, quien jura vengarse de él.",
     characters: ["Frank Castle / El Castigador", "Jigsaw", "Agente Budiansky"] },
-  { id: "ov-ghostrider-2", es: "Ghost Rider: Spirit of Vengeance", en: "Ghost Rider Spirit of Vengeance", year: 2012, date: "2012-02-17", universe: "marvel-clasico",
+  { id: "ov-ghostrider-2", es: "Ghost Rider: Spirit of Vengeance", en: "Ghost Rider Spirit of Vengeance", year: 2012, date: "2012-02-17", tmdbId: 71676, universe: "marvel-clasico",
     synopsis: "Johnny Blaze, escondido en Europa del Este, es reclutado para proteger a un niño que podría ser la clave para evitar que el diablo tome forma humana en la Tierra.",
     characters: ["Johnny Blaze / Ghost Rider", "Moreau", "Danny", "Nadya"] },
 
@@ -2335,7 +2335,7 @@ function formatMinutes(total) {
 }
 // Texto completo, para el detalle: "2 h 6 min" o "2 temporadas · 18 episodios · ~13 h".
 function lengthLabel(item) {
-  const l = LENGTHS[item.id];
+  const l = getLength(item.id);
   if (!l || !isReleased(item)) return "";
   const parts = [];
   if (l.seasons) parts.push(l.seasons + " temporadas");
@@ -2345,7 +2345,7 @@ function lengthLabel(item) {
 }
 // Texto corto, para la tarjeta: "2h 6m" o "9 ep".
 function lengthShort(item) {
-  const l = LENGTHS[item.id];
+  const l = getLength(item.id);
   if (!l || !isReleased(item)) return "";
   if (l.eps) return l.eps + " ep";
   const h = Math.floor(l.min / 60), m = l.min % 60;
@@ -2405,9 +2405,20 @@ let posters = {};
 // el resto del caché (evita pedir todo de nuevo de golpe y saturar la API).
 const FORCE_REFETCH_IDS = [];
 
+// Una sola vez: borra del caché los pósters de los títulos que ahora tienen
+// tmdbId fijo, porque la búsqueda por nombre les había asignado uno equivocado.
+const POSTER_FIX_KEY = "mcu-poster-fix-v1";
+
 function loadPosterCache() {
   try { posters = JSON.parse(localStorage.getItem(POSTER_KEY) || "{}"); } catch (e) { posters = {}; }
   FORCE_REFETCH_IDS.forEach(function (id) { delete posters[id]; });
+  try {
+    if (!localStorage.getItem(POSTER_FIX_KEY)) {
+      DATA.concat(OTHER_DATA).forEach(function (d) { if (d.tmdbId) delete posters[d.id]; });
+      savePosterCache();
+      localStorage.setItem(POSTER_FIX_KEY, "1");
+    }
+  } catch (e) {}
 }
 function savePosterCache() { try { localStorage.setItem(POSTER_KEY, JSON.stringify(posters)); } catch (e) {} }
 
@@ -2469,8 +2480,16 @@ async function fetchPoster(item) {
   if (!TMDB_API_KEY || TMDB_API_KEY === "PEGA_TU_API_KEY_ACA") {
     return fetchPosterWikipedia(item);
   }
-  const primaryKind = item.tmdbKind ? item.tmdbKind : ((item.type === "series" || item.type === "special") ? "tv" : "movie");
+  const primaryKind = tmdbKindOf(item);
   const secondaryKind = primaryKind === "movie" ? "tv" : "movie";
+  if (item.tmdbId) {
+    try {
+      let path = primaryKind + "/" + item.tmdbId;
+      if (primaryKind === "tv" && item.tmdbSeason) path += "/season/" + item.tmdbSeason;
+      const d = await tmdbGet(path);
+      if (d && d.poster_path) return TMDB_IMG_BASE + d.poster_path;
+    } catch (e) {}
+  }
   try {
     const primary = await fetchTMDbPoster(item, primaryKind);
     if (primary) return primary;
@@ -2480,6 +2499,106 @@ async function fetchPoster(item) {
   } catch (e) {
     return await fetchPosterWikipedia(item);
   }
+}
+
+function tmdbKindOf(item) {
+  return item.tmdbKind ? item.tmdbKind : ((item.type === "series" || item.type === "special") ? "tv" : "movie");
+}
+async function tmdbGet(path, attempt) {
+  attempt = attempt || 0;
+  const res = await fetch("https://api.themoviedb.org/3/" + path + (path.indexOf("?") === -1 ? "?" : "&") + "api_key=" + TMDB_API_KEY);
+  if (res.status === 429 && attempt < 2) {
+    await new Promise(function (r) { setTimeout(r, 600 * (attempt + 1)); });
+    return tmdbGet(path, attempt + 1);
+  }
+  return res.ok ? res.json() : null;
+}
+// Devuelve { kind, id } del título en TMDB, con el mismo criterio de búsqueda que los pósters.
+async function resolveTmdb(item) {
+  const primary = tmdbKindOf(item);
+  if (item.tmdbId) return { kind: primary, id: item.tmdbId };
+  const norm = function (s) { return (s || "").toLowerCase().replace(/[^a-z0-9]/g, ""); };
+  const target = norm(item.en);
+  const kinds = [primary, primary === "movie" ? "tv" : "movie"];
+  for (const kind of kinds) {
+    const year = item.tmdbYear || item.year;
+    const yearParam = kind === "movie" ? "&primary_release_year=" + year : "&first_air_date_year=" + year;
+    const data = await tmdbGet("search/" + kind + "?query=" + encodeURIComponent(item.en) + yearParam);
+    const results = (data && data.results) || [];
+    if (!results.length) continue;
+    const titleOf = function (r) { return kind === "movie" ? r.title : r.name; };
+    const best = results.find(function (r) { return norm(titleOf(r)) === target; })
+      || results.find(function (r) { return norm(titleOf(r)).indexOf(target) !== -1; })
+      || results[0];
+    return { kind: kind, id: best.id };
+  }
+  return null;
+}
+
+// Duraciones y episodios: LENGTHS (fijo, en este archivo) es la base. Lo que no
+// está ahí, o se estrenó hace poco, se busca en TMDB y se guarda en el navegador,
+// así los estrenos se completan solos sin tocar el código.
+const LENGTH_CACHE_KEY = "mcu-lengths-v1";
+const LENGTH_RECENT_DAYS = 60;          // ventana en la que se sigue actualizando un estreno
+const LENGTH_REFRESH_MS = 3 * 86400000; // cada cuánto se vuelve a consultar dentro de esa ventana
+let lengthCache = {};
+function loadLengthCache() {
+  try { lengthCache = JSON.parse(localStorage.getItem(LENGTH_CACHE_KEY) || "{}"); } catch (e) { lengthCache = {}; }
+}
+function saveLengthCache() { try { localStorage.setItem(LENGTH_CACHE_KEY, JSON.stringify(lengthCache)); } catch (e) {} }
+function getLength(id) {
+  const c = lengthCache[id];
+  return (c && c.data) || LENGTHS[id] || null;
+}
+function needsLengthFetch(item) {
+  if (!isReleased(item)) return false;
+  const c = lengthCache[item.id];
+  const stale = !c || Date.now() - c.t > LENGTH_REFRESH_MS;
+  const daysOut = (Date.now() - new Date(item.date + "T00:00:00").getTime()) / 86400000;
+  if (daysOut <= LENGTH_RECENT_DAYS) return stale;
+  if (LENGTHS[item.id]) return false;
+  return !c || (!c.data && stale);
+}
+async function fetchLength(item) {
+  const ref = await resolveTmdb(item);
+  if (!ref) return null;
+  if (ref.kind === "movie") {
+    const m = await tmdbGet("movie/" + ref.id);
+    return m && m.runtime ? { min: m.runtime } : null;
+  }
+  const show = await tmdbGet("tv/" + ref.id);
+  if (!show) return null;
+  // En "Otros Universos" una serie es la serie entera; en el UCM, cada entrada es una temporada.
+  const seasons = item.universe && !item.tmdbSeason
+    ? (show.seasons || []).filter(function (s) { return s.season_number > 0 && s.episode_count > 0; }).map(function (s) { return s.season_number; })
+    : [item.tmdbSeason || 1];
+  let eps = 0, min = 0, missing = 0;
+  for (const sn of seasons) {
+    const s = await tmdbGet("tv/" + ref.id + "/season/" + sn);
+    ((s && s.episodes) || []).forEach(function (e) { eps++; if (e.runtime) min += e.runtime; else missing++; });
+  }
+  if (!eps) return null;
+  const out = { eps: eps };
+  if (seasons.length > 1) out.seasons = seasons.length;
+  if (min && !missing) out.min = min;
+  return out;
+}
+async function refreshLengths(onDone) {
+  const items = DATA.concat(OTHER_DATA).filter(needsLengthFetch);
+  if (!items.length) return;
+  let cursor = 0;
+  async function worker() {
+    while (cursor < items.length) {
+      const item = items[cursor++];
+      let data = null;
+      try { data = await fetchLength(item); } catch (e) {}
+      lengthCache = Object.assign({}, lengthCache);
+      lengthCache[item.id] = { t: Date.now(), data: data };
+    }
+  }
+  await Promise.all([worker(), worker()]);
+  saveLengthCache();
+  onDone();
 }
 
 async function fetchAllPosters(items, onEach, concurrency = 4) {
@@ -3391,6 +3510,7 @@ loadPosterCache();
 loadPrefs();
 loadRatings();
 loadWatchDates();
+loadLengthCache();
 syncControlButtons();
 render();
 
@@ -3402,6 +3522,12 @@ if (missingPosters.length > 0) {
     refreshSearch();
   }).then(savePosterCache);
 }
+
+refreshLengths(function () {
+  render();
+  refreshSearch();
+  if (detailId) renderModal();
+});
 </script>
 </body>
 </html>
