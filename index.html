@@ -137,6 +137,9 @@
   .stk-k { background: #2A2F4C; border-radius: 4px; transform: rotate(-6deg); }
   .card.pop .stk { animation: stickerPop .42s cubic-bezier(.2, 1.6, .4, 1); }
   @keyframes stickerPop { 0% { transform: scale(0) rotate(-30deg); } 100% { transform: scale(1); } }
+  .card.locked .upcoming-img { filter: brightness(.45) saturate(.8); }
+  .card.locked.has-poster .lock-overlay { background: linear-gradient(180deg, rgba(10,12,26,.15) 30%, rgba(10,12,26,.8) 100%); }
+  .card.locked.has-poster .lock-label, .card.locked.has-poster .lock-date { color: var(--text); text-shadow: 1px 1px 0 #000; }
   .lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
     background: repeating-linear-gradient(-45deg, #161A30 0 6px, #12162A 6px 12px); text-align: center; padding: 6px; z-index: 3; }
   .lock-label { font-family: Bangers, cursive; font-size: 12px; letter-spacing: .06em; color: var(--muted); }
@@ -3280,7 +3283,7 @@ function buildCardHtml(item) {
         ? '<div class="poster-clip"><img src="' + poster + '" alt="" loading="lazy" class="' + (shouldBlur ? "blurred" : "") + '" onerror="this.style.display=\x27none\x27; this.closest(\x27.poster-box\x27).dataset.broken=\x271\x27;" /></div>'
         : typeIconSvg(item.type, "rgba(255,248,231,0.55)", 20) +
           '<span class="placeholder-title">' + escapeHtml(item.es) + "</span>")
-    : "";
+    : (poster ? '<div class="poster-clip"><img src="' + poster + '" alt="" loading="lazy" class="upcoming-img" onerror="this.closest(\x27.poster-clip\x27).remove();" /></div>' : "");
 
   const sticker = !rel ? ""
     : st === "watched" ? '<div class="stk stk-w">' + STICKER_CHECK + "</div>"
@@ -3299,7 +3302,7 @@ function buildCardHtml(item) {
   const tm = TYPE_META[kind];
   const typeTag = tm && kind !== "movie" ? '<span class="type-tag">' + typeIconSvg(kind === "special" ? "series" : kind, tm.color, 9) + tm.label + "</span>" : "";
 
-  const cls = "card" + (!rel ? " locked" : !st ? " unseen" : " st-" + st) + (lastChangedId === item.id ? " pop" : "");
+  const cls = "card" + (!rel ? " locked" + (poster ? " has-poster" : "") : !st ? " unseen" : " st-" + st) + (lastChangedId === item.id ? " pop" : "");
   return '<button class="' + cls + '" data-id="' + item.id + '" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
     '<div class="poster-box">' + centerContent + typeTag + sticker + lock + "</div>" +
     '<p class="card-title">' + escapeHtml(item.es) + "</p>" +
@@ -4149,7 +4152,7 @@ loadLengthCache();
 syncControlButtons();
 render();
 
-const missingPosters = DATA.concat(OTHER_DATA).filter(function (d) { return isReleased(d) && !posters[d.id]; });
+const missingPosters = DATA.concat(OTHER_DATA).filter(function (d) { return !posters[d.id]; });
 if (missingPosters.length > 0) {
   fetchAllPosters(missingPosters, function (id, url) {
     posters[id] = url || "";
