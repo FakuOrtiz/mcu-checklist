@@ -116,6 +116,8 @@
   #statusItemTitle { margin: 0 0 12px; }
   .status-option { display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 10px; background: #1C1D28; border: 1px solid #262735; color: #EDEBE3; font-size: 14px; cursor: pointer; }
   .status-option-clear { color: #6B6B7D; }
+  .watch-date-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+  #statusWatchDate { background: #1C1D28; border: 1px solid #262735; border-radius: 8px; color: #C9C9D6; font-size: 13px; padding: 6px 8px; color-scheme: dark; font-family: inherit; }
   .status-option-cancel { color: #6B6B7D; margin-bottom: 0; margin-top: 4px; background: none; border: none; text-align: center; }
   .star-rating { display: flex; gap: 3px; }
   .star-slot { position: relative; display: inline-block; }
@@ -273,6 +275,10 @@
     <div id="statusRatingSection" style="display:none; margin-bottom: 14px;">
       <p class="modal-label" style="margin-bottom:6px;">Tu calificación</p>
       <div id="statusRatingWidget"></div>
+      <label class="watch-date-row">
+        <span class="modal-label" style="margin:0;">Vista el</span>
+        <input type="date" id="statusWatchDate">
+      </label>
     </div>
     <button class="status-option" data-status="watched">Vista</button>
     <button class="status-option" data-status="summary">Solo vi el resumen</button>
@@ -2170,6 +2176,136 @@ const OTHER_DATA = [
     synopsis: "Sin Thor en casa, Darryl busca un nuevo compañero de departamento, y el único que responde a su aviso es el Gran Maestro.",
     characters: ["Darryl Jacobson", "Gran Maestro"] },
 ];
+// Duración en minutos (min) y, en series, cantidad de episodios (eps) y temporadas (seasons).
+// Fuente: TMDB. En series, min es la suma de todos los episodios.
+const LENGTHS = {
+  "iron-man": {min: 126},
+  "hulk": {min: 114},
+  "iron-man-2": {min: 124},
+  "thor": {min: 115},
+  "cap-1": {min: 124},
+  "avengers-1": {min: 143},
+  "iron-man-3": {min: 130},
+  "thor-2": {min: 112},
+  "cap-2": {min: 136},
+  "gotg-1": {min: 121},
+  "avengers-2": {min: 141},
+  "antman-1": {min: 117},
+  "civil-war": {min: 147},
+  "dr-strange-1": {min: 115},
+  "gotg-2": {min: 137},
+  "spiderman-homecoming": {min: 133},
+  "thor-3": {min: 131},
+  "black-panther-1": {min: 135},
+  "infinity-war": {min: 149},
+  "antman-2": {min: 119},
+  "captain-marvel": {min: 124},
+  "endgame": {min: 181},
+  "far-from-home": {min: 129},
+  "wandavision": {eps: 9, min: 363},
+  "falcon-ws": {eps: 6, min: 330},
+  "loki-1": {eps: 6, min: 302},
+  "black-widow": {min: 134},
+  "whatif-1": {eps: 9, min: 323},
+  "shang-chi": {min: 132},
+  "eternals": {min: 156},
+  "hawkeye": {eps: 6, min: 297},
+  "no-way-home": {min: 148},
+  "moon-knight": {eps: 6, min: 302},
+  "dr-strange-2": {min: 126},
+  "ms-marvel": {eps: 6, min: 289},
+  "thor-4": {min: 119},
+  "i-am-groot": {eps: 5, min: 29},
+  "she-hulk": {eps: 9, min: 309},
+  "werewolf": {min: 55},
+  "wakanda-forever": {min: 162},
+  "gotg-holiday": {min: 45},
+  "quantumania": {min: 125},
+  "gotg-3": {min: 150},
+  "secret-invasion": {eps: 6, min: 262},
+  "loki-2": {eps: 6, min: 313},
+  "the-marvels": {min: 105},
+  "whatif-2": {eps: 9, min: 289},
+  "echo": {eps: 5, min: 213},
+  "deadpool-wolverine": {min: 128},
+  "agatha": {eps: 9, min: 379},
+  "whatif-3": {eps: 8, min: 253},
+  "brave-new-world": {min: 119},
+  "daredevil-1": {eps: 9, min: 455},
+  "thunderbolts": {min: 127},
+  "ironheart": {eps: 6, min: 305},
+  "fantastic-four": {min: 115},
+  "eyes-wakanda": {eps: 4, min: 125},
+  "marvel-zombies": {eps: 4, min: 137},
+  "wonder-man": {eps: 8, min: 267},
+  "daredevil-2": {eps: 8, min: 413},
+  "punisher-special": {min: 51},
+  "brand-new-day": {min: 145},
+  "visionquest": {eps: 8, min: 451},
+  "doomsday": {min: 165},
+  "ov-howard-duck": {min: 110},
+  "ov-blade": {min: 121},
+  "ov-blade-2": {min: 117},
+  "ov-daredevil-2003": {min: 103},
+  "ov-hulk-2003": {min: 138},
+  "ov-punisher-2004": {min: 124},
+  "ov-blade-trinity": {min: 113},
+  "ov-elektra": {min: 97},
+  "ov-manthing": {min: 97},
+  "ov-ghostrider-1": {min: 114},
+  "ov-punisher-warzone": {min: 102},
+  "ov-ghostrider-2": {min: 96},
+  "ov-xmen-1": {min: 104},
+  "ov-xmen-2": {min: 133},
+  "ov-xmen-3": {min: 104},
+  "ov-xmen-origins-wolverine": {min: 107},
+  "ov-xmen-first-class": {min: 132},
+  "ov-the-wolverine": {min: 126},
+  "ov-xmen-dofp": {min: 132},
+  "ov-deadpool-1": {min: 108},
+  "ov-xmen-apocalypse": {min: 144},
+  "ov-logan": {min: 137},
+  "ov-deadpool-2": {min: 120},
+  "ov-dark-phoenix": {min: 114},
+  "ov-new-mutants": {min: 94},
+  "ov-ff-2005": {min: 106},
+  "ov-ff-silver-surfer": {min: 92},
+  "ov-ff-2015": {min: 100},
+  "ov-spiderman-2002": {min: 121},
+  "ov-spiderman-2004": {min: 127},
+  "ov-spiderman-2007": {min: 139},
+  "ov-amazing-spiderman-1": {min: 136},
+  "ov-amazing-spiderman-2": {min: 141},
+  "ov-spider-noir": {eps: 8, min: 353},
+  "ov-venom-1": {min: 112},
+  "ov-venom-2": {min: 97},
+  "ov-morbius": {min: 105},
+  "ov-madame-web": {min: 117},
+  "ov-venom-3": {min: 109},
+  "ov-kraven": {min: 127},
+  "ov-spiderverse-1": {min: 117},
+  "ov-spiderverse-2": {min: 140},
+  "ov-agents-shield": {eps: 136, seasons: 7, min: 5932},
+  "ov-agent-carter": {eps: 18, seasons: 2, min: 777},
+  "ov-daredevil-netflix": {eps: 39, seasons: 3, min: 2100},
+  "ov-jessica-jones": {eps: 39, seasons: 3, min: 2030},
+  "ov-luke-cage": {eps: 26, seasons: 2, min: 1467},
+  "ov-iron-fist": {eps: 23, seasons: 2, min: 1252},
+  "ov-defenders": {eps: 8, min: 394},
+  "ov-inhumans": {eps: 8, min: 336},
+  "ov-punisher-netflix": {eps: 26, seasons: 2, min: 1384},
+  "ov-runaways": {eps: 33, seasons: 3, min: 1617},
+  "ov-cloak-dagger": {eps: 20, seasons: 2, min: 834},
+  "oneshot-consultant": {min: 4},
+  "oneshot-funny-thing": {min: 4},
+  "oneshot-item-47": {min: 12},
+  "oneshot-agent-carter": {min: 15},
+  "oneshot-all-hail-king": {min: 14},
+  "oneshot-team-thor": {min: 3},
+  "oneshot-team-thor-2": {min: 5},
+  "oneshot-team-darryl": {min: 6},
+};
+
 
 const CHRON_ORDER = [
   "cap-1", "captain-marvel", "iron-man", "hulk", "iron-man-2", "thor",
@@ -2191,6 +2327,30 @@ const CHRON_ORDER = [
 const WATCHED_KEY = "mcu-watched-v2";
 
 function isReleased(item) { return new Date() >= new Date(item.date + "T00:00:00"); }
+function formatMinutes(total) {
+  if (total < 60) return total + " min";
+  const h = Math.floor(total / 60), m = total % 60;
+  if (h >= 10) return "~" + Math.round(total / 60) + " h";
+  return h + " h" + (m ? " " + m + " min" : "");
+}
+// Texto completo, para el detalle: "2 h 6 min" o "2 temporadas · 18 episodios · ~13 h".
+function lengthLabel(item) {
+  const l = LENGTHS[item.id];
+  if (!l || !isReleased(item)) return "";
+  const parts = [];
+  if (l.seasons) parts.push(l.seasons + " temporadas");
+  if (l.eps) parts.push(l.eps + (l.eps === 1 ? " episodio" : " episodios"));
+  if (l.min) parts.push(formatMinutes(l.min));
+  return parts.join(" · ");
+}
+// Texto corto, para la tarjeta: "2h 6m" o "9 ep".
+function lengthShort(item) {
+  const l = LENGTHS[item.id];
+  if (!l || !isReleased(item)) return "";
+  if (l.eps) return l.eps + " ep";
+  const h = Math.floor(l.min / 60), m = l.min % 60;
+  return h ? h + "h" + (m ? " " + m + "m" : "") : m + "m";
+}
 function buildBarSegments(done, summary, skip, total, mainColor) {
   if (!total) return "";
   const pct = function (n) { return (n / total) * 100; };
@@ -2357,6 +2517,24 @@ function setRating(id, value) {
   render();
   refreshSearch();
 }
+// Fecha en que se marcó cada título como visto (YYYY-MM-DD, hora local).
+// Los títulos vistos antes de que existiera esto no tienen fecha.
+const WATCH_DATES_KEY = "mcu-watch-dates-v1";
+let watchDates = {};
+function loadWatchDates() {
+  try { watchDates = JSON.parse(localStorage.getItem(WATCH_DATES_KEY) || "{}"); } catch (e) { watchDates = {}; }
+}
+function saveWatchDates() { try { localStorage.setItem(WATCH_DATES_KEY, JSON.stringify(watchDates)); } catch (e) {} }
+function todayIso() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function setWatchDate(id, iso) {
+  watchDates = Object.assign({}, watchDates);
+  if (iso) watchDates[id] = iso; else delete watchDates[id];
+  saveWatchDates();
+}
+
 function adjustRating(id, delta) {
   const current = ratings[id] || 0;
   const next = Math.max(0.5, Math.min(5, current + delta));
@@ -2500,6 +2678,9 @@ function setStatus(id, newStatus) {
   Object.keys(PHASES).forEach(function (p) { prevPhaseComplete[p] = phaseStats(status, Number(p)).complete; });
   SAGAS.forEach(function (s) { prevSagaComplete[s.id] = sagaComplete(status, s); });
 
+  if (newStatus === "watched" && status[id] !== "watched") setWatchDate(id, todayIso());
+  else if (newStatus !== "watched" && watchDates[id]) setWatchDate(id, null);
+
   const next = Object.assign({}, status);
   if (newStatus) next[id] = newStatus; else delete next[id];
   status = next;
@@ -2534,6 +2715,8 @@ function resetProgress() {
   showConfirm("¿Reiniciar todo tu progreso de visionado? Esto no se puede deshacer.", function () {
     status = {};
     saveState();
+    watchDates = {};
+    saveWatchDates();
     render();
   });
 }
@@ -2565,6 +2748,9 @@ function openStatusPicker(id) {
   if (current === "watched") {
     ratingSection.style.display = "block";
     document.getElementById("statusRatingWidget").innerHTML = buildRatingRow(id, ratings[id], 26);
+    const dateInput = document.getElementById("statusWatchDate");
+    dateInput.value = watchDates[id] || "";
+    dateInput.max = todayIso();
   } else {
     ratingSection.style.display = "none";
   }
@@ -2581,7 +2767,9 @@ function renderModal() {
   const item = findItemById(detailId);
   if (!item) { backdrop.classList.remove("show"); return; }
 
-  document.getElementById("modalYear").textContent = item.year;
+  const len = lengthLabel(item);
+  document.getElementById("modalYear").textContent = item.year + (len ? " · " + len : "") +
+    (status[item.id] === "watched" && watchDates[item.id] ? " · Vista el " + formatDate(watchDates[item.id]) : "");
   document.getElementById("modalTitle").textContent = item.es;
   document.getElementById("modalSynopsis").textContent = item.synopsis || "";
   document.getElementById("modalCharacters").innerHTML = (item.characters || [])
@@ -2716,7 +2904,7 @@ function buildCardHtml(item) {
     typeBadge + centerContent + infoBtn + stamp + skipOverlay + summaryOverlay + lock +
     "</div>" +
     '<p class="card-title" style="color:' + titleColor + '">' + escapeHtml(item.es) + "</p>" +
-    '<p class="card-year"><span>' + item.year + "</span>" + ratingBadge + "</p>" +
+    '<p class="card-year"><span>' + item.year + (lengthShort(item) ? " · " + lengthShort(item) : "") + "</span>" + ratingBadge + "</p>" +
     "</button>";
 }
 
@@ -2933,6 +3121,11 @@ document.querySelectorAll(".status-option[data-status]").forEach(function (btn) 
   });
 });
 document.getElementById("statusCancelBtn").addEventListener("click", closeStatusPicker);
+document.getElementById("statusWatchDate").addEventListener("change", function (e) {
+  if (!statusPickerId) return;
+  setWatchDate(statusPickerId, e.target.value || null);
+  if (detailId === statusPickerId) renderModal();
+});
 document.getElementById("confirmYesBtn").addEventListener("click", function () {
   const cb = confirmCallback;
   closeConfirm();
@@ -3124,7 +3317,7 @@ function buildSearchRow(item) {
   const st = status[item.id];
   const poster = posters[item.id];
   const blurred = blurUnwatched && !st;
-  let meta = item.year + " · " + sectionLabelOf(item);
+  let meta = item.year + (lengthShort(item) ? " · " + lengthShort(item) : "") + " · " + sectionLabelOf(item);
   if (!rel) {
     meta = "Sale " + formatDate(item.date) + " · " + sectionLabelOf(item);
   } else {
@@ -3197,6 +3390,7 @@ loadState();
 loadPosterCache();
 loadPrefs();
 loadRatings();
+loadWatchDates();
 syncControlButtons();
 render();
 
