@@ -83,7 +83,7 @@
   .phase-head { padding: 8px 10px; background: var(--panel); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); margin-bottom: 0; }
   .phase-head h3 { font-size: 16px; }
   /* mosaico de estudios (prueba) */
-  .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 22px; }
+  .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 10px; margin: 0 0 22px; }
   @media (min-width: 480px) { .brand-grid { grid-template-columns: repeat(4, 1fr); } }
   .brand-tile { position: relative; aspect-ratio: 16 / 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px 6px 6px; cursor: pointer;
     background: radial-gradient(120% 90% at 50% 115%, var(--brand-glow) 0%, var(--brand) 32%, transparent 72%), #0E1226;
@@ -96,7 +96,7 @@
   .brand-count { font-size: 10px; color: #E4E6F5; text-shadow: 1px 1px 0 #000; }
   .brand-bar { width: 100%; height: 6px; display: flex; overflow: hidden; background: rgba(10,12,28,.75); border: 1.5px solid var(--ink); margin-top: 3px; }
   .brand-tile.active { outline: 2.5px solid var(--paper); outline-offset: 2px; }
-  .brand-tile.active::after { content: ""; position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--paper); }
+  .brand-tile.active::after { content: ""; position: absolute; left: 50%; bottom: -20px; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--paper); pointer-events: none; }
   .universe-page { scroll-margin-top: 12px; margin-top: 22px; }
   .universe-page.fresh { animation: panelIn .28s ease; }
   @keyframes panelIn { from { opacity: 0; transform: translateY(8px); } }
