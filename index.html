@@ -393,7 +393,7 @@
   .surv-stats div { display: flex; flex-direction: column; align-items: center; padding: 10px 6px 8px; background: var(--panel); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
   .surv-stats b { font-size: 40px; font-weight: 400; line-height: 1; color: var(--accent); text-shadow: 2px 2px 0 #000; }
   .surv-stats span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 4px; }
-  .surv-code-tag { font-family: Bangers, cursive; font-size: .8em; letter-spacing: .1em; padding: 1px 7px 0; margin-left: 6px; background: var(--panel-2); border: 1.5px solid var(--ink); color: var(--accent); vertical-align: 2px; }
+  .surv-code-tag { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-family: Bangers, cursive; font-size: .8em; letter-spacing: .1em; padding: 1px 7px 0; margin-left: 6px; background: var(--panel-2); border: 1.5px solid var(--ink); color: var(--accent); vertical-align: 2px; }
   .surv-hint.center { text-align: center; }
   .surv-diff { display: inline-flex; align-items: center; gap: 5px; }
   .bolts { display: inline-flex; gap: 1px; color: var(--accent); }
@@ -3722,7 +3722,7 @@ function renderSurvivalQuestion() {
   document.getElementById("survivalBack").style.display = "";
   const q = s.seq[s.i], item = findItemById(q.id), poster = posters[q.id];
   const diffLabel = { media: "Media", dificil: "Difícil", experto: "Experto" }[q.diff] || "Media";
-  document.getElementById("survivalHeading").innerHTML = "Racha: " + s.streak + (s.code ? ' <span class="surv-code-tag">' + s.code + "</span>" : "");
+  document.getElementById("survivalHeading").innerHTML = "Racha: " + s.streak + (s.code ? ' <button class="surv-code-tag" onclick="copySurvivalCode(\x27' + s.code + '\x27)" title="Copiar código">' + s.code + copyIcon() + "</button>" : "");
   s.answered = false;
   document.getElementById("survivalBody").innerHTML =
     '<div class="surv-q">' +
@@ -3749,6 +3749,23 @@ function diffBolts(diff) {
   const bolt = '<svg width="9" height="11" viewBox="0 0 12 16" aria-hidden="true"><path d="M7 0 0 9h5l-1 7 8-10H7z" fill="currentColor" stroke="#000" stroke-width="1"/></svg>';
   return '<span class="bolts">' + new Array(n + 1).join(bolt) + "</span>";
 }
+function copyIcon() {
+  return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="1"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>';
+}
+// Copia el código de la partida para mandarlo por WhatsApp
+function copySurvivalCode(code) {
+  const done = function () { showToast("Código " + code + " copiado", "#FFF8E7"); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(done, function () { fallbackCopy(code); done(); });
+  } else { fallbackCopy(code); done(); }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } catch (e) {}
+  document.body.removeChild(ta);
+}
 function answerSurvival(k) {
   const s = survival;
   if (!s || s.answered) return;
@@ -3761,7 +3778,7 @@ function answerSurvival(k) {
     const stamp = document.getElementById("survStamp");
     if (stamp) stamp.classList.add("show");
     s.streak++; s.i++;
-    document.getElementById("survivalHeading").innerHTML = "Racha: " + s.streak + (s.code ? ' <span class="surv-code-tag">' + s.code + "</span>" : "");
+    document.getElementById("survivalHeading").innerHTML = "Racha: " + s.streak + (s.code ? ' <button class="surv-code-tag" onclick="copySurvivalCode(\x27' + s.code + '\x27)" title="Copiar código">' + s.code + copyIcon() + "</button>" : "");
     setTimeout(function () { if (survival === s) renderSurvivalQuestion(); }, 750);
   } else {
     btns[k].classList.add("incorrect");
@@ -3781,7 +3798,7 @@ function renderSurvivalEnd(cleared) {
       '<p class="surv-sub">' + (s.streak === 1 ? "respuesta seguida" : "respuestas seguidas") + "</p>" +
       (isRecord ? '<p class="surv-newrec bng">¡Nuevo récord!</p>' : '<div class="surv-record"><span>Tu récord</span><b class="bng">' + Math.max(prev, s.streak) + "</b></div>") +
       (!cleared && last ? '<div class="surv-miss"><small>Fallaste en ' + escapeHtml(item ? item.es : "") + "</small><p>" + escapeHtml(last.question) + "</p><b>Era: " + escapeHtml(last.options[last.correct]) + "</b></div>" : "") +
-      (s.code ? '<p class="surv-hint center">Código de la partida: <b class="surv-code-tag">' + s.code + "</b></p>" : "") +
+      (s.code ? '<p class="surv-hint center">Código de la partida: <button class="surv-code-tag" onclick="copySurvivalCode(\x27' + s.code + '\x27)" title="Copiar código">' + s.code + copyIcon() + "</button></p>" : "") +
       '<button class="surv-primary" onclick="createSharedSurvival()">Jugar de nuevo</button>' +
       '<button class="surv-secondary wide" onclick="renderSurvivalHome()">Volver</button>' +
     "</div>";
