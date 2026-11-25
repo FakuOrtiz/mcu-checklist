@@ -246,6 +246,49 @@
   .podium-row.top2, .podium-row.top3 { outline: 1.5px solid rgba(255,248,231,.55); outline-offset: -5px; }
   .podium-row.top3 .podium-rank { transform: rotate(5deg); }
   .podium-list .podium-row.top3 + .podium-row:not(.top) { margin-top: 8px; }
+  /* --- pruebas de estilo del top 3 --- */
+  /* A: número gigante delineado al costado del póster (estilo Top 10) */
+  .podium-row.top.st-a, .podium-row.top1.st-a { background: var(--panel); color: var(--text); outline: 0; border-width: 2px; box-shadow: 3px 3px 0 var(--ink); }
+  .podium-row.top1.st-a .podium-title { color: var(--text); } .podium-row.top1.st-a .podium-year, .podium-row.top1.st-a .podium-watched { color: var(--muted); }
+  .podium-row.top1.st-a .star-rating .sf { fill: var(--paper); stroke: var(--paper); } .podium-row.top1.st-a .star-rating .se { stroke: #6E7396; }
+  .podium-row.st-a .podium-rank { width: 46px; height: auto; background: none; border: 0; box-shadow: none; transform: none; font-size: 72px; line-height: .8; color: var(--panel); -webkit-text-stroke: 2px var(--paper); text-shadow: 3px 3px 0 #000; margin-right: -22px; z-index: 0; padding: 0; }
+  .podium-row.st-a .podium-thumb { position: relative; z-index: 1; }
+  /* B: cinta en la esquina */
+  .podium-row.top.st-b { position: relative; overflow: hidden; background: var(--panel); color: var(--text); outline: 0; padding-left: 14px; }
+  .podium-row.top1.st-b .podium-title { color: var(--text); } .podium-row.top1.st-b .podium-year, .podium-row.top1.st-b .podium-watched { color: var(--muted); }
+  .podium-row.top1.st-b .star-rating .sf { fill: var(--paper); stroke: var(--paper); } .podium-row.top1.st-b .star-rating .se { stroke: #6E7396; }
+  .podium-row.st-b .podium-rank { position: absolute; top: 9px; left: -26px; width: 90px; height: auto; transform: rotate(-45deg); background: var(--paper); color: #000; border: 0; border-block: 2px solid var(--ink); box-shadow: none; font-size: 16px; padding: 2px 0 0; }
+  .podium-row.st-b .podium-rank::after { content: "°"; }
+  .podium-row.top1.st-b .podium-rank { background: var(--accent); }
+  /* C: número dentro de un estallido de cómic */
+  .podium-row.top.st-c, .podium-row.top1.st-c { background: var(--panel); color: var(--text); outline: 0; }
+  .podium-row.top1.st-c .podium-title { color: var(--text); } .podium-row.top1.st-c .podium-year, .podium-row.top1.st-c .podium-watched { color: var(--muted); }
+  .podium-row.top1.st-c .star-rating .sf { fill: var(--paper); stroke: var(--paper); } .podium-row.top1.st-c .star-rating .se { stroke: #6E7396; }
+  .podium-row.st-c .podium-rank { width: 54px; height: 54px; border: 0; box-shadow: none; transform: rotate(-8deg); background: var(--paper); color: #000; font-size: 28px; padding-top: 4px;
+    clip-path: polygon(50% 0, 61% 18%, 82% 8%, 80% 30%, 100% 36%, 85% 52%, 100% 68%, 79% 72%, 82% 93%, 61% 83%, 50% 100%, 39% 83%, 18% 93%, 21% 72%, 0 68%, 15% 52%, 0 36%, 20% 30%, 18% 8%, 39% 18%); }
+  .podium-row.top1.st-c .podium-rank { width: 62px; height: 62px; font-size: 34px; background: var(--accent); }
+  /* duelos */
+  .duel-banner { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 14px; padding: 8px 12px; cursor: pointer; text-align: left;
+    background: var(--accent); color: #000; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 13px; }
+  .duel-banner b { font-family: Bangers, cursive; font-weight: 400; font-size: 16px; letter-spacing: .05em; }
+  .duel-banner.done { background: var(--panel-2); color: #C9CCE6; }
+  .duel-banner:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .duel-vs { font-family: Bangers, cursive; font-size: 15px; letter-spacing: .04em; color: var(--paper); background: #111; border: 2px solid var(--ink); padding: 2px 6px 0; transform: rotate(-8deg); flex-shrink: 0; }
+  .duel-vs.big { font-size: 30px; padding: 4px 10px 1px; align-self: center; transform: rotate(-10deg); box-shadow: 3px 3px 0 var(--accent-2); z-index: 1; margin: 0 -10px; }
+  #duelBackdrop { position: fixed; inset: 0; z-index: 57; background: rgba(6,8,18,.8); display: none; align-items: center; justify-content: center; padding: 16px; }
+  #duelBackdrop.show { display: flex; animation: fadeIn .18s ease; }
+  #duelBox { width: 100%; max-width: 440px; background: var(--paper); color: #111; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 14px 14px 18px; animation: sheetUp .24s cubic-bezier(.2, 1.2, .4, 1); }
+  #duelHeader { display: flex; align-items: center; justify-content: space-between; font-size: 22px; }
+  #duelClose { padding: 5px; background: #fff; border: 1.5px solid var(--ink); cursor: pointer; display: flex; }
+  .duel-sub { font-size: 12px; color: #555; margin: 2px 0 12px; }
+  .duel-arena { display: flex; align-items: stretch; justify-content: center; }
+  .duel-pick { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; color: #111; transition: transform .2s ease, opacity .2s ease; }
+  .duel-poster { width: 100%; aspect-ratio: 2 / 3; display: block; background: #0B0D1A; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); overflow: hidden; }
+  .duel-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .duel-title { font-size: 12.5px; font-weight: 700; text-align: center; line-height: 1.25; }
+  .duel-pick:active { transform: scale(.97); }
+  .duel-pick.won { transform: scale(1.04) rotate(-1.5deg); }
+  .duel-arena:has(.won) .duel-pick:not(.won) { opacity: .35; }
   .podium-hint { font-size: 11px; color: var(--dim); text-align: center; margin: 16px 0 0; }
   .podium-empty { color: var(--muted); text-align: center; padding: 50px 20px; font-size: 14px; }
 
@@ -389,6 +432,15 @@
     <button class="status-option" data-status="skip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>No la quiero ver</button>
     <button class="status-option status-option-clear" data-status="">Sin marcar</button>
     <button class="status-option status-option-cancel" id="statusCancelBtn">Cancelar</button>
+  </div>
+</div>
+
+<div id="duelBackdrop">
+  <div id="duelBox">
+    <div id="duelHeader"><span class="bng">¿Cuál les gustó más?</span>
+      <button id="duelClose" onclick="closeDuel()" aria-label="Cerrar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div id="duelBody"></div>
   </div>
 </div>
 
@@ -2778,6 +2830,37 @@ let blurUnwatched = true;
 let ratings = {};
 
 const RATINGS_KEY = "mcu-ratings-v1";
+// Desempates del podio: { id: { r: estrellas cuando se decidió, o: orden dentro del empate } }.
+// Si cambian las estrellas de un título, su desempate deja de valer.
+const TIEBREAK_KEY = "mcu-tiebreak-v1";
+let tiebreak = {};
+function loadTiebreak() { try { tiebreak = JSON.parse(localStorage.getItem(TIEBREAK_KEY) || "{}"); } catch (e) { tiebreak = {}; } }
+function saveTiebreak() { try { localStorage.setItem(TIEBREAK_KEY, JSON.stringify(tiebreak)); } catch (e) {} }
+function tieOrderOf(id) {
+  const t = tiebreak[id];
+  return t && t.r === ratings[id] ? t.o : null;
+}
+function compareRated(a, b) {
+  const d = ratings[b.id] - ratings[a.id];
+  if (d) return d;
+  const oa = tieOrderOf(a.id), ob = tieOrderOf(b.id);
+  if (oa !== null && ob !== null) return oa - ob;
+  if (oa !== null) return -1;
+  if (ob !== null) return 1;
+  return 0;
+}
+// Grupos de títulos con las mismas estrellas (de todos los universos).
+function tieGroups() {
+  const byRating = {};
+  DATA.concat(OTHER_DATA).forEach(function (d) {
+    const r = ratings[d.id];
+    if (r > 0) (byRating[r] = byRating[r] || []).push(d);
+  });
+  return Object.keys(byRating).map(function (r) { return byRating[r]; }).filter(function (g) { return g.length > 1; });
+}
+function unresolvedTies(groups) {
+  return groups.filter(function (g) { return g.some(function (d) { return tieOrderOf(d.id) === null; }); });
+}
 function loadRatings() {
   try { ratings = JSON.parse(localStorage.getItem(RATINGS_KEY) || "{}"); } catch (e) { ratings = {}; }
 }
@@ -3182,10 +3265,12 @@ function podiumPoster(item) {
   const poster = posters[item.id];
   return poster ? '<img src="' + poster + '" alt="" loading="lazy" />' : '<span class="podium-noposter">' + escapeHtml(item.es) + "</span>";
 }
+// PRUEBA: estilos del top 3 (?podio=a|b|c)
+const PODIO_STYLE = (/podio=([abc])/.exec(location.search) || [])[1] || "";
 // Fila del podio. Los 3 primeros son filas destacadas; editar = tocarla y usar el menú.
 function buildPodiumRow(item, rank) {
   const date = watchDates[item.id];
-  const top = rank <= 3 ? " top top" + rank : "";
+  const top = rank <= 3 ? " top top" + rank + (PODIO_STYLE ? " st-" + PODIO_STYLE : "") : "";
   return '<button class="podium-row' + top + '"' + podiumTap(item) + ">" +
     '<span class="podium-rank">' + rank + "</span>" +
     '<span class="podium-thumb">' + podiumPoster(item) + "</span>" +
@@ -3195,6 +3280,63 @@ function buildPodiumRow(item, rank) {
       buildStarRating(item.id, ratings[item.id], rank <= 3 ? 17 : 14, false) +
     "</span></button>";
 }
+// Duelos: inserción binaria dentro de cada empate; cada comparación es un "¿cuál les gustó más?".
+let duelResolve = null;
+let duelCount = 0;
+function askDuel(a, b, rating) {
+  duelCount++;
+  const box = document.getElementById("duelBody");
+  const side = function (d) {
+    const p = posters[d.id];
+    return '<button class="duel-pick" onclick="pickDuel(\'' + d.id + '\')">' +
+      '<span class="duel-poster">' + (p ? '<img src="' + p + '" alt="" />' : "") + "</span>" +
+      '<span class="duel-title">' + escapeHtml(d.es) + "</span></button>";
+  };
+  box.innerHTML = '<p class="duel-sub">Duelo ' + duelCount + " · las dos tienen " + String(rating).replace(".", ",") + " ★</p>" +
+    '<div class="duel-arena">' + side(a) + '<span class="duel-vs big">VS</span>' + side(b) + "</div>";
+  return new Promise(function (resolve) { duelResolve = function (id) { resolve(id === a.id); }; });
+}
+function pickDuel(id) {
+  const el = document.querySelector('.duel-pick[onclick*="' + id + '"]');
+  if (el) el.classList.add("won");
+  const r = duelResolve; duelResolve = null;
+  if (r) setTimeout(function () { r(id); }, 260);
+}
+function closeDuel() {
+  duelResolve = null;
+  document.getElementById("duelBackdrop").classList.remove("show");
+  render();
+}
+async function startDuels(repeat) {
+  const groups = repeat ? tieGroups() : unresolvedTies(tieGroups());
+  if (!groups.length) return;
+  tiebreak = Object.assign({}, tiebreak);
+  if (repeat) groups.forEach(function (g) { g.forEach(function (d) { delete tiebreak[d.id]; }); });
+  duelCount = 0;
+  document.getElementById("duelBackdrop").classList.add("show");
+  for (const group of groups) {
+    const rating = ratings[group[0].id];
+    // los que ya tienen orden se respetan; los demás se insertan por duelos
+    const sorted = group.filter(function (d) { return tieOrderOf(d.id) !== null; }).sort(compareRated);
+    const todo = group.filter(function (d) { return tieOrderOf(d.id) === null; });
+    for (const item of todo) {
+      let lo = 0, hi = sorted.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        const itemWins = await askDuel(item, sorted[mid], rating);
+        if (!document.getElementById("duelBackdrop").classList.contains("show")) return; // cerraron a mitad
+        if (itemWins) hi = mid; else lo = mid + 1;
+      }
+      sorted.splice(lo, 0, item);
+      sorted.forEach(function (d, i) { tiebreak[d.id] = { r: rating, o: i }; });
+      saveTiebreak();
+    }
+  }
+  document.getElementById("duelBackdrop").classList.remove("show");
+  render();
+  showToast("¡Empates resueltos!", "#FFF8E7");
+}
+
 function setPodiumDate(id, value) {
   setWatchDate(id, value || null);
   render();
@@ -3204,7 +3346,7 @@ function renderPodiumView() {
   const pool = podiumFilter === "ucm" ? DATA : podiumFilter === "other" ? OTHER_DATA : DATA.concat(OTHER_DATA);
   const totalRated = DATA.concat(OTHER_DATA).filter(function (d) { return ratings[d.id] > 0; }).length;
   const rated = pool.filter(function (d) { return ratings[d.id] > 0; });
-  rated.sort(function (a, b) { return ratings[b.id] - ratings[a.id]; });
+  rated.sort(compareRated);
 
   document.getElementById("count").innerHTML = rated.length + '<span> título' + (rated.length === 1 ? "" : "s") + " calificado" + (rated.length === 1 ? "" : "s") + "</span>";
   document.getElementById("overallBar").innerHTML = "";
@@ -3220,7 +3362,13 @@ function renderPodiumView() {
   }
 
   const rows = rated.map(function (item, i) { return buildPodiumRow(item, i + 1); }).join("");
-  main.innerHTML = '<section class="saga">' +
+  const groups = tieGroups();
+  const pending = unresolvedTies(groups).length;
+  const duelBtn = !groups.length ? ""
+    : pending
+      ? '<button class="duel-banner" onclick="startDuels(false)"><span class="duel-vs">VS</span><span>' + (pending === 1 ? "Hay 1 empate" : "Hay " + pending + " empates") + " · <b>¡A duelo!</b></span></button>"
+      : '<button class="duel-banner done" onclick="startDuels(true)"><span class="duel-vs">VS</span><span>Empates resueltos · <b>Repetir duelos</b></span></button>';
+  main.innerHTML = '<section class="saga">' + duelBtn +
     '<div class="podium-list">' + rows + "</div>" +
     '<p class="podium-hint">Tocá cualquiera para cambiar sus estrellas o la fecha.</p>' +
     "</section>";
@@ -3670,6 +3818,7 @@ loadState();
 loadPosterCache();
 loadPrefs();
 loadRatings();
+loadTiebreak();
 loadWatchDates();
 loadLengthCache();
 syncControlButtons();
