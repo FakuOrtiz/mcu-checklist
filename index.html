@@ -55,7 +55,6 @@
   .placeholder-title { font-size: 9px; line-height: 1.2; color: rgba(237,235,227,0.75); position: relative; z-index: 1; }
   .type-badge { position: absolute; top: 4px; left: 4px; display: flex; align-items: center; gap: 3px; border-radius: 999px; padding: 2px 6px; background: rgba(10,11,18,0.8); z-index: 2; }
   .type-badge span { font-size: 8px; font-weight: 500; }
-  .info-btn { position: absolute; top: 4px; right: 4px; border-radius: 999px; padding: 4px; background: rgba(10,11,18,0.75); z-index: 2; display: flex; }
   .stamp-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(10,11,18,0.35); z-index: 3; pointer-events: none; }
   .stamp-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transform: rotate(-10deg); }
   .lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: rgba(10,11,18,0.72); text-align: center; padding: 8px; z-index: 3; }
@@ -66,22 +65,8 @@
   footer p { font-size: 10px; color: #3F3F4C; }
   #toast { position: fixed; top: 16px; left: 50%; transform: translate(-50%, -12px); opacity: 0; z-index: 60; padding: 8px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; background: #15161F; transition: all .22s ease-out; pointer-events: none; max-width: 85vw; text-align: center; }
   #toast.show { opacity: 1; transform: translate(-50%, 0); }
-  #modalBackdrop { position: fixed; inset: 0; z-index: 50; background: rgba(10,11,18,0.75); display: none; align-items: flex-end; justify-content: center; }
-  #modalBackdrop.show { display: flex; }
-  @media (min-width: 640px) { #modalBackdrop { align-items: center; } }
-  #modalBox { width: 100%; max-width: 480px; border-radius: 16px 16px 0 0; padding: 20px; max-height: 80vh; overflow-y: auto; background: #13141D; border: 1px solid #23232E; }
-  @media (min-width: 640px) { #modalBox { border-radius: 16px; } }
-  #modalYear { font-size: 11px; color: #5A5A6C; margin: 0; }
-  #modalTitle { font-size: 18px; font-weight: 600; color: #F3E7C9; margin: 0; }
-  #modalClose { padding: 6px; border-radius: 999px; background: #1C1D28; border: none; cursor: pointer; display: flex; }
-  #modalSynopsis { font-size: 14px; line-height: 1.6; color: #C9C9D6; margin: 12px 0 16px; }
   .modal-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #5A5A6C; margin: 0 0 8px; }
-  #modalCharacters { display: flex; flex-wrap: wrap; gap: 8px; }
-  .char-chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: #1C1D28; color: #C9C9D6; border: 1px solid #262735; }
-  #postCreditsSection { margin-top: 20px; padding-top: 16px; border-top: 1px solid #23232E; }
-  #postCreditsBtn { font-size: 12px; padding: 8px 12px; border-radius: 999px; width: 100%; text-align: center; color: #9A9AAC; border: 1px solid #262735; background: #1C1D28; cursor: pointer; }
-  #postCreditsText { font-size: 14px; line-height: 1.6; color: #C9C9D6; }
-  #quizLaunchSection { margin-top: 12px; }
+  #quizLaunchSection { margin-top: 14px; }
   #quizLaunchBtn { font-size: 13px; font-weight: 600; padding: 10px 12px; border-radius: 999px; width: 100%; text-align: center; color: #0A0B12; border: none; background: #F3E7C9; cursor: pointer; }
   #quizBackdrop { position: fixed; inset: 0; z-index: 55; background: rgba(10,11,18,0.8); display: none; align-items: flex-end; justify-content: center; }
   #quizBackdrop.show { display: flex; }
@@ -233,30 +218,6 @@
 
 <footer></footer>
 
-<div id="modalBackdrop">
-  <div id="modalBox">
-    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px;">
-      <div>
-        <p id="modalYear"></p>
-        <h3 id="modalTitle" class="display-font"></h3>
-      </div>
-      <button id="modalClose">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A9AAC" stroke-width="1.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-    <p id="modalSynopsis"></p>
-    <p class="modal-label">Personajes principales</p>
-    <div id="modalCharacters"></div>
-    <div id="postCreditsSection" style="display:none;">
-      <button id="postCreditsBtn">Mostrar escena post-créditos</button>
-      <p id="postCreditsText" style="display:none;"></p>
-    </div>
-    <div id="quizLaunchSection" style="display:none;">
-      <button id="quizLaunchBtn">Hacer el quiz (10 preguntas)</button>
-    </div>
-  </div>
-</div>
-
 <div id="quizBackdrop">
   <div id="quizBox">
     <div id="quizHeader">
@@ -287,6 +248,9 @@
         <span class="modal-label" style="margin:0;">Vista el</span>
         <input type="date" id="statusWatchDate">
       </label>
+      <div id="quizLaunchSection" style="display:none;">
+        <button id="quizLaunchBtn"></button>
+      </div>
     </div>
     <button class="status-option" data-status="watched">Vista</button>
     <button class="status-option" data-status="summary">Solo vi el resumen</button>
@@ -333,238 +297,129 @@ const TYPE_META = {
 
 const DATA = [
   { id: "iron-man", es: "Iron Man", en: "Iron Man", year: 2008, date: "2008-05-02", type: "movie", phase: 1,
-    synopsis: "Tony Stark, magnate de armamento, resulta gravemente herido y secuestrado durante una demostración de armas; un electroimán conectado a un reactor Arc en su pecho es lo único que evita que la metralla llegue a su corazón. Con esa misma tecnología construye una armadura de alta tecnología para escapar — y decide usarla para proteger al mundo en vez de venderlo como arma.",
-    characters: ["Tony Stark / Iron Man", "Pepper Potts", "James Rhodes", "Obadiah Stane"],
-    postCredits: "Nick Fury aparece en la mansión de Tony para decirle que no es el único con habilidades especiales, y le habla por primera vez de la 'Iniciativa Vengadores'." },
+    characters: ["Tony Stark / Iron Man", "Pepper Potts", "James Rhodes", "Obadiah Stane"] },
   { id: "hulk", es: "El Increíble Hulk", en: "The Incredible Hulk", year: 2008, date: "2008-06-13", type: "movie", phase: 1,
-    synopsis: "Bruce Banner, expuesto a una sobredosis de radiación gamma durante un experimento militar que buscaba recrear el suero del supersoldado, ahora se transforma en un gigante verde imparable cada vez que su ritmo cardíaco se dispara por ira o estrés extremo. Prófugo del ejército que quiere convertir su condición en arma, busca desesperadamente una cura.",
-    characters: ["Bruce Banner / Hulk", "Betty Ross", "Thaddeus Ross", "Emil Blonsky"],
-    postCredits: "Tony Stark visita al General Ross en un bar y le dice que está 'armando un equipo' — su primera referencia directa a los Vengadores." },
+    characters: ["Bruce Banner / Hulk", "Betty Ross", "Thaddeus Ross", "Emil Blonsky"] },
   { id: "iron-man-2", es: "Iron Man 2", en: "Iron Man 2", year: 2010, date: "2010-05-07", type: "movie", phase: 1,
-    synopsis: "Con su identidad como Iron Man ya pública, Tony Stark descubre que el mismo reactor Arc que lo mantiene con vida lo está envenenando lentamente con paladio. Mientras busca una solución, un rival armamentista y un ingeniero ruso con sed de venganza ponen en jaque su legado.",
-    characters: ["Tony Stark", "Natasha Romanoff", "James Rhodes", "Ivan Vanko"],
-    postCredits: "El agente Coulson, enviado a Nuevo México, descubre un cráter en el desierto con un objeto enterrado — el martillo de Thor." },
+    characters: ["Tony Stark", "Natasha Romanoff", "James Rhodes", "Ivan Vanko"] },
   { id: "thor", es: "Thor", en: "Thor", year: 2011, date: "2011-05-06", type: "movie", phase: 1,
-    synopsis: "Por su arrogancia y por desatar una guerra con Jotunheim, Odín destierra a Thor a la Tierra y le quita sus poderes, dejando su martillo Mjolnir bajo un hechizo que solo alguien digno puede levantar. Sin sus habilidades divinas, Thor debe aprender humildad entre los humanos para poder recuperarlas.",
-    characters: ["Thor", "Loki", "Jane Foster", "Odín"],
-    postCredits: "Nick Fury visita al Dr. Erik Selvig y le muestra el Teseracto, un cubo de energía de origen cósmico, para que lo estudie." },
+    characters: ["Thor", "Loki", "Jane Foster", "Odín"] },
   { id: "cap-1", es: "Capitán América: El Primer Vengador", en: "Captain America The First Avenger", year: 2011, date: "2011-07-22", type: "movie", phase: 1,
-    synopsis: "Steve Rogers, un joven de salud frágil rechazado por el ejército, es aceptado en un programa experimental que lo transforma en supersoldado mediante un suero que lleva sus capacidades físicas al máximo humano posible. Ya transformado, enfrenta a HYDRA, la división de ciencia oscura del ejército nazi.",
-    characters: ["Steve Rogers / Capitán América", "Bucky Barnes", "Peggy Carter", "Cráneo Rojo"],
-    postCredits: "Steve despierta en pleno Times Square moderno y descubre que estuvo congelado casi 70 años; Nick Fury le confirma que hay un trabajo esperándolo." },
+    characters: ["Steve Rogers / Capitán América", "Bucky Barnes", "Peggy Carter", "Cráneo Rojo"] },
   { id: "avengers-1", es: "Los Vengadores", en: "The Avengers", year: 2012, date: "2012-05-04", type: "movie", phase: 1,
-    synopsis: "Loki, hermano adoptivo de Thor, llega a la Tierra con un ejército alienígena y un cetro capaz de controlar mentes, obligando a Nick Fury a reunir por primera vez a los héroes más poderosos del planeta para detenerlo.",
-    characters: ["Iron Man", "Capitán América", "Thor", "Hulk", "Viuda Negra", "Ojo de Halcón", "Loki"],
-    postCredits: "Un ser alienígena le advierte a alguien fuera de cámara que desafiar a la Tierra 'es cortejar a la muerte' — quien escucha, sonríe. Es la primera aparición de Thanos. Al final, los Vengadores comen shawarma en silencio entre los escombros." },
+    characters: ["Iron Man", "Capitán América", "Thor", "Hulk", "Viuda Negra", "Ojo de Halcón", "Loki"] },
   { id: "iron-man-3", es: "Iron Man 3", en: "Iron Man 3", year: 2013, date: "2013-05-03", type: "movie", phase: 2,
-    synopsis: "Tras casi morir en la batalla de Nueva York, Tony Stark sufre ataques de pánico mientras un terrorista llamado el Mandarín pone en jaque al país.",
-    characters: ["Tony Stark", "James Rhodes", "Pepper Potts", "Mandarín / Aldrich Killian"],
-    postCredits: "Se revela que Tony le estuvo contando toda la película a Bruce Banner, quien se queda dormido — un chiste sobre la terapia entre 'amigos científicos'." },
+    characters: ["Tony Stark", "James Rhodes", "Pepper Potts", "Mandarín / Aldrich Killian"] },
   { id: "thor-2", es: "Thor: Un Mundo Oscuro", en: "Thor The Dark World", year: 2013, date: "2013-11-08", type: "movie", phase: 2,
-    synopsis: "Una fuerza ancestral llamada el Éter resurge, poniendo a Thor y Jane Foster en el centro de un conflicto que amenaza todos los reinos.",
-    characters: ["Thor", "Jane Foster", "Loki", "Malekith"],
-    postCredits: "Sif y Volstagg le entregan el Éter a un misterioso Coleccionista, quien comenta que 'uno menos, quedan cinco' — la primera mención directa a las Gemas del Infinito." },
+    characters: ["Thor", "Jane Foster", "Loki", "Malekith"] },
   { id: "cap-2", es: "Capitán América: El Soldado de Invierno", en: "Captain America The Winter Soldier", year: 2014, date: "2014-04-04", type: "movie", phase: 2,
-    synopsis: "Steve Rogers descubre que S.H.I.E.L.D. está infiltrado y debe enfrentar a un misterioso asesino del pasado mientras huye como fugitivo.",
-    characters: ["Steve Rogers", "Natasha Romanoff", "Bucky Barnes / Soldado del Invierno", "Sam Wilson / Falcon"],
-    postCredits: "En una base secreta de HYDRA se revela al Barón von Strucker experimentando con el cetro de Loki sobre dos gemelos con habilidades — los futuros Quicksilver y Bruja Escarlata." },
+    characters: ["Steve Rogers", "Natasha Romanoff", "Bucky Barnes / Soldado del Invierno", "Sam Wilson / Falcon"] },
   { id: "gotg-1", es: "Guardianes de la Galaxia", en: "Guardians of the Galaxy", year: 2014, date: "2014-08-01", type: "movie", phase: 2,
-    synopsis: "Peter Quill roba un orbe misterioso que resulta contener una Gema del Infinito, lo que lo convierte en blanco de medio universo. Para protegerlo, se une a un grupo dispar de criminales espaciales.",
-    characters: ["Peter Quill / Star-Lord", "Gamora", "Drax", "Rocket", "Groot"],
-    postCredits: "En la sala de trofeos del Coleccionista aparece, entre curiosos objetos, un Howard el Pato viviente." },
+    characters: ["Peter Quill / Star-Lord", "Gamora", "Drax", "Rocket", "Groot"] },
   { id: "avengers-2", es: "Vengadores: La Era de Ultrón", en: "Avengers Age of Ultron", year: 2015, date: "2015-05-01", type: "movie", phase: 2,
-    synopsis: "Tony Stark y Bruce Banner experimentan en secreto con la inteligencia artificial alojada en el cetro de Loki para crear un programa que proteja al planeta, pero el resultado, Ultrón, decide que la única forma de salvar la Tierra es exterminando a la humanidad.",
-    characters: ["Iron Man", "Ultrón", "Bruja Escarlata", "Visión", "Thor", "Capitán América"],
-    postCredits: "Thanos se pone él mismo el Guantelete del Infinito (todavía vacío) y dice, resignado: 'Bien, lo haré yo mismo'." },
+    characters: ["Iron Man", "Ultrón", "Bruja Escarlata", "Visión", "Thor", "Capitán América"] },
   { id: "antman-1", es: "Ant-Man", en: "Ant-Man", year: 2015, date: "2015-07-17", type: "movie", phase: 2,
-    synopsis: "El científico Hank Pym recluta al exladrón Scott Lang para usar el traje Ant-Man, una tecnología que le permite encogerse hasta escala subatómica mientras multiplica su fuerza, con el fin de impedir que su propia invención caiga en malas manos.",
-    characters: ["Scott Lang / Ant-Man", "Hope van Dyne", "Hank Pym"],
-    postCredits: "Falcon y el Capitán América confrontan a alguien que resulta ser Bucky Barnes; por separado, Hank Pym le muestra a Hope su propio traje de la Avispa." },
+    characters: ["Scott Lang / Ant-Man", "Hope van Dyne", "Hank Pym"] },
   { id: "civil-war", es: "Capitán América: Civil War", en: "Captain America Civil War", year: 2016, date: "2016-05-06", type: "movie", phase: 3,
-    synopsis: "Un accidente internacional divide a los Vengadores entre quienes apoyan la supervisión gubernamental y quienes defienden su independencia.",
-    characters: ["Capitán América", "Iron Man", "Bucky Barnes", "Black Panther", "Spider-Man"],
-    postCredits: "Zemo, ya preso, recibe la visita de un agente que le advierte que 'alguien' quiere hablar con él. Por separado, Peter Parker prueba emocionado sus lanzatelarañas en su cuarto." },
+    characters: ["Capitán América", "Iron Man", "Bucky Barnes", "Black Panther", "Spider-Man"] },
   { id: "dr-strange-1", es: "Doctor Strange", en: "Doctor Strange", year: 2016, date: "2016-11-04", type: "movie", phase: 3,
-    synopsis: "Tras un accidente automovilístico que destruye sus manos, el neurocirujano Stephen Strange viaja a Katmandú buscando una cura y termina aprendiendo artes místicas capaces de manipular el tiempo y abrir portales entre dimensiones.",
-    characters: ["Stephen Strange", "Christine Palmer", "Karl Mordo", "Anciana"],
-    postCredits: "Strange se reúne con Thor para ayudarlo a encontrar a Odín. Por separado, Mordo le quita los poderes a un hechicero, declarando que 'hay demasiados magos'." },
+    characters: ["Stephen Strange", "Christine Palmer", "Karl Mordo", "Anciana"] },
   { id: "gotg-2", es: "Guardianes de la Galaxia Vol. 2", en: "Guardians of the Galaxy Vol 2", year: 2017, date: "2017-05-05", type: "movie", phase: 3,
-    synopsis: "Los Guardianes exploran el origen del padre biológico de Peter Quill mientras defienden su recién formada familia.",
-    characters: ["Star-Lord", "Gamora", "Rocket", "Ego", "Yondu"],
-    postCredits: "Varias escenas cortas: Kraglin practicando con la flecha de Yondu, un Groot adolescente rebelde, y Ayesha revelando un capullo con un ser dorado al que planea llamar 'Adam'." },
+    characters: ["Star-Lord", "Gamora", "Rocket", "Ego", "Yondu"] },
   { id: "spiderman-homecoming", es: "Spider-Man: Homecoming", en: "Spider-Man Homecoming", year: 2017, date: "2017-07-07", type: "movie", phase: 3,
-    synopsis: "Picado por una araña genéticamente alterada durante una visita escolar, Peter Parker gana fuerza, agilidad y sentido arácnido sobrehumanos. Bajo la tutela de Tony Stark, intenta equilibrar la secundaria con su nueva vida como Spider-Man.",
-    characters: ["Peter Parker / Spider-Man", "Tony Stark", "Ned Leeds", "Vulture"],
-    postCredits: "Un gag cómico: el Capitán América (en un video de propaganda escolar) habla sobre la paciencia, rompiendo la cuarta pared." },
+    characters: ["Peter Parker / Spider-Man", "Tony Stark", "Ned Leeds", "Vulture"] },
   { id: "thor-3", es: "Thor: Ragnarok", en: "Thor Ragnarok", year: 2017, date: "2017-11-03", type: "movie", phase: 3,
-    synopsis: "Thor queda atrapado en un planeta lejano y debe competir como gladiador para regresar a tiempo de evitar la destrucción de Asgard.",
-    characters: ["Thor", "Hulk", "Loki", "Valquiria", "Hela"],
-    postCredits: "La nave de Thor es interceptada por una nave mucho más grande que proyecta una sombra amenazante sobre ellos — la nave de Thanos." },
+    characters: ["Thor", "Hulk", "Loki", "Valquiria", "Hela"] },
   { id: "black-panther-1", es: "Black Panther", en: "Black Panther", year: 2018, date: "2018-02-16", type: "movie", phase: 3,
-    synopsis: "T'Challa hereda no solo el trono de Wakanda sino también el manto de Black Panther, cuya fuerza y sentidos sobrehumanos provienen de una hierba en forma de corazón potenciada por vibranio. Debe decidir si mantener el aislamiento de su nación o compartir su tecnología con el mundo.",
-    characters: ["T'Challa / Black Panther", "Killmonger", "Okoye", "Shuri"],
-    postCredits: "T'Challa anuncia ante la ONU que Wakanda revelará su verdadera riqueza tecnológica al mundo. En otra escena, Bucky Barnes se recupera en Wakanda, y Shuri lo saluda como 'Lobo Blanco'." },
+    characters: ["T'Challa / Black Panther", "Killmonger", "Okoye", "Shuri"] },
   { id: "infinity-war", es: "Vengadores: Infinity War", en: "Avengers Infinity War", year: 2018, date: "2018-04-27", type: "movie", phase: 3,
-    synopsis: "Thanos recorre el universo en busca de las Gemas del Infinito, y los héroes de la Tierra deben unirse como nunca antes para detenerlo.",
-    characters: ["Thanos", "Iron Man", "Capitán América", "Thor", "Gamora", "Doctor Strange"],
-    postCredits: "Nick Fury alcanza a enviar un mensaje de auxilio justo antes de desintegrarse — el buscapersonas termina de transmitir mostrando un símbolo estelar." },
+    characters: ["Thanos", "Iron Man", "Capitán América", "Thor", "Gamora", "Doctor Strange"] },
   { id: "antman-2", es: "Ant-Man y la Avispa", en: "Ant-Man and the Wasp", year: 2018, date: "2018-07-06", type: "movie", phase: 3,
-    synopsis: "Scott Lang se reúne con Hope van Dyne y Hank Pym en una misión de rescate que involucra el misterioso Reino Cuántico.",
-    characters: ["Scott Lang", "Hope van Dyne / Avispa", "Hank Pym", "Janet van Dyne"],
-    postCredits: "Mientras Scott está en el Reino Cuántico, Hank, Janet y Hope se desintegran afuera por el chasquido de Thanos, dejándolo atrapado sin nadie que pueda sacarlo." },
+    characters: ["Scott Lang", "Hope van Dyne / Avispa", "Hank Pym", "Janet van Dyne"] },
   { id: "captain-marvel", es: "Capitana Marvel", en: "Captain Marvel", year: 2019, date: "2019-03-08", type: "movie", phase: 3,
-    synopsis: "Una piloto de la Fuerza Aérea con memoria fragmentada, cuyo cuerpo quedó fusionado con energía cósmica tras un accidente con un motor experimental, descubre en medio de una guerra intergaláctica que su pasado en la Tierra es distinto de lo que le hicieron creer.",
-    characters: ["Carol Danvers / Capitana Marvel", "Nick Fury", "Talos"],
-    postCredits: "Capitana Marvel llega a la sede de los Vengadores mientras el equipo lidia con la ausencia de la mitad del universo, preguntando dónde está Fury. Su gato, Goose, escupe el Teseracto en la oficina de Fury." },
+    characters: ["Carol Danvers / Capitana Marvel", "Nick Fury", "Talos"] },
   { id: "endgame", es: "Vengadores: Endgame", en: "Avengers Endgame", year: 2019, date: "2019-04-26", type: "movie", phase: 3,
-    synopsis: "Tras el chasquido de Thanos, los Vengadores sobrevivientes idean un plan desesperado para revertir el daño causado.",
-    characters: ["Iron Man", "Capitán América", "Thor", "Viuda Negra", "Hulk", "Ojo de Halcón"],
-    postCredits: "No hay escena adicional — los créditos cierran con el sonido de un martillo golpeando metal en el taller original de Tony, un homenaje silencioso." },
+    characters: ["Iron Man", "Capitán América", "Thor", "Viuda Negra", "Hulk", "Ojo de Halcón"] },
   { id: "far-from-home", es: "Spider-Man: Far From Home", en: "Spider-Man Far From Home", year: 2019, date: "2019-07-02", type: "movie", phase: 3,
-    synopsis: "Peter Parker busca unas vacaciones tranquilas en Europa, pero es reclutado para enfrentar una nueva amenaza elemental.",
-    characters: ["Peter Parker", "Nick Fury", "Mysterio", "MJ"],
-    postCredits: "J. Jonah Jameson revela en vivo la identidad de Spider-Man al mundo con un video editado. Además, se descubre que 'Fury' y 'Hill' en realidad eran skrulls disfrazados todo este tiempo; el Fury real está en el espacio." },
+    characters: ["Peter Parker", "Nick Fury", "Mysterio", "MJ"] },
   { id: "wandavision", es: "WandaVision", en: "WandaVision", year: 2021, date: "2021-01-15", type: "series", phase: 4,
-    synopsis: "Wanda Maximoff vive una idílica vida de sitcom en un pueblo que esconde un misterio mucho más oscuro.",
-    characters: ["Wanda Maximoff", "Visión", "Mónica Rambeau", "Agnes"],
-    postCredits: "Wanda, ya sola, escucha las voces de sus hijos pidiendo ayuda mientras estudia un misterioso libro de hechizos oscuro." },
+    characters: ["Wanda Maximoff", "Visión", "Mónica Rambeau", "Agnes"] },
   { id: "falcon-ws", es: "Falcon y el Soldado de Invierno", en: "The Falcon and the Winter Soldier", year: 2021, date: "2021-03-19", type: "series", phase: 4,
-    synopsis: "Sam Wilson y Bucky Barnes deben trabajar juntos para enfrentar a un grupo extremista mientras cargan con el legado del escudo del Capitán América.",
-    characters: ["Sam Wilson", "Bucky Barnes", "John Walker", "Zemo"],
-    postCredits: "Se revela que Sharon Carter, indultada y reincorporada al gobierno, sigue vendiendo secretos en secreto como la misteriosa 'Power Broker'." },
+    characters: ["Sam Wilson", "Bucky Barnes", "John Walker", "Zemo"] },
   { id: "loki-1", es: "Loki (T1)", en: "Loki", year: 2021, date: "2021-06-09", type: "series", phase: 4,
-    synopsis: "Tras robar el Teseracto, una versión de Loki es reclutada por una organización que vigila la línea temporal para reparar el daño que causó.",
-    characters: ["Loki", "Mobius", "Sylvie"],
-    postCredits: "Loki regresa a la TVA y descubre que ya no la reconocen — ahora hay una estatua de un desconocido gobernando el lugar mientras las líneas temporales empiezan a ramificarse sin control." },
+    characters: ["Loki", "Mobius", "Sylvie"] },
   { id: "black-widow", es: "Black Widow", en: "Black Widow", year: 2021, date: "2021-07-09", type: "movie", phase: 4,
-    synopsis: "Antes de los eventos de Vengadores, Natasha Romanoff enfrenta fantasmas de su pasado como espía encubierta junto a su familia adoptiva.",
-    characters: ["Natasha Romanoff", "Yelena Belova", "Alexei / Guardián Rojo"],
-    postCredits: "Yelena visita la tumba de Natasha y es contactada por Valentina Allegra de Fontaine, quien le da un nuevo objetivo a eliminar: Clint Barton." },
+    characters: ["Natasha Romanoff", "Yelena Belova", "Alexei / Guardián Rojo"] },
   { id: "whatif-1", es: "What If…? (T1)", en: "What If", year: 2021, date: "2021-08-11", type: "series", phase: 4,
-    synopsis: "Una serie de universos alternativos explora cómo un pequeño cambio podría transformar por completo eventos clave del UCM.",
     characters: ["El Vigilante (narrador)", "Versiones alternativas de los héroes del UCM"] },
   { id: "shang-chi", es: "Shang-Chi y la Leyenda de los Diez Anillos", en: "Shang-Chi and the Legend of the Ten Rings", year: 2021, date: "2021-09-03", type: "movie", phase: 4,
-    synopsis: "Un joven con un pasado oculto es forzado a confrontar la organización secreta de su padre, quien ha usado durante siglos diez anillos místicos que le otorgan poder e inmortalidad.",
-    characters: ["Shang-Chi", "Katy", "Xu Wenwu", "Xialing"],
-    postCredits: "Wong, Capitana Marvel y Bruce Banner examinan los diez anillos de Shang-Chi y descubren que emiten una señal desconocida. Por separado, Wong invoca a Abominación para una pelea amistosa por apuestas." },
+    characters: ["Shang-Chi", "Katy", "Xu Wenwu", "Xialing"] },
   { id: "eternals", es: "Eternals", en: "Eternals", year: 2021, date: "2021-11-05", type: "movie", phase: 4,
-    synopsis: "Un grupo de seres inmortales creados por los Celestiales para proteger a la humanidad de monstruos llamados Desviantes ha vivido en secreto en la Tierra durante miles de años, hasta que una amenaza ancestral los obliga a reunirse de nuevo.",
-    characters: ["Sersi", "Ikaris", "Thena", "Kingo"],
-    postCredits: "Eros, hermano de Thanos, llega junto a Pip para ayudar a los Eternals restantes. En otra escena, Dane Whitman está por abrir un misterioso estuche cuando una voz le pregunta si está seguro de querer hacerlo." },
+    characters: ["Sersi", "Ikaris", "Thena", "Kingo"] },
   { id: "hawkeye", es: "Hawkeye", en: "Hawkeye", year: 2021, date: "2021-11-24", type: "series", phase: 4,
-    synopsis: "Clint Barton intenta pasar la Navidad con su familia, pero una joven arquera lo arrastra de vuelta a su pasado como Ronin.",
     characters: ["Clint Barton", "Kate Bishop", "Yelena Belova"] },
   { id: "no-way-home", es: "Spider-Man: No Way Home", en: "Spider-Man No Way Home", year: 2021, date: "2021-12-17", type: "movie", phase: 4,
-    synopsis: "Peter Parker pide ayuda mágica para que el mundo olvide su identidad secreta, con consecuencias que abren la puerta al multiverso.",
-    characters: ["Peter Parker", "Doctor Strange", "MJ", "Ned"],
-    postCredits: "Eddie Brock, con el simbionte Venom, aparece brevemente en un bar del UCM, se entera de la existencia de los Vengadores y es succionado de vuelta a su universo, dejando una gota del simbionte atrás." },
+    characters: ["Peter Parker", "Doctor Strange", "MJ", "Ned"] },
   { id: "moon-knight", es: "Moon Knight", en: "Moon Knight", year: 2022, date: "2022-03-30", type: "series", phase: 4,
-    synopsis: "Un hombre con trastorno de identidad disociativa descubre que comparte su cuerpo con un avatar de un dios egipcio.",
-    characters: ["Marc Spector / Steven Grant", "Layla", "Khonshu"],
-    postCredits: "Se revela un tercer alter dentro de Marc: Jake Lockley, quien libera al villano Harrow de un hospital psiquiátrico y lo ejecuta." },
+    characters: ["Marc Spector / Steven Grant", "Layla", "Khonshu"] },
   { id: "dr-strange-2", es: "Doctor Strange en el Multiverso de la Locura", en: "Doctor Strange in the Multiverse of Madness", year: 2022, date: "2022-05-06", type: "movie", phase: 4,
-    synopsis: "Doctor Strange viaja a través del multiverso para proteger a una joven con una habilidad única, enfrentando versiones alternativas de la realidad.",
-    characters: ["Stephen Strange", "América Chávez", "Wanda Maximoff"],
-    postCredits: "Strange, con un tercer ojo tras usar el Libro de Vishanti, es abordado por Clea, quien lo invita a ayudarla a resolver una incursión multiversal." },
+    characters: ["Stephen Strange", "América Chávez", "Wanda Maximoff"] },
   { id: "ms-marvel", es: "Ms. Marvel", en: "Ms Marvel", year: 2022, date: "2022-06-08", type: "series", phase: 4,
-    synopsis: "Una adolescente fanática de los superhéroes descubre que un brazalete heredado de su familia le otorga poderes de energía cósmica ligados a su herencia paquistaní.",
-    characters: ["Kamala Khan / Ms. Marvel", "Bruno", "Nakia"],
-    postCredits: "Una nave de S.A.B.E.R. contacta a Kamala en medio de la noche — el comienzo de su conexión con los eventos de Secret Invasion." },
+    characters: ["Kamala Khan / Ms. Marvel", "Bruno", "Nakia"] },
   { id: "thor-4", es: "Thor: Love and Thunder", en: "Thor Love and Thunder", year: 2022, date: "2022-07-08", type: "movie", phase: 4,
-    synopsis: "Thor busca la paz interior, pero un villano que caza dioses lo obliga a tomar las armas una vez más junto a viejos y nuevos aliados.",
-    characters: ["Thor", "Jane Foster", "Valquiria", "Gorr"],
-    postCredits: "Zeus envía a su hijo Hércules a buscar venganza contra Thor. Por separado, Jane Foster llega al Valhalla, recibida por Heimdall." },
+    characters: ["Thor", "Jane Foster", "Valquiria", "Gorr"] },
   { id: "i-am-groot", es: "Yo Soy Groot", en: "I Am Groot", year: 2022, date: "2022-08-10", type: "series", phase: 4,
-    synopsis: "Cortos protagonizados por un pequeño y travieso Groot durante su crecimiento a bordo de la nave de los Guardianes.",
     characters: ["Groot", "Rocket"] },
   { id: "she-hulk", es: "She-Hulk: Abogada Hulka", en: "She-Hulk Attorney at Law", year: 2022, date: "2022-08-18", type: "series", phase: 4,
-    synopsis: "Una transfusión de sangre de emergencia con su primo Bruce Banner le transmite a Jennifer Walters el gen Hulk, dándole fuerza y tamaño sobrehumanos que debe aprender a controlar mientras mantiene su carrera de abogada.",
-    characters: ["Jennifer Walters / She-Hulk", "Bruce Banner", "Emil Blonsky"],
-    postCredits: "Jennifer rompe la cuarta pared y confronta directamente a K.E.V.I.N., la IA que escribe los guiones de Marvel Studios, para exigir un final distinto al que le habían dado." },
+    characters: ["Jennifer Walters / She-Hulk", "Bruce Banner", "Emil Blonsky"] },
   { id: "werewolf", es: "Werewolf by Night", en: "Werewolf by Night", year: 2022, date: "2022-10-07", type: "special", phase: 4,
-    synopsis: "Jack Russell esconde una maldición licántropa heredada de su familia mientras participa en una cacería secreta de monstruos que compite por una reliquia poderosa.",
     characters: ["Jack Russell", "Elsa Bloodstone"] },
   { id: "wakanda-forever", es: "Black Panther: Wakanda Forever", en: "Black Panther Wakanda Forever", year: 2022, date: "2022-11-11", type: "movie", phase: 4,
-    synopsis: "Wakanda enfrenta amenazas externas e internas tras la pérdida de su rey, mientras Namor, gobernante de un reino submarino con fuerza sobrehumana y capacidad de volar gracias al vibranio azul, entra en escena.",
-    characters: ["Shuri", "Okoye", "Namor", "Ramonda"],
-    postCredits: "Se revela que Shuri y Nakia criaron en secreto al hijo de T'Challa en Haití — un niño llamado también T'Challa." },
+    characters: ["Shuri", "Okoye", "Namor", "Ramonda"] },
   { id: "gotg-holiday", es: "Especial Navideño de los Guardianes", en: "The Guardians of the Galaxy Holiday Special", year: 2022, date: "2022-11-25", type: "special", phase: 4,
-    synopsis: "Los Guardianes intentan darle a Peter Quill el mejor regalo de Navidad posible, con resultados tan torpes como entrañables.",
     characters: ["Drax", "Mantis", "Peter Quill"] },
   { id: "quantumania", es: "Ant-Man y la Avispa: Quantumanía", en: "Ant-Man and the Wasp Quantumania", year: 2023, date: "2023-02-17", type: "movie", phase: 5,
-    synopsis: "La familia Lang-Van Dyne queda atrapada en el Reino Cuántico y se enfrenta a Kang el Conquistador, un ser exiliado ahí que dice controlar el tiempo mismo a través de variantes de sí mismo en el multiverso.",
-    characters: ["Scott Lang", "Hope van Dyne", "Kang el Conquistador", "Cassie Lang"],
-    postCredits: "En la TVA, Loki y Mobius descubren que múltiples variantes de Kang se están reuniendo en un consejo — el primer indicio de una guerra multiversal por venir." },
+    characters: ["Scott Lang", "Hope van Dyne", "Kang el Conquistador", "Cassie Lang"] },
   { id: "gotg-3", es: "Guardianes de la Galaxia Vol. 3", en: "Guardians of the Galaxy Vol 3", year: 2023, date: "2023-05-05", type: "movie", phase: 5,
-    synopsis: "Los Guardianes emprenden una misión desesperada para salvar a Rocket, revelando que fue creado mediante experimentación genética forzada por un científico obsesionado con la perfección llamado el Alto Evolucionador.",
-    characters: ["Rocket", "Star-Lord", "Alto Evolucionador", "Gamora"],
-    postCredits: "Rocket, ya en paz, disfruta de sus nuevos amigos peludos rescatados. Por separado, Peter Quill regresa a la Tierra a visitar a su abuelo." },
+    characters: ["Rocket", "Star-Lord", "Alto Evolucionador", "Gamora"] },
   { id: "secret-invasion", es: "Secret Invasion", en: "Secret Invasion", year: 2023, date: "2023-06-21", type: "series", phase: 5,
-    synopsis: "Nick Fury descubre que una facción de skrulls (una raza alienígena capaz de cambiar de forma y suplantar identidades) lleva años infiltrada preparando una invasión encubierta de la Tierra.",
-    characters: ["Nick Fury", "Talos", "Gravik"],
-    postCredits: "G'iah, tras consumir muestras de sangre de superhumanos, obtiene múltiples poderes combinados de golpe, convirtiéndose en una amenaza mucho más peligrosa." },
+    characters: ["Nick Fury", "Talos", "Gravik"] },
   { id: "loki-2", es: "Loki (T2)", en: "Loki", year: 2023, tmdbYear: 2021, tmdbSeason: 2, date: "2023-10-06", type: "series", phase: 5,
-    synopsis: "Loki y el TVA enfrentan el colapso de la línea temporal sagrada tras los eventos que desataron el multiverso.",
     characters: ["Loki", "Mobius", "Sylvie", "Victor Timely"] },
   { id: "the-marvels", es: "The Marvels", en: "The Marvels", year: 2023, date: "2023-11-10", type: "movie", phase: 5,
-    synopsis: "Una anomalía cuántica entrelaza los poderes de Carol Danvers, Kamala Khan y Mónica Rambeau, de modo que usar sus habilidades al mismo tiempo las teletransporta entre ellas — algo que deben aprender a controlar en equipo.",
-    characters: ["Carol Danvers", "Kamala Khan", "Mónica Rambeau"],
-    postCredits: "Una variante de Kamala Khan de otro universo llega a reclutar a nuestra Kamala para un nuevo equipo de jóvenes héroes." },
+    characters: ["Carol Danvers", "Kamala Khan", "Mónica Rambeau"] },
   { id: "whatif-2", es: "What If…? (T2)", en: "What If", year: 2023, tmdbYear: 2021, tmdbSeason: 2, date: "2023-12-22", type: "series", phase: 5,
-    synopsis: "Nuevas historias alternativas continúan explorando giros inesperados en momentos clave del UCM.",
     characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
   { id: "echo", es: "Echo", en: "Echo", year: 2024, date: "2024-01-09", type: "series", phase: 5,
-    synopsis: "Maya López, sorda de nacimiento y sin poderes sobrehumanos más allá de una habilidad fotográfica para imitar movimientos, regresa a su comunidad de origen para enfrentar su pasado ligado al crimen organizado de Kingpin.",
-    characters: ["Maya López / Echo", "Kingpin", "Bucky Barnes"],
-    postCredits: "Kingpin, que había sido dado por muerto tras recibir un disparo en Hawkeye, es mostrado recuperándose en secreto, preparando su regreso al poder." },
+    characters: ["Maya López / Echo", "Kingpin", "Bucky Barnes"] },
   { id: "deadpool-wolverine", es: "Deadpool & Wolverine", en: "Deadpool and Wolverine", year: 2024, date: "2024-07-26", type: "movie", phase: 5,
-    synopsis: "Deadpool, cuyo cáncer terminal fue 'curado' por un programa que le dio un factor de curación descontrolado y desfiguró su piel, recluta a una versión reticente de Wolverine para una misión que pone en juego la existencia misma de su universo.",
-    characters: ["Wade Wilson / Deadpool", "Logan / Wolverine"],
-    postCredits: "Una larga secuencia de bloopers y escenas detrás de cámara, con un cierre emotivo dedicado a los actores que interpretaron a Wolverine y otros personajes en películas anteriores de X-Men." },
+    characters: ["Wade Wilson / Deadpool", "Logan / Wolverine"] },
   { id: "agatha", es: "Agatha All Along", en: "Agatha All Along", year: 2024, date: "2024-09-18", type: "series", phase: 5,
-    synopsis: "Tras los eventos de WandaVision, Agatha Harkness reúne a un grupo de brujas para recorrer un peligroso camino mágico y recuperar sus poderes.",
-    characters: ["Agatha Harkness", "Teen", "Jennifer Kale"],
-    postCredits: "Se revela que 'Teen', el joven que acompañó a Agatha, es en realidad Billy Maximoff — el hijo de Wanda, ahora usando el nombre de Billy Kaplan." },
+    characters: ["Agatha Harkness", "Teen", "Jennifer Kale"] },
   { id: "whatif-3", es: "What If…? (T3)", en: "What If", year: 2024, tmdbYear: 2021, tmdbSeason: 3, date: "2024-12-22", type: "series", phase: 5,
-    synopsis: "La serie de universos alternativos continúa explorando nuevas variantes de héroes y villanos conocidos.",
     characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
   { id: "brave-new-world", es: "Capitán América: Un Nuevo Mundo", en: "Captain America Brave New World", year: 2025, date: "2025-02-14", type: "movie", phase: 5,
-    synopsis: "El nuevo Capitán América, Sam Wilson, enfrenta una conspiración internacional que pone a prueba su liderazgo sin el suero de supersoldado.",
-    characters: ["Sam Wilson / Capitán América", "Joaquín Torres", "Thaddeus Ross"],
-    postCredits: "Sam visita a Samuel Sterns (el Líder) preso en La Balsa. Sterns le advierte, con tono ominoso, que existen otros mundos además del suyo — y que los héroes de la Tierra tendrán que proteger más que un solo planeta." },
+    characters: ["Sam Wilson / Capitán América", "Joaquín Torres", "Thaddeus Ross"] },
   { id: "daredevil-1", es: "Daredevil: Born Again (T1)", en: "Daredevil Born Again", year: 2025, date: "2025-03-04", type: "series", phase: 5,
-    synopsis: "Ciego desde niño por un accidente con residuos químicos que también agudizó el resto de sus sentidos a niveles sobrehumanos, Matt Murdock retoma su doble vida como abogado de día y vigilante nocturno en un Hell's Kitchen que vuelve a caer bajo la sombra de Kingpin.",
     characters: ["Matt Murdock / Daredevil", "Kingpin", "Karen Page"] },
   { id: "thunderbolts", es: "Thunderbolts*", en: "Thunderbolts", year: 2025, date: "2025-05-02", type: "movie", phase: 5,
-    synopsis: "Un grupo de antihéroes y exagentes con pasados turbios es reunido para una misión encubierta que los obliga a confiar entre sí.",
-    characters: ["Yelena Belova", "Bucky Barnes", "John Walker"],
-    postCredits: "Valentina rebautiza al equipo como los 'New Avengers'. En una escena posterior, ya instalados en la torre, el grupo es alertado de una nave interdimensional entrando en la atmósfera — con el símbolo de los 4 Fantásticos." },
+    characters: ["Yelena Belova", "Bucky Barnes", "John Walker"] },
   { id: "ironheart", es: "Ironheart", en: "Ironheart", year: 2025, date: "2025-06-24", type: "series", phase: 5,
-    synopsis: "Riri Williams, una genio de la ingeniería que construyó su primera armadura desde cero inspirada en la de Iron Man, la perfecciona mientras enfrenta fuerzas que combinan magia y alta tecnología.",
     characters: ["Riri Williams / Ironheart", "Parker Robbins"] },
   { id: "fantastic-four", es: "Los 4 Fantásticos: Primeros Pasos", en: "The Fantastic Four First Steps", year: 2025, date: "2025-07-25", tmdbId: 617126, type: "movie", phase: 6,
-    synopsis: "Un equipo de exploradores expuesto a radiación cósmica durante un viaje espacial obtiene poderes extraordinarios — elasticidad, invisibilidad, control del fuego y fuerza rocosa — y debe proteger la Tierra de una amenaza cósmica.",
-    characters: ["Reed Richards", "Sue Storm", "Johnny Storm", "Ben Grimm"],
-    postCredits: "Cuatro años después, mientras Sue le lee a su hijo Franklin, una figura encapuchada aparece sosteniendo la máscara plateada del Doctor Doom, observando al niño con interés." },
+    characters: ["Reed Richards", "Sue Storm", "Johnny Storm", "Ben Grimm"] },
   { id: "eyes-wakanda", es: "Eyes of Wakanda", en: "Eyes of Wakanda", year: 2025, date: "2025-08-01", type: "series", phase: 6,
-    synopsis: "Serie animada que recorre distintas épocas de la historia de Wakanda a través de guerreros que protegieron sus reliquias más valiosas.",
     characters: ["Guerreros wakandianos de distintas eras"] },
   { id: "marvel-zombies", es: "Marvel Zombies", en: "Marvel Zombies", year: 2025, date: "2025-09-24", type: "series", phase: 6,
-    synopsis: "Un grupo de sobrevivientes enfrenta una realidad alternativa donde un virus convirtió a la mayoría de los héroes en zombis.",
     characters: ["Kamala Khan", "Versiones zombificadas de héroes conocidos"] },
   { id: "wonder-man", es: "Wonder Man", en: "Wonder Man", year: 2026, date: "2026-01-27", type: "series", phase: 6,
-    synopsis: "Simon Williams, expuesto a energía iónica por un programa científico que le dio fuerza y resistencia sobrehumanas, intenta abrirse camino como actor en Hollywood mientras lidia con su propio pasado como superhéroe.",
     characters: ["Simon Williams / Wonder Man"] },
   { id: "daredevil-2", es: "Daredevil: Born Again (T2)", en: "Daredevil Born Again", year: 2026, tmdbYear: 2025, tmdbSeason: 2, date: "2026-03-24", type: "series", phase: 6,
-    synopsis: "Matt Murdock continúa su lucha contra el creciente poder político de Wilson Fisk como alcalde de Nueva York.",
     characters: ["Matt Murdock", "Kingpin", "Karen Page"] },
   { id: "punisher-special", es: "The Punisher: One Last Kill", en: "The Punisher One Last Kill", year: 2026, date: "2026-05-12", type: "special", phase: 6,
-    synopsis: "Frank Castle, un exmarine que se convirtió en un vigilante letal sin poderes tras el asesinato de su familia, emprende una última misión personal que pone a prueba los límites de su propio código de justicia.",
     characters: ["Frank Castle / Punisher"] },
   { id: "brand-new-day", es: "Spider-Man: Brand New Day", en: "Spider-Man Brand New Day", year: 2026, date: "2026-07-31", type: "movie", phase: 6,
-    synopsis: "Peter Parker enfrenta una nueva etapa de su vida como Spider-Man en un Nueva York transformado tras los eventos multiversales recientes.",
-    characters: ["Peter Parker / Spider-Man"],
-    postCredits: "La app rastreadora de Ned intenta ubicar a Spider-Man en Nueva York sin éxito, hasta que amplía la búsqueda y lo encuentra muy lejos de la Tierra — en pleno espacio." },
+    characters: ["Peter Parker / Spider-Man"] },
   { id: "visionquest", es: "VisionQuest", en: "VisionQuest", year: 2026, date: "2026-10-14", type: "series", phase: 6 },
   { id: "doomsday", es: "Vengadores: Doomsday", en: "Avengers Doomsday", year: 2026, date: "2026-12-18", type: "movie", phase: 6 },
   { id: "daredevil-3", es: "Daredevil: Born Again (T3)", en: "Daredevil Born Again", year: 2027, tmdbYear: 2025, tmdbSeason: 3, date: "2027-03-31", type: "series", phase: 6 },
@@ -1986,202 +1841,141 @@ const OTHER_UNIVERSES_ORDER = ["marvel-clasico", "xmen-fox", "fantastic-four-fox
 const OTHER_DATA = [
   // Marvel Clásico Pre-UCM
   { id: "ov-howard-duck", es: "Howard the Duck", en: "Howard the Duck", year: 1986, date: "1986-08-01", universe: "marvel-clasico",
-    synopsis: "Howard, un pato parlante de otro planeta, es arrastrado por accidente a la Tierra, donde con la ayuda de una cantante de rock y un técnico de laboratorio intenta volver a casa mientras una fuerza oscura toma el control de un científico.",
     characters: ["Howard el Pato", "Beverly Switzler", "Phil Blumburtt", "Dr. Jenning"] },
   { id: "ov-blade", es: "Blade", en: "Blade", year: 1998, date: "1998-08-21", universe: "marvel-clasico",
-    synopsis: "Un cazador mitad humano, mitad vampiro, dedica su vida a eliminar vampiros tras la muerte de su madre, mientras investiga un plan para despertar a un antiguo dios de sangre.",
     characters: ["Blade", "Whistler", "Deacon Frost"] },
   { id: "ov-blade-2", es: "Blade II", en: "Blade II", year: 2002, date: "2002-03-22", universe: "marvel-clasico",
-    synopsis: "Blade se ve obligado a aliarse temporalmente con los vampiros para enfrentar una nueva amenaza mutante, los Reapers, criaturas que se alimentan tanto de humanos como de vampiros.",
     characters: ["Blade", "Whistler", "Nyssa", "Nomak"] },
   { id: "ov-daredevil-2003", es: "Daredevil", en: "Daredevil", year: 2003, date: "2003-02-14", universe: "marvel-clasico",
-    synopsis: "Matt Murdock, un abogado ciego de Hell's Kitchen cuyos sentidos restantes están sobrehumanamente agudizados, combate el crimen de noche como el justiciero enmascarado Daredevil.",
     characters: ["Matt Murdock / Daredevil", "Elektra Natchios", "Kingpin", "Bullseye"] },
   { id: "ov-hulk-2003", es: "Hulk", en: "Hulk", year: 2003, date: "2003-06-20", universe: "marvel-clasico",
-    synopsis: "Bruce Banner, un científico genetista con un pasado traumático, sufre un accidente con radiación gamma que lo transforma en un gigante verde cada vez que pierde el control, mientras el ejército y su propio padre lo persiguen.",
     characters: ["Bruce Banner / Hulk", "Betty Ross", "General Ross", "David Banner"] },
   { id: "ov-punisher-2004", es: "The Punisher", en: "The Punisher", year: 2004, date: "2004-04-16", universe: "marvel-clasico",
-    synopsis: "Frank Castle, un agente encubierto, ve a toda su familia asesinada por venganza de un criminal, y se convierte en El Castigador para cazar sin piedad a los responsables.",
     characters: ["Frank Castle / El Castigador", "Howard Saint", "Micro"] },
   { id: "ov-blade-trinity", es: "Blade: Trinity", en: "Blade Trinity", year: 2004, date: "2004-12-08", universe: "marvel-clasico",
-    synopsis: "Blade enfrenta a Drake, el primer y más poderoso vampiro original, mientras una nueva generación de cazadores humanos, los Nightstalkers, se une a su lucha.",
     characters: ["Blade", "Whistler", "Abigail Whistler", "Drake"] },
   { id: "ov-elektra", es: "Elektra", en: "Elektra", year: 2005, date: "2005-01-14", universe: "marvel-clasico",
-    synopsis: "Tras regresar a la vida, la asesina Elektra Natchios recibe el encargo de matar a un hombre y a su hija, pero descubre que debe protegerlos de la organización La Mano.",
     characters: ["Elektra Natchios", "Stick", "Mark Miller", "Abby Miller"] },
   { id: "ov-manthing", es: "Man-Thing", en: "Man-Thing", year: 2005, date: "2005-04-30", universe: "marvel-clasico",
-    synopsis: "En un pantano de Louisiana, un científico transformado en una criatura vegetal protege las tierras ancestrales de un empresario que busca explotarlas petroleramente.",
     characters: ["Man-Thing", "Kyle Williams", "Dr. Theodore Sallis"] },
   { id: "ov-ghostrider-1", es: "Ghost Rider", en: "Ghost Rider", year: 2007, date: "2007-02-16", universe: "marvel-clasico",
-    synopsis: "Johnny Blaze vende su alma al diablo para salvar a su padre, y se convierte en el Motorista Fantasma, un cazarrecompensas infernal con una calavera en llamas.",
     characters: ["Johnny Blaze / Ghost Rider", "Mefisto", "Blackheart", "Roxanne"] },
   { id: "ov-punisher-warzone", es: "Punisher: War Zone", en: "Punisher War Zone", year: 2008, date: "2008-12-05", universe: "marvel-clasico",
-    synopsis: "Frank Castle sigue su cruzada sangrienta contra el crimen organizado de Nueva York, enfrentando al desfigurado Jigsaw, quien jura vengarse de él.",
     characters: ["Frank Castle / El Castigador", "Jigsaw", "Agente Budiansky"] },
   { id: "ov-ghostrider-2", es: "Ghost Rider: Spirit of Vengeance", en: "Ghost Rider Spirit of Vengeance", year: 2012, date: "2012-02-17", tmdbId: 71676, universe: "marvel-clasico",
-    synopsis: "Johnny Blaze, escondido en Europa del Este, es reclutado para proteger a un niño que podría ser la clave para evitar que el diablo tome forma humana en la Tierra.",
     characters: ["Johnny Blaze / Ghost Rider", "Moreau", "Danny", "Nadya"] },
 
   // X-Men (Era Fox)
   { id: "ov-xmen-1", es: "X-Men", en: "X-Men", year: 2000, date: "2000-07-14", universe: "xmen-fox",
-    synopsis: "En un mundo donde los mutantes son temidos, Charles Xavier reúne a un equipo de X-Men para detener a Magneto, quien planea convertir a los líderes mundiales en mutantes a la fuerza.",
     characters: ["Charles Xavier / Profesor X", "Erik Lehnsherr / Magneto", "Logan / Wolverine", "Marie / Rogue"] },
   { id: "ov-xmen-2", es: "X2: X-Men United", en: "X2 X-Men United", year: 2003, date: "2003-05-02", universe: "xmen-fox",
-    synopsis: "Tras un ataque a la Casa Blanca por un mutante, el coronel Stryker lanza un asalto a la mansión de Xavier, forzando a X-Men y a la Hermandad de Magneto a unirse contra una amenaza común.",
     characters: ["Charles Xavier", "Magneto", "Coronel Stryker", "Nightcrawler"] },
   { id: "ov-xmen-3", es: "X-Men: The Last Stand", en: "X-Men The Last Stand", year: 2006, date: "2006-05-26", universe: "xmen-fox",
-    synopsis: "Cuando se descubre una 'cura' que elimina el gen mutante, la comunidad mutante se divide, mientras Jean Grey regresa transformada en la entidad conocida como Fénix Oscura.",
     characters: ["Jean Grey / Fénix", "Charles Xavier", "Magneto", "Wolverine"] },
   { id: "ov-xmen-origins-wolverine", es: "X-Men Origins: Wolverine", en: "X-Men Origins Wolverine", year: 2009, date: "2009-05-01", universe: "xmen-fox",
-    synopsis: "La historia del pasado de Logan, desde su infancia con su hermano Victor hasta el doloroso experimento que lo convirtió en Wolverine, con un esqueleto de adamantium indestructible.",
     characters: ["Logan / Wolverine", "Victor Creed / Sabretooth", "William Stryker", "Gambit"] },
   { id: "ov-xmen-first-class", es: "X-Men: First Class", en: "X-Men First Class", year: 2011, date: "2011-06-03", universe: "xmen-fox",
-    synopsis: "En plena Guerra Fría, un joven Charles Xavier y Erik Lehnsherr forjan una amistad y reclutan al primer equipo de mutantes jóvenes para detener a Sebastian Shaw de provocar una guerra nuclear.",
     characters: ["Charles Xavier", "Erik Lehnsherr", "Sebastian Shaw", "Mystique"] },
   { id: "ov-the-wolverine", es: "The Wolverine", en: "The Wolverine", year: 2013, date: "2013-07-26", universe: "xmen-fox",
-    synopsis: "Logan viaja a Japón para despedirse de un hombre cuya vida salvó décadas atrás, y se ve envuelto en una trama familiar donde pierden temporalmente su factor curativo.",
     characters: ["Logan / Wolverine", "Yashida", "Mariko", "Viper"] },
   { id: "ov-xmen-dofp", es: "X-Men: Days of Future Past", en: "X-Men Days of Future Past", year: 2014, date: "2014-05-23", universe: "xmen-fox",
-    synopsis: "En un futuro distópico dominado por Centinelas, Wolverine es enviado al pasado para evitar que Mystique cometa un asesinato que desencadena la creación de esas máquinas exterminadoras.",
     characters: ["Logan / Wolverine", "Charles Xavier", "Erik Lehnsherr", "Mystique"] },
   { id: "ov-deadpool-1", es: "Deadpool", en: "Deadpool", year: 2016, date: "2016-02-12", universe: "xmen-fox",
-    synopsis: "Wade Wilson, un mercenario desfigurado por un experimento ilegal que le da factor curativo, se convierte en el antihéroe Deadpool para vengarse del hombre que arruinó su vida.",
     characters: ["Wade Wilson / Deadpool", "Vanessa", "Ajax", "Colossus"] },
   { id: "ov-xmen-apocalypse", es: "X-Men: Apocalypse", en: "X-Men Apocalypse", year: 2016, date: "2016-05-27", universe: "xmen-fox",
-    synopsis: "El primer mutante de la historia, Apocalipsis, despierta tras milenios dormido y recluta a cuatro Jinetes para destruir la civilización y rehacer el mundo a su imagen.",
     characters: ["Apocalipsis", "Charles Xavier", "Erik Lehnsherr", "Mystique"] },
   { id: "ov-logan", es: "Logan", en: "Logan", year: 2017, date: "2017-03-03", universe: "xmen-fox",
-    synopsis: "En un futuro cercano donde los mutantes casi han desaparecido, un envejecido y debilitado Logan cuida de un Xavier anciano, hasta que debe proteger a una niña con poderes similares a los suyos.",
     characters: ["Logan / Wolverine", "Charles Xavier", "Laura / X-23", "Caliban"] },
   { id: "ov-deadpool-2", es: "Deadpool 2", en: "Deadpool 2", year: 2018, date: "2018-05-18", universe: "xmen-fox",
-    synopsis: "Tras una tragedia personal, Deadpool forma el equipo X-Force para proteger a un joven mutante de Cable, un soldado del futuro que viaja en el tiempo para eliminarlo.",
     characters: ["Wade Wilson / Deadpool", "Cable", "Domino", "Russell / Fuego de Fuego"] },
   { id: "ov-dark-phoenix", es: "Dark Phoenix", en: "Dark Phoenix", year: 2019, date: "2019-06-07", universe: "xmen-fox",
-    synopsis: "Tras un accidente en el espacio, Jean Grey absorbe una fuerza cósmica que amplifica sus poderes descontroladamente, convirtiéndola en una amenaza para sus amigos y el mundo.",
     characters: ["Jean Grey", "Charles Xavier", "Erik Lehnsherr", "Vuk"] },
   { id: "ov-new-mutants", es: "New Mutants", en: "The New Mutants", year: 2020, date: "2020-08-28", universe: "xmen-fox",
-    synopsis: "Un grupo de jóvenes mutantes es retenido en una instalación aislada bajo supervisión de la Dra. Reyes, mientras enfrentan visiones de sus propios traumas convertidos en monstruos reales.",
     characters: ["Danielle Moonstar", "Dra. Cecilia Reyes", "Illyana Rasputin", "Rahne Sinclair"] },
 
   // Los 4 Fantásticos (Fox)
   { id: "ov-ff-2005", es: "Fantastic Four", en: "Fantastic Four", year: 2005, date: "2005-07-08", universe: "fantastic-four-fox",
-    synopsis: "Cuatro astronautas son expuestos a radiación cósmica durante una misión espacial, obteniendo poderes extraordinarios que deben aprender a controlar mientras enfrentan a su antiguo socio convertido en villano.",
     characters: ["Reed Richards", "Sue Storm", "Johnny Storm", "Victor von Doom"] },
   { id: "ov-ff-silver-surfer", es: "Fantastic Four: Rise of the Silver Surfer", en: "Fantastic Four Rise of the Silver Surfer", year: 2007, date: "2007-06-15", universe: "fantastic-four-fox",
-    synopsis: "Los Cuatro Fantásticos enfrentan al enigmático Silver Surfer, heraldo de un devorador de planetas, mientras Victor von Doom regresa buscando aprovechar la situación para sus propios fines.",
     characters: ["Reed Richards", "Silver Surfer", "Victor von Doom", "Sue Storm"] },
   { id: "ov-ff-2015", es: "Fantastic Four", en: "Fantastic Four", year: 2015, date: "2015-08-07", universe: "fantastic-four-fox",
-    synopsis: "Un reinicio donde un grupo de jóvenes científicos desarrolla la tecnología para viajar a una dimensión paralela, un accidente durante el viaje les otorga poderes y transforma a uno de ellos en villano.",
     characters: ["Reed Richards", "Sue Storm", "Victor Domashev", "Ben Grimm"] },
 
   // Spider-Man de Sony (pre-UCM)
   { id: "ov-spiderman-2002", es: "Spider-Man", en: "Spider-Man", year: 2002, date: "2002-05-03", universe: "spiderman-sony",
-    synopsis: "El joven Peter Parker es mordido por una araña genéticamente modificada, obteniendo poderes arácnidos, mientras debe enfrentar al Duende Verde tras la muerte de su tío Ben.",
     characters: ["Peter Parker / Spider-Man", "Norman Osborn / Duende Verde", "Mary Jane Watson", "Tío Ben"] },
   { id: "ov-spiderman-2004", es: "Spider-Man 2", en: "Spider-Man 2", year: 2004, date: "2004-06-30", universe: "spiderman-sony",
-    synopsis: "Agobiado por equilibrar su vida como Peter Parker y Spider-Man, el héroe enfrenta al Dr. Otto Octavius, quien tras un accidente se fusiona con brazos mecánicos y se convierte en el Doctor Octopus.",
     characters: ["Peter Parker / Spider-Man", "Dr. Otto Octavius / Doctor Octopus", "Mary Jane Watson", "Harry Osborn"] },
   { id: "ov-spiderman-2007", es: "Spider-Man 3", en: "Spider-Man 3", year: 2007, date: "2007-05-04", universe: "spiderman-sony",
-    synopsis: "Peter Parker debe lidiar con un simbionte alienígena que amplifica su lado oscuro, mientras enfrenta al Hombre de Arena y a su antiguo amigo Harry Osborn, quien hereda el manto del Duende.",
     characters: ["Peter Parker / Spider-Man", "Eddie Brock / Venom", "Harry Osborn / Nuevo Duende", "Flint Marko / Hombre de Arena"] },
   { id: "ov-amazing-spiderman-1", es: "The Amazing Spider-Man", en: "The Amazing Spider-Man", year: 2012, date: "2012-07-03", universe: "spiderman-sony",
-    synopsis: "En un reinicio de la historia, Peter Parker investiga el pasado de sus padres mientras obtiene poderes arácnidos y enfrenta al Dr. Curt Connors, quien se transforma en el monstruoso Lagarto.",
     characters: ["Peter Parker / Spider-Man", "Dr. Curt Connors / Lagarto", "Gwen Stacy", "Capitán Stacy"] },
   { id: "ov-amazing-spiderman-2", es: "The Amazing Spider-Man 2", en: "The Amazing Spider-Man 2", year: 2014, date: "2014-05-02", universe: "spiderman-sony",
-    synopsis: "Spider-Man enfrenta a Electro, un empleado de Oscorp convertido en ser de energía pura, mientras su amistad con Harry Osborn se deteriora al convertirse este en el nuevo Duende Verde.",
     characters: ["Peter Parker / Spider-Man", "Max Dillon / Electro", "Harry Osborn", "Gwen Stacy"] },
   { id: "ov-spider-noir", es: "Spider-Noir", en: "Spider-Noir", year: 2026, date: "2026-05-25", universe: "spiderman-sony", tmdbKind: "tv",
-    synopsis: "Ben Reilly, un detective privado venido a menos en la Nueva York de los años 30, debe enfrentar su pasado tras una tragedia personal mientras se convierte en el único superhéroe de la ciudad, conocido como The Spider.",
     characters: ["Ben Reilly / The Spider", "Robbie Robertson", "Cat Hardy", "Janet"] },
 
   // Universo Venom (SSU)
   { id: "ov-venom-1", es: "Venom", en: "Venom", year: 2018, date: "2018-10-05", universe: "venom-ssu",
-    synopsis: "El periodista Eddie Brock se fusiona con un simbionte alienígena llamado Venom tras investigar los experimentos ilegales de la Fundación Life, obteniendo poderes descomunales y una personalidad dividida.",
     characters: ["Eddie Brock / Venom", "Carlton Drake", "Anne Weying"] },
   { id: "ov-venom-2", es: "Venom: Let There Be Carnage", en: "Venom Let There Be Carnage", year: 2021, date: "2021-10-01", universe: "venom-ssu",
-    synopsis: "Eddie Brock debe lidiar con las tensiones de convivir con Venom mientras el asesino en serie Cletus Kasady se fusiona con un simbionte propio, Carnage, mucho más violento y descontrolado.",
     characters: ["Eddie Brock / Venom", "Cletus Kasady / Carnage", "Frances Barrison / Shriek", "Anne Weying"] },
   { id: "ov-morbius", es: "Morbius", en: "Morbius", year: 2022, date: "2022-04-01", universe: "venom-ssu",
-    synopsis: "El brillante bioquímico Michael Morbius, afectado por una rara enfermedad sanguínea, se somete a un experimento con murciélagos vampiro que lo cura pero lo transforma en un ser con sed de sangre.",
     characters: ["Dr. Michael Morbius", "Milo", "Martine Bancroft"] },
   { id: "ov-madame-web", es: "Madame Web", en: "Madame Web", year: 2024, date: "2024-02-14", universe: "venom-ssu",
-    synopsis: "Cassandra Webb, una paramédica de Nueva York, desarrolla la habilidad de ver el futuro tras un accidente, lo que la lleva a proteger a tres jóvenes destinadas a cruzarse con el destino de Spider-Man.",
     characters: ["Cassandra Webb", "Ezekiel Sims", "Julia Carpenter", "Anya Corazon"] },
   { id: "ov-venom-3", es: "Venom: The Last Dance", en: "Venom The Last Dance", year: 2024, date: "2024-10-25", universe: "venom-ssu",
-    synopsis: "Eddie y Venom, perseguidos tanto por el ejército como por fuerzas alienígenas que buscan recuperar al simbionte, emprenden un último viaje juntos que pondrá a prueba su vínculo.",
     characters: ["Eddie Brock / Venom", "Teddy", "Rex Strickland"] },
   { id: "ov-kraven", es: "Kraven the Hunter", en: "Kraven the Hunter", year: 2024, date: "2024-12-13", universe: "venom-ssu",
-    synopsis: "Sergei Kravinoff se convierte en el cazador más temido del mundo tras una transformación que le otorga habilidades sobrehumanas, motivado por una compleja relación con su padre criminal.",
     characters: ["Sergei Kravinoff / Kraven", "Nikolai Kravinoff", "Dmitri Smerdyakov"] },
 
   // Spider-Verse Animado
   { id: "ov-spiderverse-1", es: "Spider-Man: Into the Spider-Verse", en: "Spider-Man Into the Spider-Verse", year: 2018, date: "2018-12-14", universe: "spiderverse-animado",
-    synopsis: "Miles Morales, un adolescente de Brooklyn, es mordido por una araña radiactiva y debe aprender a ser un nuevo Spider-Man con la ayuda de versiones alternativas del héroe provenientes de otras dimensiones.",
     characters: ["Miles Morales", "Peter B. Parker", "Gwen Stacy / Spider-Gwen", "Kingpin"] },
   { id: "ov-spiderverse-2", es: "Spider-Man: Across the Spider-Verse", en: "Spider-Man Across the Spider-Verse", year: 2023, date: "2023-06-02", universe: "spiderverse-animado",
-    synopsis: "Miles Morales se reencuentra con Gwen Stacy y descubre una sociedad secreta de innumerables Spider-Man de todo el multiverso, liderada por Miguel O'Hara, cuyas reglas amenazan con separarlo de su padre.",
     characters: ["Miles Morales", "Gwen Stacy", "Miguel O'Hara / Spider-Man 2099", "El Hombre Mancha"] },
   { id: "ov-spiderverse-3", es: "Spider-Man: Beyond the Spider-Verse", en: "Spider-Man Beyond the Spider-Verse", year: 2027, date: "2027-06-18", universe: "spiderverse-animado" },
 
   // Marvel Television (Netflix)
   { id: "ov-agents-shield", es: "Agents of S.H.I.E.L.D.", en: "Agents of SHIELD", year: 2013, date: "2013-09-24", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "El agente Phil Coulson lidera un pequeño equipo de S.H.I.E.L.D. que investiga casos relacionados con personas con habilidades especiales, mientras la organización enfrenta amenazas internas y externas a lo largo de los años.",
     characters: ["Phil Coulson", "Melinda May", "Daisy Johnson / Quake", "Leo Fitz"] },
   { id: "ov-agent-carter", es: "Agent Carter", en: "Agent Carter", year: 2015, date: "2015-01-06", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "En la Nueva York de la posguerra, Peggy Carter trabaja en la Reserva Científica Estratégica, subestimada por sus colegas, mientras en secreto limpia el nombre de Howard Stark de acusaciones de traición.",
     characters: ["Peggy Carter", "Howard Stark", "Edwin Jarvis", "Daniel Sousa"] },
   { id: "ov-daredevil-netflix", es: "Daredevil", en: "Daredevil", year: 2015, date: "2015-04-10", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Matt Murdock, abogado ciego de Hell's Kitchen con sentidos sobrehumanos, combate el crimen organizado como el justiciero Daredevil mientras se enfrenta al ascenso del poderoso Wilson Fisk.",
     characters: ["Matt Murdock / Daredevil", "Wilson Fisk / Kingpin", "Karen Page", "Foggy Nelson"] },
   { id: "ov-jessica-jones", es: "Jessica Jones", en: "Jessica Jones", year: 2015, date: "2015-11-20", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Jessica Jones, una investigadora privada con fuerza sobrehumana y un pasado traumático, se ve forzada a enfrentar a Kilgrave, un hombre con el poder de controlar mentalmente a cualquiera, incluyéndola a ella en el pasado.",
     characters: ["Jessica Jones", "Kilgrave", "Trish Walker", "Luke Cage"] },
   { id: "ov-luke-cage", es: "Luke Cage", en: "Luke Cage", year: 2016, date: "2016-09-30", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Luke Cage, un hombre con piel indestructible y fuerza sobrehumana producto de un experimento carcelario, intenta vivir en el anonimato en Harlem hasta que la violencia de su pasado lo obliga a convertirse en un héroe para su comunidad.",
     characters: ["Luke Cage", "Cornell 'Cottonmouth' Stokes", "Misty Knight", "Claire Temple"] },
   { id: "ov-iron-fist", es: "Iron Fist", en: "Iron Fist", year: 2017, date: "2017-03-17", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Danny Rand, dado por muerto durante quince años tras un accidente aéreo, regresa a Nueva York como el Puño de Hierro, un guerrero entrenado en artes marciales con el poder de canalizar su chi, para reclamar su herencia familiar.",
     characters: ["Danny Rand / Puño de Hierro", "Colleen Wing", "Harold Meachum", "Madame Gao"] },
   { id: "ov-defenders", es: "The Defenders", en: "The Defenders", year: 2017, date: "2017-08-18", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Daredevil, Jessica Jones, Luke Cage e Iron Fist, cuatro héroes solitarios de Nueva York, se ven forzados a unir fuerzas al descubrir un plan de La Mano que amenaza con destruir la ciudad desde sus cimientos.",
     characters: ["Matt Murdock / Daredevil", "Jessica Jones", "Luke Cage", "Danny Rand / Iron Fist"] },
   { id: "ov-inhumans", es: "Inhumans", en: "Inhumans", year: 2017, date: "2017-09-29", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "En la ciudad oculta de Attilan, en la Luna, el rey Inhumano Black Bolt enfrenta un golpe de estado liderado por su hermano Maximus, que lo exilia junto a su familia real a la Tierra.",
     characters: ["Black Bolt", "Medusa", "Maximus", "Karnak"] },
   { id: "ov-punisher-netflix", es: "The Punisher", en: "The Punisher", year: 2017, date: "2017-11-17", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Frank Castle, atormentado por la masacre de su familia y sus compañeros, descubre una conspiración militar que lo llevará a desenterrar la verdad mientras continúa su cruzada violenta contra el crimen.",
     characters: ["Frank Castle / El Castigador", "Micro", "Karen Page", "Billy Russo"] },
   { id: "ov-runaways", es: "Runaways", en: "Runaways", year: 2017, date: "2017-11-21", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Un grupo de adolescentes de Los Ángeles descubre que sus padres son en secreto parte de una organización criminal llamada El Orgullo, y deciden unirse para detenerlos usando sus propias habilidades recién descubiertas.",
     characters: ["Alex Wilder", "Nico Minoru", "Karolina Dean", "Chase Stein"] },
   { id: "ov-cloak-dagger", es: "Cloak & Dagger", en: "Cloak and Dagger", year: 2018, date: "2018-06-07", universe: "marvel-netflix", tmdbKind: "tv",
-    synopsis: "Tandy Bowen y Tyrone Johnson, dos adolescentes de Nueva Orleans con pasados traumáticos y orígenes conectados por un mismo incidente, descubren que poseen poderes opuestos de luz y oscuridad que funcionan mejor juntos.",
     characters: ["Tandy Bowen / Dagger", "Tyrone Johnson / Cloak", "Mina Hess"] },
 
   // Marvel One-Shots
   { id: "oneshot-consultant", es: "The Consultant", en: "Marvel One-Shot: The Consultant", year: 2011, date: "2011-09-13", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Marvel One-Shot incluido en el Blu-ray de Thor. Los agentes Coulson y Sitwell se enteran de que el Consejo de Seguridad Mundial quiere liberar a Emil Blonsky para sumarlo a la Iniciativa Vengadores, y planean hacer que el general Ross se niegue a soltarlo.",
     characters: ["Phil Coulson", "Jasper Sitwell", "General Ross", "Tony Stark"] },
   { id: "oneshot-funny-thing", es: "A Funny Thing Happened on the Way to Thor's Hammer", en: "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer", year: 2011, date: "2011-10-25", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Marvel One-Shot corto, previo a los eventos de Thor. En camino a Nuevo México, el agente Coulson se detiene en una tienda de ruta y se ve envuelto en un asalto.",
     characters: ["Phil Coulson"] },
   { id: "oneshot-item-47", es: "Item 47", en: "Marvel One-Shot: Item 47", year: 2012, date: "2012-09-25", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Marvel One-Shot posterior a Los Vengadores. Una pareja encuentra un arma chitauri abandonada y la usa para robar bancos, mientras el agente Sitwell debe recuperarla.",
     characters: ["Agente Sitwell", "La pareja de ladrones"] },
   { id: "oneshot-agent-carter", es: "Agent Carter (One-Shot)", en: "Marvel One-Shot: Agent Carter", year: 2013, date: "2013-09-03", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Un año después de Capitán América: El primer vengador, Peggy Carter, frustrada por ser relegada en la Reserva Científica Estratégica, sale en una misión no autorizada tras el misterioso Zodiac.",
     characters: ["Peggy Carter", "Howard Stark"] },
   { id: "oneshot-all-hail-king", es: "All Hail the King", en: "Marvel One-Shot: All Hail the King", year: 2014, date: "2014-02-04", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Tras los eventos de Iron Man 3, Trevor Slattery, el falso Mandarín, está preso y concede una entrevista a un documentalista que resulta ser un miembro de los Diez Anillos.",
     characters: ["Trevor Slattery", "Jackson Norriss"] },
   { id: "oneshot-team-thor", es: "Team Thor", en: "Team Thor", year: 2016, date: "2016-08-28", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Falso documental de Taika Waititi sobre qué hacía Thor mientras el resto de los Vengadores peleaba en Civil War: se muda con su compañero de departamento Darryl Jacobson y decide fundar el Team Thor.",
     characters: ["Thor", "Darryl Jacobson"] },
   { id: "oneshot-team-thor-2", es: "Team Thor: Part 2", en: "Team Thor: Part 2", year: 2017, date: "2017-02-14", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Continuación del falso documental. Mientras Cap e Iron Man se enfrentan, Thor intenta pagarle el alquiler a Darryl con monedas asgardianas.",
     characters: ["Thor", "Darryl Jacobson"] },
   { id: "oneshot-team-darryl", es: "Team Darryl", en: "Team Darryl", year: 2018, date: "2018-02-20", universe: "marvel-oneshots", tmdbKind: "movie",
-    synopsis: "Sin Thor en casa, Darryl busca un nuevo compañero de departamento, y el único que responde a su aviso es el Gran Maestro.",
     characters: ["Darryl Jacobson", "Gran Maestro"] },
 ];
 // Duración en minutos (min) y, en series, cantidad de episodios (eps) y temporadas (seasons).
@@ -2959,8 +2753,6 @@ function syncControlButtons() {
   });
   updateBlurEyeIcon();
 }
-let detailId = null;
-let showPostCredits = false;
 let toastTimer = null;
 
 function loadState() {
@@ -3035,16 +2827,6 @@ function resetProgress() {
   });
 }
 
-function openDetail(id) {
-  detailId = id;
-  showPostCredits = false;
-  renderModal();
-}
-function closeDetail() {
-  detailId = null;
-  document.getElementById("modalBackdrop").classList.remove("show");
-}
-
 let statusPickerId = null;
 function findItemById(id) {
   return DATA.find(function (d) { return d.id === id; }) || OTHER_DATA.find(function (d) { return d.id === id; });
@@ -3070,6 +2852,10 @@ function openStatusPicker(id) {
     const dateInput = document.getElementById("statusWatchDate");
     dateInput.value = watchDates[id] || "";
     dateInput.max = todayIso();
+    const quiz = QUIZZES[id];
+    const quizSection = document.getElementById("quizLaunchSection");
+    quizSection.style.display = quiz && quiz.length ? "block" : "none";
+    if (quiz && quiz.length) document.getElementById("quizLaunchBtn").textContent = "Hacer el quiz (" + quiz.length + " preguntas)";
   } else {
     ratingSection.style.display = "none";
   }
@@ -3078,44 +2864,6 @@ function openStatusPicker(id) {
 function closeStatusPicker() {
   statusPickerId = null;
   document.getElementById("statusBackdrop").classList.remove("show");
-}
-
-function renderModal() {
-  const backdrop = document.getElementById("modalBackdrop");
-  if (!detailId) { backdrop.classList.remove("show"); return; }
-  const item = findItemById(detailId);
-  if (!item) { backdrop.classList.remove("show"); return; }
-
-  const len = lengthLabel(item);
-  document.getElementById("modalYear").textContent = item.year + (len ? " · " + len : "") +
-    (status[item.id] === "watched" && watchDates[item.id] ? " · Vista el " + formatDate(watchDates[item.id]) : "");
-  document.getElementById("modalTitle").textContent = item.es;
-  document.getElementById("modalSynopsis").textContent = item.synopsis || "";
-  document.getElementById("modalCharacters").innerHTML = (item.characters || [])
-    .map(function (c) { return '<span class="char-chip">' + escapeHtml(c) + "</span>"; })
-    .join("");
-
-  const pcSection = document.getElementById("postCreditsSection");
-  const pcBtn = document.getElementById("postCreditsBtn");
-  const pcText = document.getElementById("postCreditsText");
-  if (item.postCredits) {
-    pcSection.style.display = "block";
-    if (showPostCredits) {
-      pcBtn.style.display = "none";
-      pcText.style.display = "block";
-      pcText.textContent = item.postCredits;
-    } else {
-      pcBtn.style.display = "block";
-      pcText.style.display = "none";
-    }
-  } else {
-    pcSection.style.display = "none";
-  }
-
-  const quizSection = document.getElementById("quizLaunchSection");
-  quizSection.style.display = (QUIZZES[item.id] && QUIZZES[item.id].length) ? "block" : "none";
-
-  backdrop.classList.add("show");
 }
 
 const SVG_CAP = ' stroke-linecap="round" stroke-linejoin="round">';
@@ -3129,10 +2877,7 @@ function typeIconSvg(type, color, size) {
 }
 const lockSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A9A" stroke-width="1.5"' + SVG_CAP +
   '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
-const checkSvg = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0A0B12" stroke-width="2.5"' + SVG_CAP + '<path d="M20 6 9 17l-5-5"/></svg>';
-const infoSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9C9D6" stroke-width="1.5"' + SVG_CAP +
-  '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="1" fill="#C9C9D6" stroke="none"/></svg>';
-const phaseGemSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="STROKECOLOR" stroke-width="1.5"' + SVG_CAP +
+const checkSvg = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0A0B12" stroke-width="2.5"' + SVG_CAP + '<path d="M20 6 9 17l-5-5"/></svg>';const phaseGemSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="STROKECOLOR" stroke-width="1.5"' + SVG_CAP +
   '<path d="M6 3h12l4 6-10 12L2 9Z"/></svg>';
 const skipSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9C9D6" stroke-width="2"' + SVG_CAP +
   '<path d="M8 8l8 8M16 8l-8 8"/></svg>';
@@ -3193,10 +2938,6 @@ function buildCardHtml(item) {
           '<span class="placeholder-title">' + escapeHtml(item.es) + "</span>")
     : "";
 
-  const infoBtn = (st === "watched" || st === "summary") && item.synopsis
-    ? '<div class="info-btn" onclick="event.stopPropagation(); openDetail(\'' + item.id + '\')">' + infoSvg + "</div>"
-    : "";
-
   const stamp = rel && st === "watched"
     ? '<div class="stamp-overlay"><div class="stamp-circle" style="background:' + WATCHED_COLOR + ';box-shadow:0 0 10px ' + WATCHED_GLOW + '">' + checkSvg + "</div></div>"
     : "";
@@ -3225,7 +2966,7 @@ function buildCardHtml(item) {
 
   return '<button class="card" data-id="' + item.id + '" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
     '<div class="poster-box" style="border:1px solid ' + borderColor + ';opacity:' + (rel ? 1 : 0.6) + '">' +
-    typeBadge + centerContent + infoBtn + stamp + skipOverlay + summaryOverlay + lock + pcBadge +
+    typeBadge + centerContent + stamp + skipOverlay + summaryOverlay + lock + pcBadge +
     "</div>" +
     '<p class="card-title" style="color:' + titleColor + '">' + escapeHtml(item.es) + "</p>" +
     '<p class="card-year"><span>' + item.year + (lengthShort(item) ? " · " + lengthShort(item) : "") + "</span>" + ratingBadge + "</p>" +
@@ -3236,7 +2977,7 @@ function buildPodiumRow(item, rank) {
   const poster = posters[item.id];
   const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : (rank + "°");
   const editing = podiumEditing === item.id;
-  const hasDetail = !!item.synopsis;
+  const canOpen = isReleased(item);
 
   const ratingRow = editing
     ? '<div class="podium-edit-row">' +
@@ -3250,7 +2991,7 @@ function buildPodiumRow(item, rank) {
 
   return '<div class="podium-row">' +
     '<span class="podium-rank">' + medal + "</span>" +
-    '<div class="podium-thumb"' + (hasDetail ? ' style="cursor:pointer;" onclick="openDetail(\'' + item.id + '\')"' : "") + '>' +
+    '<div class="podium-thumb"' + (canOpen ? ' style="cursor:pointer;" onclick="openStatusPicker(\'' + item.id + '\')"' : "") + '>' +
     (poster ? '<img src="' + poster + '" alt="" />' : "") + "</div>" +
     '<div class="podium-info">' +
     '<p class="podium-title">' + escapeHtml(item.es) + "</p>" +
@@ -3425,10 +3166,6 @@ function render() {
 }
 
 document.getElementById("resetBtn").addEventListener("click", resetProgress);
-document.getElementById("modalClose").addEventListener("click", closeDetail);
-document.getElementById("modalBackdrop").addEventListener("click", function (e) {
-  if (e.target.id === "modalBackdrop") closeDetail();
-});
 document.getElementById("statusBackdrop").addEventListener("click", function (e) {
   if (e.target.id === "statusBackdrop") closeStatusPicker();
 });
@@ -3450,7 +3187,6 @@ document.getElementById("statusWatchDate").addEventListener("change", function (
   if (!statusPickerId) return;
   setWatchDate(statusPickerId, e.target.value || null);
   render();
-  if (detailId === statusPickerId) renderModal();
 });
 document.getElementById("confirmYesBtn").addEventListener("click", function () {
   const cb = confirmCallback;
@@ -3460,10 +3196,6 @@ document.getElementById("confirmYesBtn").addEventListener("click", function () {
 document.getElementById("confirmNoBtn").addEventListener("click", closeConfirm);
 document.getElementById("confirmBackdrop").addEventListener("click", function (e) {
   if (e.target.id === "confirmBackdrop") closeConfirm();
-});
-document.getElementById("postCreditsBtn").addEventListener("click", function () {
-  showPostCredits = true;
-  renderModal();
 });
 document.querySelectorAll("#filters .mini-toggle").forEach(function (btn) {
   btn.addEventListener("click", function () {
@@ -3609,7 +3341,10 @@ function showQuizResult() {
 }
 
 document.getElementById("quizLaunchBtn").addEventListener("click", function () {
-  if (detailId) startQuiz(detailId);
+  if (!statusPickerId) return;
+  const id = statusPickerId;
+  closeStatusPicker();
+  startQuiz(id);
 });
 document.getElementById("quizClose").addEventListener("click", closeQuiz);
 document.getElementById("quizBackdrop").addEventListener("click", function (e) {
@@ -3733,7 +3468,6 @@ if (missingPosters.length > 0) {
 refreshLengths(function () {
   render();
   refreshSearch();
-  if (detailId) renderModal();
 });
 </script>
 </body>
