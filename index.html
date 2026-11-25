@@ -114,6 +114,12 @@
   #statusBox { width: 100%; max-width: 420px; border-radius: 16px 16px 0 0; padding: 16px; background: #13141D; border: 1px solid #23232E; }
   @media (min-width: 640px) { #statusBox { border-radius: 16px; } }
   #statusItemTitle { margin: 0 0 12px; }
+  #statusItemTitle:has(+ #statusMeta:not(:empty)) { margin-bottom: 4px; }
+  #statusMeta { margin: 0 0 14px; font-size: 12px; line-height: 1.45; color: #9A9AAC; }
+  #statusMeta:empty { display: none; }
+  #statusMeta .pc-line { display: flex; gap: 6px; align-items: flex-start; color: #C9C9D6; margin-top: 2px; }
+  #statusMeta .pc-line svg { flex-shrink: 0; margin-top: 3px; }
+  .pc-badge { position: absolute; bottom: 4px; right: 4px; display: flex; align-items: center; gap: 3px; border-radius: 999px; padding: 2px 6px 2px 5px; background: rgba(10,11,18,0.82); border: 1px solid rgba(237,235,227,0.35); color: #EDEBE3; font-size: 9px; font-weight: 600; line-height: 1; z-index: 4; pointer-events: none; }
   .status-option { display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 10px; background: #1C1D28; border: 1px solid #262735; color: #EDEBE3; font-size: 14px; cursor: pointer; }
   .status-option-clear { color: #6B6B7D; }
   .watch-date-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
@@ -135,6 +141,7 @@
   .podium-info { flex: 1; min-width: 0; }
   .podium-title { font-size: 13px; color: #EDEBE3; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .podium-year { font-size: 10px; color: #5A5A6C; margin: 0 0 4px; }
+  .podium-watched { color: #8A8A9C; }
   .podium-edit-row { display: flex; align-items: center; gap: 6px; }
   .podium-edit-btn { font-size: 10px; color: #6B6B7D; background: none; border: 1px solid #262735; border-radius: 999px; padding: 3px 9px; cursor: pointer; margin-left: 4px; }
   .podium-edit-done { color: #0A0B12; background: #F3E7C9; border-color: #F3E7C9; font-weight: 600; }
@@ -272,6 +279,7 @@
 <div id="statusBackdrop">
   <div id="statusBox">
     <p id="statusItemTitle" class="modal-label"></p>
+    <div id="statusMeta"></div>
     <div id="statusRatingSection" style="display:none; margin-bottom: 14px;">
       <p class="modal-label" style="margin-bottom:6px;">Tu calificación</p>
       <div id="statusRatingWidget"></div>
@@ -2305,6 +2313,134 @@ const LENGTHS = {
   "oneshot-team-thor-2": {min: 5},
   "oneshot-team-darryl": {min: 6},
 };
+// Escenas post-créditos: mid = a mitad de créditos, end = al final de todo.
+// En series, eps lista solo los episodios que tienen (vacío = ninguno). Sin entrada = no se sabe.
+// Cargado a mano contrastando Wikipedia, MediaStinger y notas especializadas (nov 2026).
+const POST_CREDITS = {
+  "iron-man": {mid: 0, end: 1},
+  "hulk": {mid: 0, end: 0},
+  "iron-man-2": {mid: 0, end: 1},
+  "thor": {mid: 0, end: 1},
+  "cap-1": {mid: 0, end: 1},
+  "avengers-1": {mid: 1, end: 1},
+  "iron-man-3": {mid: 0, end: 1},
+  "thor-2": {mid: 1, end: 1},
+  "cap-2": {mid: 1, end: 1},
+  "gotg-1": {mid: 1, end: 1},
+  "avengers-2": {mid: 1, end: 0},
+  "antman-1": {mid: 1, end: 1},
+  "civil-war": {mid: 1, end: 1},
+  "dr-strange-1": {mid: 1, end: 1},
+  "gotg-2": {mid: 4, end: 1},
+  "spiderman-homecoming": {mid: 1, end: 1},
+  "thor-3": {mid: 1, end: 1},
+  "black-panther-1": {mid: 1, end: 1},
+  "infinity-war": {mid: 0, end: 1},
+  "antman-2": {mid: 1, end: 1},
+  "captain-marvel": {mid: 1, end: 1},
+  "endgame": {mid: 0, end: 0},
+  "far-from-home": {mid: 1, end: 1},
+  "wandavision": {eps: {"7": {mid: 0, end: 1}, "8": {mid: 1, end: 0}, "9": {mid: 1, end: 1}}},
+  "falcon-ws": {eps: {"5": {mid: 1, end: 0}, "6": {mid: 1, end: 0}}},
+  "loki-1": {eps: {"4": {mid: 1, end: 0}, "6": {mid: 1, end: 0}}},
+  "black-widow": {mid: 0, end: 1},
+  "whatif-1": {eps: {"9": {mid: 1, end: 0}}},
+  "shang-chi": {mid: 1, end: 1},
+  "eternals": {mid: 1, end: 1},
+  "hawkeye": {eps: {"6": {mid: 0, end: 1}}},
+  "no-way-home": {mid: 1, end: 1},
+  "moon-knight": {eps: {"6": {mid: 1, end: 0}}},
+  "dr-strange-2": {mid: 1, end: 1},
+  "ms-marvel": {eps: {"1": {mid: 1, end: 0}, "6": {mid: 1, end: 0}}},
+  "thor-4": {mid: 1, end: 1},
+  "i-am-groot": {eps: {"5": {mid: 0, end: 1}}},
+  "she-hulk": {eps: {"1": {mid: 1, end: 0}, "2": {mid: 1, end: 0}, "3": {mid: 1, end: 0}, "4": {mid: 1, end: 0}, "9": {mid: 1, end: 0}}},
+  "werewolf": {mid: 0, end: 0},
+  "wakanda-forever": {mid: 1, end: 0},
+  "gotg-holiday": {mid: 0, end: 1},
+  "quantumania": {mid: 1, end: 1},
+  "gotg-3": {mid: 1, end: 1},
+  "secret-invasion": {eps: {}},
+  "loki-2": {eps: {"1": {mid: 1, end: 0}}},
+  "the-marvels": {mid: 1, end: 0},
+  "whatif-2": {eps: {"4": {mid: 1, end: 0}}},
+  "echo": {eps: {"5": {mid: 1, end: 0}}},
+  "deadpool-wolverine": {mid: 0, end: 1},
+  "agatha": {eps: {}},
+  "whatif-3": {eps: {}},
+  "brave-new-world": {mid: 0, end: 1},
+  "daredevil-1": {eps: {"9": {mid: 1, end: 0}}},
+  "thunderbolts": {mid: 1, end: 1},
+  "ironheart": {eps: {"6": {mid: 1, end: 0}}},
+  "fantastic-four": {mid: 1, end: 1},
+  "eyes-wakanda": {eps: {}},
+  "marvel-zombies": {eps: {}},
+  "wonder-man": {eps: {}},
+  "daredevil-2": {eps: {}},
+  "punisher-special": {mid: 0, end: 0},
+  "brand-new-day": {mid: 0, end: 1},
+  "visionquest": {eps: {"8": {mid: 1, end: 1}}},
+  "ov-blade": {mid: 0, end: 0},
+  "ov-blade-2": {mid: 0, end: 0},
+  "ov-daredevil-2003": {mid: 1, end: 0},
+  "ov-hulk-2003": {mid: 0, end: 0},
+  "ov-punisher-2004": {mid: 0, end: 0},
+  "ov-blade-trinity": {mid: 0, end: 1},
+  "ov-elektra": {mid: 0, end: 0},
+  "ov-manthing": {mid: 0, end: 0},
+  "ov-ghostrider-1": {mid: 0, end: 0},
+  "ov-punisher-warzone": {mid: 0, end: 0},
+  "ov-ghostrider-2": {mid: 0, end: 0},
+  "ov-xmen-1": {mid: 0, end: 0},
+  "ov-xmen-2": {mid: 0, end: 0},
+  "ov-xmen-3": {mid: 0, end: 1},
+  "ov-xmen-origins-wolverine": {mid: 1, end: 1},
+  "ov-xmen-first-class": {mid: 0, end: 0},
+  "ov-the-wolverine": {mid: 1, end: 0},
+  "ov-xmen-dofp": {mid: 0, end: 1},
+  "ov-deadpool-1": {mid: 0, end: 1},
+  "ov-xmen-apocalypse": {mid: 0, end: 1},
+  "ov-logan": {mid: 0, end: 0},
+  "ov-deadpool-2": {mid: 1, end: 0},
+  "ov-dark-phoenix": {mid: 0, end: 0},
+  "ov-new-mutants": {mid: 0, end: 0},
+  "ov-ff-2005": {mid: 0, end: 0},
+  "ov-ff-silver-surfer": {mid: 1, end: 0},
+  "ov-ff-2015": {mid: 0, end: 0},
+  "ov-spiderman-2002": {mid: 0, end: 0},
+  "ov-spiderman-2004": {mid: 0, end: 0},
+  "ov-spiderman-2007": {mid: 0, end: 0},
+  "ov-amazing-spiderman-1": {mid: 1, end: 0},
+  "ov-amazing-spiderman-2": {mid: 1, end: 0},
+  "ov-spider-noir": {eps: {}},
+  "ov-venom-1": {mid: 1, end: 1},
+  "ov-venom-2": {mid: 1, end: 0},
+  "ov-morbius": {mid: 2, end: 0},
+  "ov-madame-web": {mid: 0, end: 0},
+  "ov-venom-3": {mid: 1, end: 1},
+  "ov-kraven": {mid: 0, end: 0},
+  "ov-spiderverse-1": {mid: 0, end: 1},
+  "ov-spiderverse-2": {mid: 0, end: 0},
+  "ov-agent-carter": {eps: {}},
+  "ov-daredevil-netflix": {eps: {}},
+  "ov-jessica-jones": {eps: {}},
+  "ov-luke-cage": {eps: {}},
+  "ov-iron-fist": {eps: {}},
+  "ov-defenders": {eps: {"S1E8": {mid: 0, end: 1}}},
+  "ov-inhumans": {eps: {}},
+  "ov-punisher-netflix": {eps: {}},
+  "ov-runaways": {eps: {}},
+  "ov-cloak-dagger": {eps: {"S1E10": {mid: 0, end: 1}}},
+  "oneshot-consultant": {mid: 0, end: 0},
+  "oneshot-funny-thing": {mid: 0, end: 0},
+  "oneshot-item-47": {mid: 0, end: 1},
+  "oneshot-agent-carter": {mid: 0, end: 1},
+  "oneshot-all-hail-king": {mid: 0, end: 1},
+  "oneshot-team-thor": {mid: 0, end: 0},
+  "oneshot-team-thor-2": {mid: 0, end: 0},
+  "oneshot-team-darryl": {mid: 0, end: 0},
+};
+
 
 
 const CHRON_ORDER = [
@@ -2343,11 +2479,62 @@ function lengthLabel(item) {
   if (l.min) parts.push(formatMinutes(l.min));
   return parts.join(" · ");
 }
+// Escenas post-créditos. Fuente: POST_CREDITS (cargado a mano); para películas
+// que no están ahí, lo que marque TMDB (solo sabe si hay a mitad y/o al final, no cuántas).
+function postCreditsOf(item) {
+  if (POST_CREDITS[item.id]) return POST_CREDITS[item.id];
+  const l = getLength(item.id);
+  return (l && l.pc) || null;
+}
+function postCreditsCount(item) {
+  const pc = postCreditsOf(item);
+  if (!pc) return 0;
+  if (pc.eps) return Object.keys(pc.eps).reduce(function (n, k) { return n + pc.eps[k].mid + pc.eps[k].end; }, 0);
+  return pc.mid + pc.end;
+}
+function pcWhere(mid, end, approx) {
+  if (approx) return [mid ? "a mitad de créditos" : "", end ? "al final" : ""].filter(Boolean).join(" y ");
+  const parts = [];
+  if (mid) parts.push(mid + " a mitad de créditos");
+  if (end) parts.push(end + " al final");
+  return parts.join(", ");
+}
+function pcEpisodeName(key) {
+  const m = /^S(\d+)E(\d+)$/.exec(key);
+  return m ? "T" + m[1] + " ep. " + m[2] : "ep. " + key;
+}
+function postCreditsLabel(item) {
+  if (!isReleased(item)) return "";
+  const pc = postCreditsOf(item);
+  if (!pc) return "";
+  if (pc.eps) {
+    const keys = Object.keys(pc.eps).sort(function (a, b) {
+      const n = function (k) { const m = /^S(\d+)E(\d+)$/.exec(k); return m ? m[1] * 1000 + Number(m[2]) : Number(k); };
+      return n(a) - n(b);
+    });
+    if (!keys.length) return "Sin escenas post-créditos";
+    return "Post-créditos en " + keys.map(function (k) {
+      const e = pc.eps[k];
+      const where = e.mid && e.end ? "mitad y final" : e.mid ? (e.mid > 1 ? e.mid + " a mitad" : "a mitad") : (e.end > 1 ? e.end + " al final" : "al final");
+      return pcEpisodeName(k) + " (" + where + ")";
+    }).join(" · ");
+  }
+  const total = pc.mid + pc.end;
+  if (!total) return "Sin escenas post-créditos";
+  if (pc.approx) return "Post-créditos: " + pcWhere(pc.mid, pc.end, true);
+  return "Post-créditos: " + total + " — " + pcWhere(pc.mid, pc.end);
+}
+function creditsSvg(size, color) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' +
+    '<path d="M6 5h12M8 10h8M5 15h14M9 20h6"/></svg>';
+}
+
 // Texto corto, para la tarjeta: "2h 6m" o "9 ep".
 function lengthShort(item) {
   const l = getLength(item.id);
   if (!l || !isReleased(item)) return "";
   if (l.eps) return l.eps + " ep";
+  if (!l.min) return "";
   const h = Math.floor(l.min / 60), m = l.min % 60;
   return h ? h + "h" + (m ? " " + m + "m" : "") : m + "m";
 }
@@ -2563,8 +2750,16 @@ async function fetchLength(item) {
   const ref = await resolveTmdb(item);
   if (!ref) return null;
   if (ref.kind === "movie") {
-    const m = await tmdbGet("movie/" + ref.id);
-    return m && m.runtime ? { min: m.runtime } : null;
+    const m = await tmdbGet("movie/" + ref.id + "?append_to_response=keywords");
+    if (!m) return null;
+    const out = {};
+    if (m.runtime) out.min = m.runtime;
+    // TMDB marca las escenas con estas palabras clave. Que falten no significa
+    // que no haya: en los estrenos suelen cargarse días después.
+    const kw = ((m.keywords && m.keywords.keywords) || []).map(function (k) { return k.name; });
+    const mid = kw.indexOf("duringcreditsstinger") !== -1, end = kw.indexOf("aftercreditsstinger") !== -1;
+    if (mid || end) out.pc = { mid: mid ? 1 : 0, end: end ? 1 : 0, approx: true };
+    return Object.keys(out).length ? out : null;
   }
   const show = await tmdbGet("tv/" + ref.id);
   if (!show) return null;
@@ -2859,6 +3054,11 @@ function openStatusPicker(id) {
   statusPickerId = id;
   const item = findItemById(id);
   document.getElementById("statusItemTitle").textContent = item ? item.es : "";
+  const len = item ? lengthLabel(item) : "";
+  const pc = item ? postCreditsLabel(item) : "";
+  document.getElementById("statusMeta").innerHTML =
+    (len ? "<div>" + escapeHtml(len) + "</div>" : "") +
+    (pc ? '<div class="pc-line">' + creditsSvg(11, "#9A9AAC") + "<span>" + escapeHtml(pc) + "</span></div>" : "");
   const current = status[id] || "";
   document.querySelectorAll(".status-option[data-status]").forEach(function (b) {
     b.classList.toggle("current", b.dataset.status === current);
@@ -3018,9 +3218,14 @@ function buildCardHtml(item) {
 
   const ratingBadge = ratings[item.id] ? '<span class="card-rating-inline">★ ' + ratings[item.id] + "</span>" : "";
 
+  const pcCount = rel ? postCreditsCount(item) : 0;
+  const pcBadge = pcCount
+    ? '<div class="pc-badge" title="Escenas post-créditos">' + creditsSvg(9, "#EDEBE3") + pcCount + "</div>"
+    : "";
+
   return '<button class="card" data-id="' + item.id + '" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
     '<div class="poster-box" style="border:1px solid ' + borderColor + ';opacity:' + (rel ? 1 : 0.6) + '">' +
-    typeBadge + centerContent + infoBtn + stamp + skipOverlay + summaryOverlay + lock +
+    typeBadge + centerContent + infoBtn + stamp + skipOverlay + summaryOverlay + lock + pcBadge +
     "</div>" +
     '<p class="card-title" style="color:' + titleColor + '">' + escapeHtml(item.es) + "</p>" +
     '<p class="card-year"><span>' + item.year + (lengthShort(item) ? " · " + lengthShort(item) : "") + "</span>" + ratingBadge + "</p>" +
@@ -3049,7 +3254,8 @@ function buildPodiumRow(item, rank) {
     (poster ? '<img src="' + poster + '" alt="" />' : "") + "</div>" +
     '<div class="podium-info">' +
     '<p class="podium-title">' + escapeHtml(item.es) + "</p>" +
-    '<p class="podium-year">' + item.year + "</p>" +
+    '<p class="podium-year">' + item.year +
+      (watchDates[item.id] ? ' · <span class="podium-watched">vista el ' + formatDate(watchDates[item.id]) + "</span>" : "") + "</p>" +
     ratingRow +
     "</div>" +
     "</div>";
@@ -3243,6 +3449,7 @@ document.getElementById("statusCancelBtn").addEventListener("click", closeStatus
 document.getElementById("statusWatchDate").addEventListener("change", function (e) {
   if (!statusPickerId) return;
   setWatchDate(statusPickerId, e.target.value || null);
+  render();
   if (detailId === statusPickerId) renderModal();
 });
 document.getElementById("confirmYesBtn").addEventListener("click", function () {
