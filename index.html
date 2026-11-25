@@ -219,26 +219,38 @@
   #quizRetryBtn { background: var(--accent); color: #000; box-shadow: 3px 3px 0 var(--ink); }
   #quizCloseBtn { background: #fff; color: #111; }
 
-  /* podio */
-  .podium-list { display: flex; flex-direction: column; gap: 12px; }
-  .podium-row { display: flex; align-items: center; gap: 11px; background: var(--panel); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 9px 10px 9px 6px; }
-  .podium-rank { width: 38px; height: 38px; flex-shrink: 0; display: grid; place-items: center; font-family: Bangers, cursive; font-size: 17px; color: var(--muted); }
-  .podium-rank.r1 { background: var(--paper); color: #000; clip-path: polygon(50% 0,61% 32%,98% 35%,70% 57%,79% 91%,50% 72%,21% 91%,30% 57%,2% 35%,39% 32%); padding-top: 4px; }
-  .podium-rank.r2 span, .podium-rank.r3 span { width: 28px; height: 28px; display: grid; place-items: center; color: #000; border: 2px solid var(--ink); }
-  .podium-rank.r2 span { background: #E2E8F0; border-radius: 50%; }
-  .podium-rank.r3 span { background: #CBB59A; transform: rotate(45deg); width: 24px; height: 24px; }
-  .podium-rank.r3 span i { transform: rotate(-45deg); font-style: normal; }
-  .podium-thumb { width: 42px; height: 63px; overflow: hidden; flex-shrink: 0; background: #0B0D1A; border: 1.5px solid var(--ink); }
+  /* podio: el top 3 como podio real; el resto en lista compacta */
+  .podium-stage { display: grid; grid-template-columns: 1fr 1.2fr 1fr; align-items: end; gap: 10px; margin: 4px 0 26px; }
+  .podium-spot { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; min-width: 0; }
+  .podium-spot.empty { cursor: default; }
+  .podium-spot:active .podium-spot-poster { transform: scale(.97); }
+  .podium-spot-poster { width: 100%; aspect-ratio: 2 / 3; display: block; position: relative; background: #0B0D1A; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); overflow: hidden; transition: transform .12s ease; }
+  .podium-spot-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .podium-spot.p1 .podium-spot-poster { border-width: 2.5px; box-shadow: 4px 4px 0 var(--ink), 0 0 0 2px var(--paper); }
+  .podium-spot-title { font-size: 10.5px; font-weight: 600; line-height: 1.2; text-align: center; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 25px; width: 100%; }
+  .podium-spot.p1 .podium-spot-title { font-size: 11.5px; }
+  .podium-spot .star-rating { gap: 1px; justify-content: center; }
+  .podium-step { width: 100%; display: flex; align-items: flex-start; justify-content: center; margin-top: 3px; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+    background: repeating-linear-gradient(-45deg, #1E2445 0 6px, #1A1F3A 6px 12px); }
+  .podium-step span { font-family: Bangers, cursive; color: var(--text); text-shadow: 2px 2px 0 #000; line-height: 1; padding-top: 6px; }
+  .podium-spot.p1 .podium-step { height: 74px; background: var(--paper); }
+  .podium-spot.p1 .podium-step span { font-size: 46px; color: #000; text-shadow: 2px 2px 0 var(--accent); }
+  .podium-spot.p2 .podium-step { height: 52px; }
+  .podium-spot.p2 .podium-step span { font-size: 34px; }
+  .podium-spot.p3 .podium-step { height: 38px; }
+  .podium-spot.p3 .podium-step span { font-size: 28px; padding-top: 4px; }
+  .podium-list { display: flex; flex-direction: column; gap: 10px; }
+  .podium-row { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; color: inherit; cursor: pointer; background: var(--panel); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 8px 10px 8px 8px; }
+  .podium-row:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .podium-rank { width: 34px; flex-shrink: 0; text-align: center; font-family: Bangers, cursive; font-size: 24px; color: var(--muted); text-shadow: 2px 2px 0 #000; }
+  .podium-thumb { width: 40px; height: 60px; flex-shrink: 0; background: #0B0D1A; border: 1.5px solid var(--ink); overflow: hidden; display: block; }
   .podium-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .podium-info { flex: 1; min-width: 0; }
-  .podium-title { font-size: 13px; font-weight: 600; color: var(--text); margin: 0 0 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .podium-year { font-size: 10px; color: var(--muted); margin: 0 0 4px; }
+  .podium-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .podium-title { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .podium-year { font-size: 10px; color: var(--muted); }
   .podium-watched { color: #C9CCE6; }
-  .podium-edit-btn { font-family: Bangers, cursive; font-size: 11.5px; letter-spacing: .06em; color: #C9CCE6; background: var(--panel-2); border: 1.5px solid var(--ink); padding: 2px 8px 1px; cursor: pointer; margin-left: auto; }
-  .podium-edit-done { color: #000; background: var(--paper); box-shadow: 2px 2px 0 var(--ink); }
-  .podium-date-row { margin-top: 7px; gap: 8px; font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-  .podium-date { background: var(--paper); color: #111; border: 1.5px solid var(--ink); border-radius: 0; font-family: inherit; font-size: 12px; padding: 3px 5px; color-scheme: light; letter-spacing: 0; min-width: 0; }
-  .podium-row.editing { box-shadow: 3px 3px 0 var(--ink), 0 0 0 2px var(--accent); }
+  .podium-noposter { display: flex; align-items: center; justify-content: center; height: 100%; padding: 4px; font-size: 9px; color: var(--muted); text-align: center; }
+  .podium-hint { font-size: 11px; color: var(--dim); text-align: center; margin: 16px 0 0; }
   .podium-empty { color: var(--muted); text-align: center; padding: 50px 20px; font-size: 14px; }
 
   /* confirmación */
@@ -3167,38 +3179,33 @@ function buildCardHtml(item) {
     "</button>";
 }
 
-function buildPodiumRow(item, rank) {
+function podiumTap(item) {
+  return isReleased(item) ? ' onclick="openStatusPicker(\'' + item.id + '\')"' : "";
+}
+function podiumPoster(item) {
   const poster = posters[item.id];
-  const rankHtml = rank === 1 ? '<span class="podium-rank r1">1</span>'
-    : rank === 2 ? '<span class="podium-rank r2"><span>2</span></span>'
-    : rank === 3 ? '<span class="podium-rank r3"><span><i>3</i></span></span>'
-    : '<span class="podium-rank">' + rank + "°</span>";
-  const editing = podiumEditing === item.id;
-  const canOpen = isReleased(item);
+  return poster ? '<img src="' + poster + '" alt="" loading="lazy" />' : '<span class="podium-noposter">' + escapeHtml(item.es) + "</span>";
+}
+// Un lugar del podio (1°, 2° o 3°): póster grande, título, estrellas y su escalón con el número.
+function buildPodiumSpot(item, rank) {
+  return '<button class="podium-spot p' + rank + '"' + podiumTap(item) + ">" +
+    '<span class="podium-spot-poster">' + podiumPoster(item) + "</span>" +
+    '<span class="podium-spot-title">' + escapeHtml(item.es) + "</span>" +
+    buildStarRating(item.id, ratings[item.id], rank === 1 ? 14 : 12, false) +
+    '<span class="podium-step"><span>' + rank + "</span></span>" +
+    "</button>";
+}
+// Del 4° para abajo: fila compacta, siempre igual (editar = tocarla y usar el menú).
+function buildPodiumRow(item, rank) {
   const date = watchDates[item.id];
-
-  const ratingRow = editing
-    ? '<div class="podium-edit-row">' + buildRatingRow(item.id, ratings[item.id], 17, true) + "</div>" +
-      '<div class="podium-edit-row podium-date-row"><span>Vista el</span>' +
-      '<input type="date" class="podium-date" value="' + (date || "") + '" max="' + todayIso() + '" onclick="event.stopPropagation()" onchange="setPodiumDate(\x27' + item.id + '\x27, this.value)">' +
-      '<button class="podium-edit-btn podium-edit-done" onclick="event.stopPropagation(); togglePodiumEdit(\x27' + item.id + '\x27)">Listo</button>' +
-      "</div>"
-    : '<div class="podium-edit-row">' +
-      buildStarRating(item.id, ratings[item.id], 17, false) +
-      '<button class="podium-edit-btn" onclick="event.stopPropagation(); togglePodiumEdit(\x27' + item.id + '\x27)">Editar</button>' +
-      "</div>";
-
-  return '<div class="podium-row' + (editing ? " editing" : "") + '">' +
-    rankHtml +
-    '<div class="podium-thumb"' + (canOpen ? ' style="cursor:pointer;" onclick="openStatusPicker(\x27' + item.id + '\x27)"' : "") + ">" +
-    (poster ? '<img src="' + poster + '" alt="" loading="lazy" />' : "") + "</div>" +
-    '<div class="podium-info">' +
-    '<p class="podium-title">' + escapeHtml(item.es) + "</p>" +
-    '<p class="podium-year">' + item.year +
-      (date ? ' · <span class="podium-watched">vista el ' + formatDate(date) + "</span>" : "") + "</p>" +
-    ratingRow +
-    "</div>" +
-    "</div>";
+  return '<button class="podium-row"' + podiumTap(item) + ">" +
+    '<span class="podium-rank">' + rank + "</span>" +
+    '<span class="podium-thumb">' + podiumPoster(item) + "</span>" +
+    '<span class="podium-info">' +
+      '<span class="podium-title">' + escapeHtml(item.es) + "</span>" +
+      '<span class="podium-year">' + item.year + (date ? ' · <span class="podium-watched">vista el ' + formatDate(date) + "</span>" : "") + "</span>" +
+      buildStarRating(item.id, ratings[item.id], 14, false) +
+    "</span></button>";
 }
 function setPodiumDate(id, value) {
   setWatchDate(id, value || null);
@@ -3224,8 +3231,17 @@ function renderPodiumView() {
     return;
   }
 
-  const rowsHtml = rated.map(function (item, i) { return buildPodiumRow(item, i + 1); }).join("");
-  main.innerHTML = '<section class="saga"><div class="podium-list">' + rowsHtml + "</div></section>";
+  const top = rated.slice(0, 3);
+  // orden visual del podio: 2° · 1° · 3°
+  const stage = [top[1] ? buildPodiumSpot(top[1], 2) : '<span class="podium-spot p2 empty"></span>',
+                 buildPodiumSpot(top[0], 1),
+                 top[2] ? buildPodiumSpot(top[2], 3) : '<span class="podium-spot p3 empty"></span>'].join("");
+  const rest = rated.slice(3).map(function (item, i) { return buildPodiumRow(item, i + 4); }).join("");
+  main.innerHTML = '<section class="saga">' +
+    '<div class="podium-stage">' + stage + "</div>" +
+    (rest ? '<div class="podium-list">' + rest + "</div>" : "") +
+    '<p class="podium-hint">Tocá cualquiera para cambiar sus estrellas o la fecha.</p>' +
+    "</section>";
 }
 
 function universeStats(universeKey) {
