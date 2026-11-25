@@ -3291,7 +3291,7 @@ function buildCardHtml(item) {
   return '<button class="' + cls + '" data-id="' + item.id + '" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
     '<div class="poster-box">' + centerContent + sticker + lock + "</div>" +
     '<p class="card-title">' + escapeHtml(item.es) + "</p>" +
-    '<p class="card-year"><span class="meta">' + typeIc + item.year + (len ? " · " + len : "") + framesHtml(item) + "</span>" + ratingBadge + "</p>" +
+    '<p class="card-year"><span class="meta">' + typeIc + item.year + (len ? " · " + len : "") + "</span>" + ratingBadge + "</p>" +
     "</button>";
 }
 
