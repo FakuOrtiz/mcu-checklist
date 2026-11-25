@@ -219,26 +219,7 @@
   #quizRetryBtn { background: var(--accent); color: #000; box-shadow: 3px 3px 0 var(--ink); }
   #quizCloseBtn { background: #fff; color: #111; }
 
-  /* podio: el top 3 como podio real; el resto en lista compacta */
-  .podium-stage { display: grid; grid-template-columns: 1fr 1.2fr 1fr; align-items: end; gap: 10px; margin: 4px 0 26px; }
-  .podium-spot { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; min-width: 0; }
-  .podium-spot.empty { cursor: default; }
-  .podium-spot:active .podium-spot-poster { transform: scale(.97); }
-  .podium-spot-poster { width: 100%; aspect-ratio: 2 / 3; display: block; position: relative; background: #0B0D1A; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); overflow: hidden; transition: transform .12s ease; }
-  .podium-spot-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .podium-spot.p1 .podium-spot-poster { border-width: 2.5px; box-shadow: 4px 4px 0 var(--ink), 0 0 0 2px var(--paper); }
-  .podium-spot-title { font-size: 10.5px; font-weight: 600; line-height: 1.2; text-align: center; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 25px; width: 100%; }
-  .podium-spot.p1 .podium-spot-title { font-size: 11.5px; }
-  .podium-spot .star-rating { gap: 1px; justify-content: center; }
-  .podium-step { width: 100%; display: flex; align-items: flex-start; justify-content: center; margin-top: 3px; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
-    background: repeating-linear-gradient(-45deg, #1E2445 0 6px, #1A1F3A 6px 12px); }
-  .podium-step span { font-family: Bangers, cursive; color: var(--text); text-shadow: 2px 2px 0 #000; line-height: 1; padding-top: 6px; }
-  .podium-spot.p1 .podium-step { height: 74px; background: var(--paper); }
-  .podium-spot.p1 .podium-step span { font-size: 46px; color: #000; text-shadow: 2px 2px 0 var(--accent); }
-  .podium-spot.p2 .podium-step { height: 52px; }
-  .podium-spot.p2 .podium-step span { font-size: 34px; }
-  .podium-spot.p3 .podium-step { height: 38px; }
-  .podium-spot.p3 .podium-step span { font-size: 28px; padding-top: 4px; }
+  /* podio: lista; los 3 primeros son filas destacadas */
   .podium-list { display: flex; flex-direction: column; gap: 10px; }
   .podium-row { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; color: inherit; cursor: pointer; background: var(--panel); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 8px 10px 8px 8px; }
   .podium-row:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
@@ -250,6 +231,21 @@
   .podium-year { font-size: 10px; color: var(--muted); }
   .podium-watched { color: #C9CCE6; }
   .podium-noposter { display: flex; align-items: center; justify-content: center; height: 100%; padding: 4px; font-size: 9px; color: var(--muted); text-align: center; }
+  .podium-row.top { padding: 12px 12px 12px 10px; gap: 13px; }
+  .podium-row.top .podium-thumb { width: 58px; height: 87px; border-width: 2px; box-shadow: 2px 2px 0 var(--ink); }
+  .podium-row.top .podium-title { font-size: 15px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .podium-row.top .podium-year { font-size: 10.5px; }
+  .podium-row.top .podium-rank { width: 44px; height: 44px; display: grid; place-items: center; font-size: 30px; color: #000; text-shadow: none;
+    background: var(--paper); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); transform: rotate(-6deg); padding-top: 3px; }
+  .podium-row.top1 { background: var(--paper); color: #111; border-width: 2.5px; box-shadow: 4px 4px 0 var(--ink); margin-bottom: 2px; }
+  .podium-row.top1 .podium-title { color: #111; font-size: 16px; }
+  .podium-row.top1 .podium-year, .podium-row.top1 .podium-watched { color: #555; }
+  .podium-row.top1 .star-rating .sf { fill: #111; stroke: #111; }
+  .podium-row.top1 .star-rating .se { stroke: #999; }
+  .podium-row.top1 .podium-rank { width: 52px; height: 52px; font-size: 38px; background: #111; color: var(--paper); box-shadow: 2px 2px 0 var(--accent-2); }
+  .podium-row.top2, .podium-row.top3 { outline: 1.5px solid rgba(255,248,231,.55); outline-offset: -5px; }
+  .podium-row.top3 .podium-rank { transform: rotate(5deg); }
+  .podium-list .podium-row.top3 + .podium-row:not(.top) { margin-top: 8px; }
   .podium-hint { font-size: 11px; color: var(--dim); text-align: center; margin: 16px 0 0; }
   .podium-empty { color: var(--muted); text-align: center; padding: 50px 20px; font-size: 14px; }
 
@@ -3186,25 +3182,17 @@ function podiumPoster(item) {
   const poster = posters[item.id];
   return poster ? '<img src="' + poster + '" alt="" loading="lazy" />' : '<span class="podium-noposter">' + escapeHtml(item.es) + "</span>";
 }
-// Un lugar del podio (1°, 2° o 3°): póster grande, título, estrellas y su escalón con el número.
-function buildPodiumSpot(item, rank) {
-  return '<button class="podium-spot p' + rank + '"' + podiumTap(item) + ">" +
-    '<span class="podium-spot-poster">' + podiumPoster(item) + "</span>" +
-    '<span class="podium-spot-title">' + escapeHtml(item.es) + "</span>" +
-    buildStarRating(item.id, ratings[item.id], rank === 1 ? 14 : 12, false) +
-    '<span class="podium-step"><span>' + rank + "</span></span>" +
-    "</button>";
-}
-// Del 4° para abajo: fila compacta, siempre igual (editar = tocarla y usar el menú).
+// Fila del podio. Los 3 primeros son filas destacadas; editar = tocarla y usar el menú.
 function buildPodiumRow(item, rank) {
   const date = watchDates[item.id];
-  return '<button class="podium-row"' + podiumTap(item) + ">" +
+  const top = rank <= 3 ? " top top" + rank : "";
+  return '<button class="podium-row' + top + '"' + podiumTap(item) + ">" +
     '<span class="podium-rank">' + rank + "</span>" +
     '<span class="podium-thumb">' + podiumPoster(item) + "</span>" +
     '<span class="podium-info">' +
       '<span class="podium-title">' + escapeHtml(item.es) + "</span>" +
       '<span class="podium-year">' + item.year + (date ? ' · <span class="podium-watched">vista el ' + formatDate(date) + "</span>" : "") + "</span>" +
-      buildStarRating(item.id, ratings[item.id], 14, false) +
+      buildStarRating(item.id, ratings[item.id], rank <= 3 ? 17 : 14, false) +
     "</span></button>";
 }
 function setPodiumDate(id, value) {
@@ -3231,15 +3219,9 @@ function renderPodiumView() {
     return;
   }
 
-  const top = rated.slice(0, 3);
-  // orden visual del podio: 2° · 1° · 3°
-  const stage = [top[1] ? buildPodiumSpot(top[1], 2) : '<span class="podium-spot p2 empty"></span>',
-                 buildPodiumSpot(top[0], 1),
-                 top[2] ? buildPodiumSpot(top[2], 3) : '<span class="podium-spot p3 empty"></span>'].join("");
-  const rest = rated.slice(3).map(function (item, i) { return buildPodiumRow(item, i + 4); }).join("");
+  const rows = rated.map(function (item, i) { return buildPodiumRow(item, i + 1); }).join("");
   main.innerHTML = '<section class="saga">' +
-    '<div class="podium-stage">' + stage + "</div>" +
-    (rest ? '<div class="podium-list">' + rest + "</div>" : "") +
+    '<div class="podium-list">' + rows + "</div>" +
     '<p class="podium-hint">Tocá cualquiera para cambiar sus estrellas o la fecha.</p>' +
     "</section>";
 }
