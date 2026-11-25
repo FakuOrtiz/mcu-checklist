@@ -244,27 +244,27 @@
   #orderBackdrop { position: fixed; inset: 0; z-index: 57; background: rgba(6,8,18,.8); display: none; align-items: flex-end; justify-content: center; }
   #orderBackdrop.show { display: flex; animation: fadeIn .18s ease; }
   @media (min-width: 640px) { #orderBackdrop { align-items: center; } }
-  #orderBox { width: 100%; max-width: 460px; max-height: 90vh; display: flex; flex-direction: column; background: var(--paper); color: #111; border: 3px solid var(--ink); border-bottom: 0;
+  #orderBox { width: 100%; max-width: 460px; height: min(82vh, 640px); display: flex; flex-direction: column; background: var(--paper); color: #111; border: 3px solid var(--ink); border-bottom: 0;
     padding: 14px 14px max(14px, env(safe-area-inset-bottom)); animation: sheetUp .24s cubic-bezier(.2, 1.1, .4, 1); }
   @media (min-width: 640px) { #orderBox { border-bottom: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); } }
   #orderHeader { display: flex; align-items: center; justify-content: space-between; font-size: 22px; }
   #orderClose { padding: 5px; background: #fff; border: 1.5px solid var(--ink); cursor: pointer; display: flex; }
-  #orderLevels { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 2px; }
+  #orderLevels { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 12px; }
   .order-level-now { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .order-level-now small { font-size: 11px; color: var(--muted); }
   .order-arrow { width: 38px; height: 38px; display: grid; place-items: center; background: var(--panel-2); color: var(--text); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); cursor: pointer; }
   .order-arrow:active { transform: translate(2px, 2px); box-shadow: none; }
   .order-arrow:disabled { opacity: .3; cursor: default; box-shadow: none; }
-  #orderHint { font-size: 12px; color: #555; margin: 6px 0 10px; min-height: 16px; }
   #orderList { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px 4px 6px 2px; overscroll-behavior: contain; }
-  .order-row { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 8px; background: #fff; border: 1.5px solid var(--ink); position: relative; transition: transform .15s ease; user-select: none; }
+  .order-row { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 8px; background: #fff; border: 1.5px solid var(--ink); position: relative; transition: transform .15s ease, box-shadow .15s ease; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: pan-y; cursor: grab; }
+  .order-row.lifting { transform: scale(1.02); }
   .order-row.dragging { transition: none; z-index: 2; box-shadow: 4px 6px 0 var(--ink); background: #FFFDF5; }
   .order-pos { width: 30px; flex-shrink: 0; text-align: center; font-family: Bangers, cursive; font-size: 22px; color: #111; }
   .order-thumb { width: 34px; height: 51px; flex-shrink: 0; background: #0B0D1A; border: 1.5px solid var(--ink); overflow: hidden; }
   .order-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .order-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.25; }
   .order-title small { display: block; font-size: 10.5px; font-weight: 400; color: #666; }
-  .order-handle { padding: 10px 6px; cursor: grab; touch-action: none; color: #111; display: flex; }
+  .order-handle { padding: 10px 6px; color: #111; display: flex; pointer-events: none; }
   .order-row.dragging .order-handle { cursor: grabbing; }
   #orderDoneBtn { margin-top: 10px; font-family: Bangers, cursive; font-size: 18px; letter-spacing: .06em; padding: 7px 0 5px; background: var(--accent); color: #000; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; }
   .podium-hint { font-size: 11px; color: var(--dim); text-align: center; margin: 16px 0 0; }
@@ -342,7 +342,6 @@
   .reset-check input:checked { background: var(--paper); }
   #confirmYesBtn { background: var(--panel-2); color: var(--text); }
   #confirmNoBtn { background: var(--paper); color: #000; }
-  #orderHint { color: var(--muted); }
   .order-row { background: var(--panel-2); }
   .order-row.dragging { background: #2C3360; }
   .order-pos, .order-handle { color: var(--text); }
@@ -460,7 +459,6 @@
       <button id="orderClose" onclick="closeOrder()" aria-label="Cerrar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     <div id="orderLevels"></div>
-    <p id="orderHint"></p>
     <div id="orderList"></div>
     <button id="orderDoneBtn" onclick="closeOrder()">Listo</button>
   </div>
@@ -3348,20 +3346,17 @@ function renderOrder() {
   // selector con flechas: solo niveles que tienen títulos (de 5 ★ hacia abajo)
   const levels = STAR_LEVELS.filter(function (r) { return counts[r]; });
   const idx = levels.indexOf(orderLevel);
-  const prev = levels[idx - 1], next = levels[idx + 1];
+  const more = levels[idx - 1], less = levels[idx + 1]; // levels va de 5 ★ hacia abajo
   const n = counts[orderLevel] || 0;
   const arrow = function (target, dir) {
-    return '<button class="order-arrow"' + (target !== undefined ? ' onclick="setOrderLevel(' + target + ')"' : " disabled") + ' aria-label="' + (dir < 0 ? "Más estrellas" : "Menos estrellas") + '">' +
+    return '<button class="order-arrow"' + (target !== undefined ? ' onclick="setOrderLevel(' + target + ')"' : " disabled") + ' aria-label="' + (dir < 0 ? "Menos estrellas" : "Más estrellas") + '">' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="' + (dir < 0 ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6") + '"/></svg></button>';
   };
-  document.getElementById("orderLevels").innerHTML = arrow(prev, -1) +
+  document.getElementById("orderLevels").innerHTML = arrow(less, -1) +
     '<div class="order-level-now">' + buildStarRating("lvl", orderLevel, 20, false) + "<small>" + n + (n === 1 ? " título" : " títulos") + "</small></div>" +
-    arrow(next, 1);
+    arrow(more, 1);
   const items = levelItems(orderLevel);
   const base = ratedAll().filter(function (d) { return ratings[d.id] > orderLevel; }).length + 1;
-  document.getElementById("orderHint").textContent = items.length > 1
-    ? "Arrastrá desde ≡ para cambiar el orden. El número es el puesto que tendría en el podio."
-    : items.length === 1 ? "Hay un solo título con " + starLabel(orderLevel) + ": no hay nada que desempatar." : "";
   document.getElementById("orderList").innerHTML = items.map(function (d, i) {
     const p = posters[d.id];
     return '<div class="order-row" data-id="' + d.id + '">' +
@@ -3379,29 +3374,45 @@ function saveLevelOrder() {
   ids.forEach(function (id, i) { tiebreak[id] = { r: orderLevel, o: i }; });
   saveTiebreak();
 }
-// Arrastre con el dedo o el mouse (pointer events): la fila sigue el dedo y las demás se corren.
+// Arrastre: con el mouse arranca al instante; con el dedo, después de dejarlo apoyado un momento
+// (así un deslizamiento rápido sigue moviendo la lista).
 (function () {
-  let drag = null;
+  const HOLD_MS = 220;
+  let drag = null, pending = null;
   const list = function () { return document.getElementById("orderList"); };
   function relabel(order) {
     const base = Number(list().dataset.base);
     order.forEach(function (row, i) { row.querySelector(".order-pos").textContent = base + i; });
   }
-  document.addEventListener("pointerdown", function (e) {
-    const handle = e.target.closest && e.target.closest(".order-handle");
-    if (!handle) return;
-    e.preventDefault();
-    const row = handle.closest(".order-row");
+  function begin(row, y, pointerId) {
     const rows = [].slice.call(list().children);
-    const step = rows.length > 1 ? rows[1].offsetTop - rows[0].offsetTop : row.offsetHeight;
-    drag = { row: row, rows: rows, from: rows.indexOf(row), to: rows.indexOf(row), step: step, startY: e.clientY, startScroll: list().scrollTop, id: e.pointerId };
+    if (rows.length < 2) return;
+    const step = rows[1].offsetTop - rows[0].offsetTop;
+    drag = { row: row, rows: rows, from: rows.indexOf(row), to: rows.indexOf(row), step: step, startY: y, startScroll: list().scrollTop, id: pointerId };
     row.classList.add("dragging");
-    try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+    try { row.setPointerCapture(pointerId); } catch (err) {}
+    if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
+  }
+  document.addEventListener("pointerdown", function (e) {
+    const row = e.target.closest && e.target.closest("#orderList .order-row");
+    if (!row || drag) return;
+    if (e.pointerType === "mouse") { e.preventDefault(); begin(row, e.clientY, e.pointerId); return; }
+    row.classList.add("lifting");
+    pending = { row: row, x: e.clientX, y: e.clientY, id: e.pointerId,
+      timer: setTimeout(function () { row.classList.remove("lifting"); begin(row, pending.y, pending.id); pending = null; }, HOLD_MS) };
   });
+  function cancelPending() {
+    if (!pending) return;
+    clearTimeout(pending.timer); pending.row.classList.remove("lifting"); pending = null;
+  }
   document.addEventListener("pointermove", function (e) {
+    if (pending && e.pointerId === pending.id) {
+      if (Math.abs(e.clientY - pending.y) > 8 || Math.abs(e.clientX - pending.x) > 8) cancelPending();
+      return;
+    }
     if (!drag || e.pointerId !== drag.id) return;
     const l = list(), rect = l.getBoundingClientRect();
-    if (e.clientY < rect.top + 30) l.scrollTop -= 8; else if (e.clientY > rect.bottom - 30) l.scrollTop += 8;
+    if (e.clientY < rect.top + 36) l.scrollTop -= 8; else if (e.clientY > rect.bottom - 36) l.scrollTop += 8;
     const dy = e.clientY - drag.startY + (l.scrollTop - drag.startScroll);
     drag.row.style.transform = "translateY(" + dy + "px)";
     const to = Math.max(0, Math.min(drag.rows.length - 1, Math.round((drag.from * drag.step + dy) / drag.step)));
@@ -3415,7 +3426,10 @@ function saveLevelOrder() {
     });
     relabel(order);
   });
+  // mientras se arrastra con el dedo, que la lista no se desplace
+  document.addEventListener("touchmove", function (e) { if (drag) e.preventDefault(); }, { passive: false });
   function end(e) {
+    if (pending && e.pointerId === pending.id) { cancelPending(); return; }
     if (!drag || e.pointerId !== drag.id) return;
     const l = list();
     drag.rows.forEach(function (r) { r.style.transform = ""; });
@@ -3428,6 +3442,7 @@ function saveLevelOrder() {
   }
   document.addEventListener("pointerup", end);
   document.addEventListener("pointercancel", end);
+  document.addEventListener("contextmenu", function (e) { if (e.target.closest && e.target.closest("#orderList")) e.preventDefault(); });
 })();
 
 function setPodiumDate(id, value) {
