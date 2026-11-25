@@ -100,15 +100,10 @@
   .universe-page { scroll-margin-top: 12px; margin-top: 22px; }
   .universe-page.fresh { animation: panelIn .28s ease; }
   @keyframes panelIn { from { opacity: 0; transform: translateY(8px); } }
-  .universe-page .brand-cover { margin: 0 0 14px; height: 96px; }
   .universe-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
   .universe-head h2 { font-size: 21px; margin: 0; color: var(--text); }
   .universe-page .phase-bar-outer { margin-bottom: 4px; }
   .universe-grid { padding: 14px 8px 0 0; margin-right: -8px; }
-  /* portada al abrir el grupo (prueba) */
-  .brand-cover { height: 84px; margin: 14px 8px 0 0; display: flex; align-items: center; justify-content: center; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
-    background: radial-gradient(circle, rgba(255,255,255,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(90% 140% at 50% 120%, var(--brand-glow) 0%, var(--brand) 35%, #0E1226 75%); }
-  .brand-cover img { max-height: 52px; max-width: 62%; object-fit: contain; display: block; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
 
   .phase-head + .phase-bar-outer { margin: 0 2px 0 0; height: 5px; border-top: 0; }
   .phase-block { margin-bottom: 10px; }
@@ -3276,11 +3271,8 @@ function renderOtherView() {
   let panelHtml = "";
   if (otherOpen) {
     const meta = UNIVERSE_META[otherOpen];
-    const b = UNIVERSE_BRANDS[otherOpen];
     const st = universeStats(otherOpen);
     panelHtml = '<div class="universe-page' + (universeJustOpened ? " fresh" : "") + '" id="universePanel">' +
-      '<div class="brand-cover" style="' + brandStyle(otherOpen) + '">' +
-        (b ? '<img src="' + b.logo + '" alt="' + b.alt + '" />' : "") + "</div>" +
       '<div class="universe-head"><h2 class="display-font">' + meta.label + '</h2><span class="phase-count">' + groupCountLabel(st.done, st.total) + "</span></div>" +
       '<div class="phase-bar-outer">' + buildBarSegments(st.done, st.summary, st.skip, st.released, WATCHED_COLOR) + "</div>" +
       '<div class="grid universe-grid">' + st.items.map(buildCardHtml).join("") + "</div>" +
