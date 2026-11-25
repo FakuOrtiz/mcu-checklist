@@ -238,33 +238,38 @@
   .podium-rank.award.laurel i { font-size: 23px; margin-top: -4px; -webkit-text-stroke: 1px #000; text-shadow: 1.5px 1.5px 0 #000; }
   .podium-rank.award.r1 i { color: #FFE58A; } .podium-rank.award.r2 i { color: #F1F4FA; } .podium-rank.award.r3 i { color: #F6C08F; }
   .podium-rank.award.r1 .award-svg { filter: drop-shadow(0 0 4px rgba(233,185,58,.45)); }
-  .podium-row.top1 { position: relative; overflow: hidden; border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink), 0 0 0 1.5px rgba(232,195,90,.55); }
+  .podium-row.top1 { position: relative; overflow: hidden; }
   .podium-row.top1::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; pointer-events: none;
     background: linear-gradient(100deg, transparent, rgba(255,240,200,.14), transparent); animation: podiumGlint 5s ease-in-out infinite 1s; }
   @keyframes podiumGlint { 0%, 70% { left: -60%; } 100% { left: 130%; } }
   .podium-list .podium-row.top3 + .podium-row:not(.top) { margin-top: 6px; }
-  /* duelos */
-  .duel-banner { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 14px; padding: 8px 12px; cursor: pointer; text-align: left;
-    background: var(--accent); color: #000; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 13px; }
-  .duel-banner b { font-family: Bangers, cursive; font-weight: 400; font-size: 16px; letter-spacing: .05em; }
-  .duel-banner.done { background: var(--panel-2); color: #C9CCE6; }
-  .duel-banner:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-  .duel-vs { font-family: Bangers, cursive; font-size: 15px; letter-spacing: .04em; color: var(--paper); background: #111; border: 2px solid var(--ink); padding: 2px 6px 0; transform: rotate(-8deg); flex-shrink: 0; }
-  .duel-vs.big { font-size: 30px; padding: 4px 10px 1px; align-self: center; transform: rotate(-10deg); box-shadow: 3px 3px 0 var(--accent-2); z-index: 1; margin: 0 -10px; }
-  #duelBackdrop { position: fixed; inset: 0; z-index: 57; background: rgba(6,8,18,.8); display: none; align-items: center; justify-content: center; padding: 16px; }
-  #duelBackdrop.show { display: flex; animation: fadeIn .18s ease; }
-  #duelBox { width: 100%; max-width: 440px; background: var(--paper); color: #111; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 14px 14px 18px; animation: sheetUp .24s cubic-bezier(.2, 1.2, .4, 1); }
-  #duelHeader { display: flex; align-items: center; justify-content: space-between; font-size: 22px; }
-  #duelClose { padding: 5px; background: #fff; border: 1.5px solid var(--ink); cursor: pointer; display: flex; }
-  .duel-sub { font-size: 12px; color: #555; margin: 2px 0 12px; }
-  .duel-arena { display: flex; align-items: stretch; justify-content: center; }
-  .duel-pick { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; color: #111; transition: transform .2s ease, opacity .2s ease; }
-  .duel-poster { width: 100%; aspect-ratio: 2 / 3; display: block; background: #0B0D1A; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); overflow: hidden; }
-  .duel-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .duel-title { font-size: 12.5px; font-weight: 700; text-align: center; line-height: 1.25; }
-  .duel-pick:active { transform: scale(.97); }
-  .duel-pick.won { transform: scale(1.04) rotate(-1.5deg); }
-  .duel-arena:has(.won) .duel-pick:not(.won) { opacity: .35; }
+  .order-open-btn { display: inline-flex; align-items: center; gap: 4px; }
+  #orderBackdrop { position: fixed; inset: 0; z-index: 57; background: rgba(6,8,18,.8); display: none; align-items: flex-end; justify-content: center; }
+  #orderBackdrop.show { display: flex; animation: fadeIn .18s ease; }
+  @media (min-width: 640px) { #orderBackdrop { align-items: center; } }
+  #orderBox { width: 100%; max-width: 460px; max-height: 90vh; display: flex; flex-direction: column; background: var(--paper); color: #111; border: 3px solid var(--ink); border-bottom: 0;
+    padding: 14px 14px max(14px, env(safe-area-inset-bottom)); animation: sheetUp .24s cubic-bezier(.2, 1.1, .4, 1); }
+  @media (min-width: 640px) { #orderBox { border-bottom: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); } }
+  #orderHeader { display: flex; align-items: center; justify-content: space-between; font-size: 22px; }
+  #orderClose { padding: 5px; background: #fff; border: 1.5px solid var(--ink); cursor: pointer; display: flex; }
+  #orderLevels { display: flex; gap: 5px; overflow-x: auto; padding: 10px 2px 4px; margin: 0 -2px; scrollbar-width: none; }
+  .order-level { flex-shrink: 0; font-family: Bangers, cursive; font-size: 14px; letter-spacing: .04em; padding: 4px 8px 2px; border: 1.5px solid var(--ink); background: #fff; color: #111; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+  .order-level small { font-family: Inter, sans-serif; font-size: 10px; font-weight: 700; background: #111; color: var(--paper); border-radius: 999px; padding: 0 5px; }
+  .order-level.active { background: #111; color: var(--paper); box-shadow: 2px 2px 0 var(--accent-2); }
+  .order-level.active small { background: var(--accent); color: #000; }
+  .order-level.empty { opacity: .35; cursor: default; }
+  #orderHint { font-size: 12px; color: #555; margin: 6px 0 10px; min-height: 16px; }
+  #orderList { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px 4px 6px 2px; overscroll-behavior: contain; }
+  .order-row { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 8px; background: #fff; border: 1.5px solid var(--ink); position: relative; transition: transform .15s ease; user-select: none; }
+  .order-row.dragging { transition: none; z-index: 2; box-shadow: 4px 6px 0 var(--ink); background: #FFFDF5; }
+  .order-pos { width: 30px; flex-shrink: 0; text-align: center; font-family: Bangers, cursive; font-size: 22px; color: #111; }
+  .order-thumb { width: 34px; height: 51px; flex-shrink: 0; background: #0B0D1A; border: 1.5px solid var(--ink); overflow: hidden; }
+  .order-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .order-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.25; }
+  .order-title small { display: block; font-size: 10.5px; font-weight: 400; color: #666; }
+  .order-handle { padding: 10px 6px; cursor: grab; touch-action: none; color: #111; display: flex; }
+  .order-row.dragging .order-handle { cursor: grabbing; }
+  #orderDoneBtn { margin-top: 10px; font-family: Bangers, cursive; font-size: 18px; letter-spacing: .06em; padding: 7px 0 5px; background: var(--accent); color: #000; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; }
   .podium-hint { font-size: 11px; color: var(--dim); text-align: center; margin: 16px 0 0; }
   .podium-empty { color: var(--muted); text-align: center; padding: 50px 20px; font-size: 14px; }
 
@@ -356,12 +361,13 @@
       <button class="mini-toggle" data-sort="chrono">Cronológico</button>
     </div>
   </div>
-  <div class="controls-row" id="podiumControls" style="display:none;">
+  <div class="controls-row" id="podiumControls" style="display:none; justify-content:space-between;">
     <div class="control-group" id="podiumFilter">
       <button class="mini-toggle active" data-pf="all">Todo</button>
       <button class="mini-toggle" data-pf="ucm">UCM</button>
       <button class="mini-toggle" data-pf="other">Otros Universos</button>
     </div>
+    <button class="mini-toggle order-open-btn" id="orderOpenBtn" onclick="openOrder()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4"/></svg>Ordenar</button>
   </div>
 </header>
 
@@ -411,12 +417,15 @@
   </div>
 </div>
 
-<div id="duelBackdrop">
-  <div id="duelBox">
-    <div id="duelHeader"><span class="bng">¿Cuál les gustó más?</span>
-      <button id="duelClose" onclick="closeDuel()" aria-label="Cerrar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+<div id="orderBackdrop">
+  <div id="orderBox">
+    <div id="orderHeader"><span class="bng">Ordenar empates</span>
+      <button id="orderClose" onclick="closeOrder()" aria-label="Cerrar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
-    <div id="duelBody"></div>
+    <div id="orderLevels"></div>
+    <p id="orderHint"></p>
+    <div id="orderList"></div>
+    <button id="orderDoneBtn" onclick="closeOrder()">Listo</button>
   </div>
 </div>
 
@@ -2825,18 +2834,6 @@ function compareRated(a, b) {
   if (ob !== null) return 1;
   return 0;
 }
-// Grupos de títulos con las mismas estrellas (de todos los universos).
-function tieGroups() {
-  const byRating = {};
-  DATA.concat(OTHER_DATA).forEach(function (d) {
-    const r = ratings[d.id];
-    if (r > 0) (byRating[r] = byRating[r] || []).push(d);
-  });
-  return Object.keys(byRating).map(function (r) { return byRating[r]; }).filter(function (g) { return g.length > 1; });
-}
-function unresolvedTies(groups) {
-  return groups.filter(function (g) { return g.some(function (d) { return tieOrderOf(d.id) === null; }); });
-}
 function loadRatings() {
   try { ratings = JSON.parse(localStorage.getItem(RATINGS_KEY) || "{}"); } catch (e) { ratings = {}; }
 }
@@ -3288,62 +3285,106 @@ function buildPodiumRow(item, rank) {
       buildStarRating(item.id, ratings[item.id], 14, false) +
     "</span></button>";
 }
-// Duelos: inserción binaria dentro de cada empate; cada comparación es un "¿cuál les gustó más?".
-let duelResolve = null;
-let duelCount = 0;
-function askDuel(a, b, rating) {
-  duelCount++;
-  const box = document.getElementById("duelBody");
-  const side = function (d) {
-    const p = posters[d.id];
-    return '<button class="duel-pick" onclick="pickDuel(\'' + d.id + '\')">' +
-      '<span class="duel-poster">' + (p ? '<img src="' + p + '" alt="" />' : "") + "</span>" +
-      '<span class="duel-title">' + escapeHtml(d.es) + "</span></button>";
-  };
-  box.innerHTML = '<p class="duel-sub">Duelo ' + duelCount + " · las dos tienen " + String(rating).replace(".", ",") + " ★</p>" +
-    '<div class="duel-arena">' + side(a) + '<span class="duel-vs big">VS</span>' + side(b) + "</div>";
-  return new Promise(function (resolve) { duelResolve = function (id) { resolve(id === a.id); }; });
-}
-function pickDuel(id) {
-  const el = document.querySelector('.duel-pick[onclick*="' + id + '"]');
-  if (el) el.classList.add("won");
-  const r = duelResolve; duelResolve = null;
-  if (r) setTimeout(function () { r(id); }, 260);
-}
-function closeDuel() {
-  duelResolve = null;
-  document.getElementById("duelBackdrop").classList.remove("show");
-  render();
-}
-async function startDuels(repeat) {
-  const groups = repeat ? tieGroups() : unresolvedTies(tieGroups());
-  if (!groups.length) return;
-  tiebreak = Object.assign({}, tiebreak);
-  if (repeat) groups.forEach(function (g) { g.forEach(function (d) { delete tiebreak[d.id]; }); });
-  duelCount = 0;
-  document.getElementById("duelBackdrop").classList.add("show");
-  for (const group of groups) {
-    const rating = ratings[group[0].id];
-    // los que ya tienen orden se respetan; los demás se insertan por duelos
-    const sorted = group.filter(function (d) { return tieOrderOf(d.id) !== null; }).sort(compareRated);
-    const todo = group.filter(function (d) { return tieOrderOf(d.id) === null; });
-    for (const item of todo) {
-      let lo = 0, hi = sorted.length;
-      while (lo < hi) {
-        const mid = (lo + hi) >> 1;
-        const itemWins = await askDuel(item, sorted[mid], rating);
-        if (!document.getElementById("duelBackdrop").classList.contains("show")) return; // cerraron a mitad
-        if (itemWins) hi = mid; else lo = mid + 1;
-      }
-      sorted.splice(lo, 0, item);
-      sorted.forEach(function (d, i) { tiebreak[d.id] = { r: rating, o: i }; });
-      saveTiebreak();
-    }
+// Ventana "Ordenar": por nivel de estrellas, arrastrar para decidir el orden dentro del empate.
+const STAR_LEVELS = [5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5];
+let orderLevel = null;
+function starLabel(r) { return String(r).replace(".5", "½").replace(/^0½$/, "½") + " ★"; }
+function ratedAll() { return DATA.concat(OTHER_DATA).filter(function (d) { return ratings[d.id] > 0; }); }
+function levelItems(r) { return ratedAll().filter(function (d) { return ratings[d.id] === r; }).sort(compareRated); }
+function openOrder() {
+  const counts = {};
+  ratedAll().forEach(function (d) { counts[ratings[d.id]] = (counts[ratings[d.id]] || 0) + 1; });
+  if (orderLevel === null || !counts[orderLevel]) {
+    orderLevel = STAR_LEVELS.filter(function (r) { return counts[r] > 1; })[0] || STAR_LEVELS.filter(function (r) { return counts[r]; })[0] || 5;
   }
-  document.getElementById("duelBackdrop").classList.remove("show");
-  render();
-  showToast("¡Empates resueltos!", "#FFF8E7");
+  document.getElementById("orderBackdrop").classList.add("show");
+  renderOrder();
 }
+function closeOrder() {
+  document.getElementById("orderBackdrop").classList.remove("show");
+  render();
+}
+function setOrderLevel(r) { orderLevel = r; renderOrder(); }
+function renderOrder() {
+  const counts = {};
+  ratedAll().forEach(function (d) { counts[ratings[d.id]] = (counts[ratings[d.id]] || 0) + 1; });
+  document.getElementById("orderLevels").innerHTML = STAR_LEVELS.map(function (r) {
+    const n = counts[r] || 0;
+    return '<button class="order-level' + (r === orderLevel ? " active" : "") + (n ? "" : " empty") + '"' + (n ? ' onclick="setOrderLevel(' + r + ')"' : " disabled") + ">" +
+      starLabel(r) + (n ? "<small>" + n + "</small>" : "") + "</button>";
+  }).join("");
+  const items = levelItems(orderLevel);
+  const base = ratedAll().filter(function (d) { return ratings[d.id] > orderLevel; }).length + 1;
+  document.getElementById("orderHint").textContent = items.length > 1
+    ? "Arrastrá desde ≡ para cambiar el orden. El número es el puesto que tendría en el podio."
+    : items.length === 1 ? "Hay un solo título con " + starLabel(orderLevel) + ": no hay nada que desempatar." : "";
+  document.getElementById("orderList").innerHTML = items.map(function (d, i) {
+    const p = posters[d.id];
+    return '<div class="order-row" data-id="' + d.id + '">' +
+      '<span class="order-pos">' + (base + i) + "</span>" +
+      '<span class="order-thumb">' + (p ? '<img src="' + p + '" alt="" />' : "") + "</span>" +
+      '<span class="order-title">' + escapeHtml(d.es) + "<small>" + d.year + "</small></span>" +
+      (items.length > 1 ? '<span class="order-handle" aria-label="Arrastrar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 8h14M5 12h14M5 16h14"/></svg></span>' : "") +
+      "</div>";
+  }).join("");
+  document.getElementById("orderList").dataset.base = base;
+}
+function saveLevelOrder() {
+  const ids = [].map.call(document.querySelectorAll("#orderList .order-row"), function (r) { return r.dataset.id; });
+  tiebreak = Object.assign({}, tiebreak);
+  ids.forEach(function (id, i) { tiebreak[id] = { r: orderLevel, o: i }; });
+  saveTiebreak();
+}
+// Arrastre con el dedo o el mouse (pointer events): la fila sigue el dedo y las demás se corren.
+(function () {
+  let drag = null;
+  const list = function () { return document.getElementById("orderList"); };
+  function relabel(order) {
+    const base = Number(list().dataset.base);
+    order.forEach(function (row, i) { row.querySelector(".order-pos").textContent = base + i; });
+  }
+  document.addEventListener("pointerdown", function (e) {
+    const handle = e.target.closest && e.target.closest(".order-handle");
+    if (!handle) return;
+    e.preventDefault();
+    const row = handle.closest(".order-row");
+    const rows = [].slice.call(list().children);
+    const step = rows.length > 1 ? rows[1].offsetTop - rows[0].offsetTop : row.offsetHeight;
+    drag = { row: row, rows: rows, from: rows.indexOf(row), to: rows.indexOf(row), step: step, startY: e.clientY, startScroll: list().scrollTop, id: e.pointerId };
+    row.classList.add("dragging");
+    try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  document.addEventListener("pointermove", function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const l = list(), rect = l.getBoundingClientRect();
+    if (e.clientY < rect.top + 30) l.scrollTop -= 8; else if (e.clientY > rect.bottom - 30) l.scrollTop += 8;
+    const dy = e.clientY - drag.startY + (l.scrollTop - drag.startScroll);
+    drag.row.style.transform = "translateY(" + dy + "px)";
+    const to = Math.max(0, Math.min(drag.rows.length - 1, Math.round((drag.from * drag.step + dy) / drag.step)));
+    drag.to = to;
+    const order = drag.rows.filter(function (r) { return r !== drag.row; });
+    order.splice(to, 0, drag.row);
+    drag.rows.forEach(function (r, i) {
+      if (r === drag.row) return;
+      const shift = (order.indexOf(r) - i) * drag.step;
+      r.style.transform = shift ? "translateY(" + shift + "px)" : "";
+    });
+    relabel(order);
+  });
+  function end(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const l = list();
+    drag.rows.forEach(function (r) { r.style.transform = ""; });
+    drag.row.classList.remove("dragging");
+    const ref = drag.rows.filter(function (r) { return r !== drag.row; })[drag.to] || null;
+    l.insertBefore(drag.row, ref);
+    relabel([].slice.call(l.children));
+    if (drag.to !== drag.from) saveLevelOrder();
+    drag = null;
+  }
+  document.addEventListener("pointerup", end);
+  document.addEventListener("pointercancel", end);
+})();
 
 function setPodiumDate(id, value) {
   setWatchDate(id, value || null);
@@ -3370,13 +3411,7 @@ function renderPodiumView() {
   }
 
   const rows = rated.map(function (item, i) { return buildPodiumRow(item, i + 1); }).join("");
-  const groups = tieGroups();
-  const pending = unresolvedTies(groups).length;
-  const duelBtn = !groups.length ? ""
-    : pending
-      ? '<button class="duel-banner" onclick="startDuels(false)"><span class="duel-vs">VS</span><span>' + (pending === 1 ? "Hay 1 empate" : "Hay " + pending + " empates") + " · <b>¡A duelo!</b></span></button>"
-      : '<button class="duel-banner done" onclick="startDuels(true)"><span class="duel-vs">VS</span><span>Empates resueltos · <b>Repetir duelos</b></span></button>';
-  main.innerHTML = '<section class="saga">' + duelBtn +
+  main.innerHTML = '<section class="saga">' +
     '<div class="podium-list">' + rows + "</div>" +
     '<p class="podium-hint">Tocá cualquiera para cambiar sus estrellas o la fecha.</p>' +
     "</section>";
