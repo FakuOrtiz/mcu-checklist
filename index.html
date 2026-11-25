@@ -169,7 +169,6 @@
   #statusMeta:empty { display: none; }
   #statusMeta .pc-line { display: flex; gap: 6px; align-items: center; color: #222; margin-top: 4px; }
   #statusMeta .fr { margin: 0; }
-  #statusMeta .fr b { border-color: #333; } #statusMeta .fr b.e { background: #111; border-color: #111; }
   #statusRatingSection .modal-label { margin: 0; }
   #statusRatingSection > .modal-label + div { margin-top: 6px; }
   .watch-date-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
@@ -187,8 +186,6 @@
   .star-rating { display: flex; gap: 3px; }
   .star-rating .se { stroke: #6E7396; }
   .star-rating .sf { fill: var(--paper); stroke: var(--paper); }
-  #statusBox .star-rating .se { stroke: #999; }
-  #statusBox .star-rating .sf { fill: #111; stroke: #111; }
   .star-slot { position: relative; display: inline-block; }
   .star-fill-wrap { position: absolute; top: 0; left: 0; height: 100%; overflow: hidden; display: block; pointer-events: none; }
   .star-fill-wrap svg { display: block; }
@@ -313,6 +310,50 @@
   .search-info { flex: 1; min-width: 0; }
   .search-title { font-size: 14px; font-weight: 600; color: var(--text); margin: 0 0 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .search-meta { font-size: 11px; color: var(--muted); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ===== Ventanas en modo oscuro (menú, quiz, reiniciar, ordenar, avisos, buscador) ===== */
+  #statusBox, #quizBox, #confirmBox, #orderBox { background: var(--panel); color: var(--text); }
+  .modal-label, .reset-label { color: var(--muted); }
+  #statusItemTitle, #quizProgress, .quiz-question, #confirmTitle, #orderHeader { color: var(--text); }
+  #statusMeta { color: var(--muted); }
+  #statusMeta .pc-line { color: #DCDEEE; }
+  #statusWatchDate, .podium-date { background: #10142A; color: var(--text); border-color: var(--ink); color-scheme: dark; }
+  .status-option { background: var(--panel-2); color: var(--text); }
+  .status-option.current { background: var(--paper); color: #000; }
+  .status-option-clear { color: var(--muted); }
+  .status-option-cancel { color: var(--muted); background: none; }
+  .podium-adjust { background: var(--panel-2); color: var(--text); }
+  #quizClose, #orderClose { background: var(--panel-2); }
+  #quizClose svg, #orderClose svg { stroke: var(--text); }
+  #quizBar { background: #10142A; }
+  .quiz-option { background: var(--panel-2); color: var(--text); }
+  .quiz-option.correct { background: var(--paper); color: #000; }
+  .quiz-option.incorrect { background: var(--panel); color: var(--dim); }
+  .quiz-score { color: var(--text); text-shadow: 3px 3px 0 #000, 5px 5px 0 var(--accent-2); }
+  .quiz-verdict { color: #C9CCE6; }
+  #quizCloseBtn { background: var(--panel-2); color: var(--text); }
+  #confirmMessage { color: #C9CCE6; }
+  .scope-opt { background: var(--panel-2); color: var(--text); }
+  .scope-opt.active { background: var(--paper); color: #000; }
+  .reset-check { color: var(--text); }
+  .reset-check small { color: var(--muted); }
+  .reset-check input { background: #10142A; }
+  .reset-check input::after { border-color: #000; }
+  .reset-check input:checked { background: var(--paper); }
+  #confirmYesBtn { background: var(--panel-2); color: var(--text); }
+  #confirmNoBtn { background: var(--paper); color: #000; }
+  .order-level { background: var(--panel-2); color: var(--text); }
+  .order-level small { background: var(--paper); color: #000; }
+  .order-level.active { background: var(--paper); color: #000; }
+  .order-level.active small { background: #000; color: var(--paper); }
+  #orderHint { color: var(--muted); }
+  .order-row { background: var(--panel-2); }
+  .order-row.dragging { background: #2C3360; }
+  .order-pos, .order-handle { color: var(--text); }
+  .order-title small { color: var(--muted); }
+  #toast { background: var(--panel) !important; color: var(--text) !important; }
+  #searchInput { background: #10142A; color: var(--text); }
+  #searchInput::placeholder { color: var(--dim); }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
