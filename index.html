@@ -74,7 +74,13 @@
   .phase-count { font-size: 10.5px; color: var(--muted); margin-left: auto; text-align: right; }
   .phase-chevron { transition: transform .18s ease; flex-shrink: 0; display: flex; }
   .phase-chevron.collapsed { transform: rotate(-90deg); }
-  .phase-grid-wrap { overflow: hidden; transition: max-height .32s ease; padding: 6px 6px 6px 0; margin: -6px -6px -6px 0; }
+  .phase-grid-wrap { overflow: hidden; transition: max-height .32s ease; margin: -8px -8px 0 0; }
+  .phase-grid-wrap > .grid { padding: 8px 8px 6px 0; }
+  .phase-head { transition: background .2s ease, padding .2s ease, box-shadow .2s ease; }
+  .phase-block.is-collapsed { margin-bottom: 10px; }
+  .phase-block.is-collapsed .phase-head { margin-bottom: 0; padding: 8px 10px; background: var(--panel); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+  .phase-block.is-collapsed .phase-head h3 { font-size: 16px; }
+  .phase-block.is-collapsed .phase-bar-outer { display: none; }
 
   /* tarjetas */
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 12px; }
@@ -86,9 +92,8 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 6px; text-align: center; }
   .poster-clip { position: absolute; inset: 0; overflow: hidden; }
   .poster-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: filter .35s ease; }
-  .card.unseen .poster-box img, .card.st-skip .poster-box img { filter: grayscale(1) contrast(1.15) brightness(.62); }
-  .card.st-skip .poster-box img { filter: grayscale(1) brightness(.35); }
-  .poster-box img.blurred { filter: grayscale(1) brightness(.62) blur(10px) !important; }
+  .card.st-skip .poster-box img { filter: brightness(.4) saturate(.6); }
+  .poster-box img.blurred { filter: blur(10px) brightness(.8) !important; }
   .placeholder-title { font-size: 9px; line-height: 1.2; color: rgba(255,248,231,.75); position: relative; z-index: 1; }
   .stk { position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; display: grid; place-items: center; border: 2px solid var(--ink); box-shadow: 1.5px 1.5px 0 var(--ink); z-index: 4; pointer-events: none; }
   .stk-w { background: var(--paper); border-radius: 50%; }
@@ -216,6 +221,18 @@
   #confirmBox { width: 100%; max-width: 340px; padding: 16px; background: var(--paper); color: #111; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); animation: sheetUp .22s cubic-bezier(.2, 1.2, .4, 1); }
   #confirmTitle { font-family: Bangers, cursive; font-size: 24px; letter-spacing: .05em; margin: 0; }
   #confirmMessage { font-size: 13px; line-height: 1.5; color: #333; margin: 6px 0 16px; }
+  .reset-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: #555; margin: 12px 0 6px; }
+  .reset-scope { display: flex; gap: 6px; flex-wrap: wrap; }
+  .scope-opt { font-family: Bangers, cursive; font-size: 14px; letter-spacing: .05em; padding: 4px 10px 2px; border: 1.5px solid var(--ink); background: #fff; color: #111; cursor: pointer; }
+  .scope-opt.active { background: #111; color: var(--paper); box-shadow: 2px 2px 0 var(--accent-2); }
+  .reset-check { display: flex; gap: 9px; align-items: flex-start; font-size: 13px; line-height: 1.35; color: #111; padding: 7px 0; cursor: pointer; }
+  .reset-check small { color: #666; }
+  .reset-check input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; flex-shrink: 0; margin: 0; border: 2px solid var(--ink); background: #fff; display: grid; place-items: center; cursor: pointer; }
+  .reset-check input::after { content: ""; width: 9px; height: 5px; border: solid #fff; border-width: 0 0 2.5px 2.5px; transform: rotate(-45deg) translate(1px, -1px); opacity: 0; }
+  .reset-check input:checked { background: #111; }
+  .reset-check input:checked::after { opacity: 1; }
+  .reset-check input:disabled { opacity: .5; }
+  #confirmYesBtn:disabled { opacity: .35; cursor: default; }
   .confirm-actions { display: flex; gap: 10px; }
   .confirm-actions button { flex: 1; padding: 8px 10px 6px; font-family: Bangers, cursive; font-size: 17px; letter-spacing: .06em; cursor: pointer; border: 2px solid var(--ink); }
   #confirmYesBtn { background: #fff; color: #111; border-style: dashed; }
@@ -344,6 +361,18 @@
 <div id="confirmBackdrop">
   <div id="confirmBox">
     <p id="confirmTitle"></p>
+    <div id="resetOptions" style="display:none;">
+      <p class="reset-label">Dónde</p>
+      <div class="reset-scope">
+        <button type="button" class="scope-opt" data-scope="all">Todo</button>
+        <button type="button" class="scope-opt" data-scope="ucm">UCM</button>
+        <button type="button" class="scope-opt" data-scope="other">Otros universos</button>
+      </div>
+      <p class="reset-label">Qué</p>
+      <label class="reset-check"><input type="checkbox" id="resetMarks"><span>Marcas: vista, resumen y "no la quiero ver" <small>(también borra sus fechas)</small></span></label>
+      <label class="reset-check"><input type="checkbox" id="resetDates"><span>Fechas de visto</span></label>
+      <label class="reset-check"><input type="checkbox" id="resetRatings"><span>Estrellas del podio</span></label>
+    </div>
     <p id="confirmMessage"></p>
     <div class="confirm-actions">
       <button id="confirmYesBtn">Sí, reiniciar</button>
@@ -2784,6 +2813,7 @@ function toggleUniverseCollapse(universeKey) {
   const wrap = document.querySelector('.phase-grid-wrap[data-universe="' + universeKey + '"]');
   const chevron = document.querySelector('.phase-head[data-universe="' + universeKey + '"] .phase-chevron');
   if (chevron) chevron.classList.toggle("collapsed", willCollapse);
+  if (wrap && wrap.closest(".phase-block")) wrap.closest(".phase-block").classList.toggle("is-collapsed", willCollapse);
   if (!wrap) return;
 
   if (willCollapse) {
@@ -2810,6 +2840,7 @@ function togglePhaseCollapse(phaseNum) {
   const wrap = document.querySelector('.phase-grid-wrap[data-phase="' + phaseNum + '"]');
   const chevron = document.querySelector('.phase-head[data-phase="' + phaseNum + '"] .phase-chevron');
   if (chevron) chevron.classList.toggle("collapsed", willCollapse);
+  if (wrap && wrap.closest(".phase-block")) wrap.closest(".phase-block").classList.toggle("is-collapsed", willCollapse);
   if (!wrap) return;
 
   if (willCollapse) {
@@ -2910,6 +2941,8 @@ let confirmCallback = null;
 function showConfirm(title, message, onConfirm) {
   confirmCallback = onConfirm;
   document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("resetOptions").style.display = "none";
+  document.getElementById("confirmYesBtn").disabled = false;
   document.getElementById("confirmMessage").textContent = message;
   document.getElementById("confirmBackdrop").classList.add("show");
 }
@@ -2918,15 +2951,45 @@ function closeConfirm() {
   document.getElementById("confirmBackdrop").classList.remove("show");
 }
 
+// Reiniciar con opciones: dónde (todo, UCM, otros) y qué (marcas, fechas, estrellas).
+let resetScope = "all";
 function resetProgress() {
-  showConfirm("¿Reiniciar todo?", "Se borran todas las marcas de vistas y las fechas. Las estrellas del podio se mantienen. No se puede deshacer.", function () {
-    status = {};
-    saveState();
-    watchDates = {};
-    saveWatchDates();
-    render();
-  });
+  resetScope = mainView === "other" ? "other" : mainView === "ucm" ? "ucm" : "all";
+  document.getElementById("resetMarks").checked = true;
+  document.getElementById("resetDates").checked = false;
+  document.getElementById("resetRatings").checked = false;
+  showConfirm("¿Qué querés reiniciar?", "No se puede deshacer.", applyReset);
+  document.getElementById("resetOptions").style.display = "block";
+  syncResetDialog();
 }
+function syncResetDialog() {
+  document.querySelectorAll(".scope-opt").forEach(function (b) { b.classList.toggle("active", b.dataset.scope === resetScope); });
+  const marks = document.getElementById("resetMarks").checked;
+  const dates = document.getElementById("resetDates");
+  if (marks) dates.checked = true;
+  dates.disabled = marks;
+  const any = marks || dates.checked || document.getElementById("resetRatings").checked;
+  document.getElementById("confirmYesBtn").disabled = !any;
+}
+function applyReset() {
+  const pool = resetScope === "ucm" ? DATA : resetScope === "other" ? OTHER_DATA : DATA.concat(OTHER_DATA);
+  const ids = pool.map(function (d) { return d.id; });
+  const marks = document.getElementById("resetMarks").checked;
+  const dates = marks || document.getElementById("resetDates").checked;
+  const stars = document.getElementById("resetRatings").checked;
+  if (marks) { status = Object.assign({}, status); ids.forEach(function (id) { delete status[id]; }); saveState(); }
+  if (dates) { watchDates = Object.assign({}, watchDates); ids.forEach(function (id) { delete watchDates[id]; }); saveWatchDates(); }
+  if (stars) { ratings = Object.assign({}, ratings); ids.forEach(function (id) { delete ratings[id]; }); saveRatings(); }
+  render();
+  refreshSearch();
+  showToast("Listo, reiniciado", "#FFF8E7");
+}
+document.querySelectorAll(".scope-opt").forEach(function (b) {
+  b.addEventListener("click", function () { resetScope = b.dataset.scope; syncResetDialog(); });
+});
+["resetMarks", "resetDates", "resetRatings"].forEach(function (id) {
+  document.getElementById(id).addEventListener("change", syncResetDialog);
+});
 
 let statusPickerId = null;
 function findItemById(id) {
@@ -3165,7 +3228,7 @@ function renderOtherView() {
     const collapsed = !!collapsedUniverses[universeKey];
     const cardsHtml = items.map(buildCardHtml).join("");
 
-    return '<div class="phase-block">' +
+    return '<div class="phase-block' + (collapsed ? " is-collapsed" : "") + '">' +
       '<div class="phase-head" data-universe="' + universeKey + '" onclick="toggleUniverseCollapse(\'' + universeKey + '\')" style="cursor:pointer;">' +
       '<span class="phase-chevron' + (collapsed ? " collapsed" : "") + '">' + chevronSvg + "</span>" +
       "<h3>" + meta.label + '</h3><span class="phase-count">' + groupCountLabel(stats.done, stats.total, items) + "</span></div>" +
@@ -3257,7 +3320,7 @@ function render() {
       const collapsed = !!collapsedPhases[phaseNum];
       const cardsHtml = items.map(buildCardHtml).join("");
 
-      return '<div class="phase-block">' +
+      return '<div class="phase-block' + (collapsed ? " is-collapsed" : "") + '">' +
         '<div class="phase-head" data-phase="' + phaseNum + '" onclick="togglePhaseCollapse(' + phaseNum + ')" style="cursor:pointer;">' +
         '<span class="phase-chevron' + (collapsed ? " collapsed" : "") + '">' + chevronSvg + "</span>" +
         "<h3>" + meta.label + '</h3><span class="phase-count">' + groupCountLabel(stats.done, stats.total, items) + "</span></div>" +
