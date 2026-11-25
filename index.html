@@ -83,8 +83,7 @@
   .phase-head { padding: 8px 10px; background: var(--panel); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); margin-bottom: 0; }
   .phase-head h3 { font-size: 16px; }
   /* mosaico de estudios (prueba) */
-  .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 10px; margin: 0 0 22px; }
-  @media (min-width: 480px) { .brand-grid { grid-template-columns: repeat(4, 1fr); } }
+  .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 10px; margin: 0 auto 22px; max-width: 640px; }
   .brand-tile { position: relative; aspect-ratio: 16 / 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px 6px 6px; cursor: pointer;
     background: radial-gradient(120% 90% at 50% 115%, var(--brand-glow) 0%, var(--brand) 32%, transparent 72%), #0E1226;
     border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); transition: transform .12s ease, box-shadow .12s ease; }
@@ -682,8 +681,6 @@ const DATA = [
     characters: ["Loki", "Mobius", "Sylvie"] },
   { id: "black-widow", es: "Black Widow", en: "Black Widow", year: 2021, date: "2021-07-09", type: "movie", phase: 4,
     characters: ["Natasha Romanoff", "Yelena Belova", "Alexei / Guardián Rojo"] },
-  { id: "whatif-1", es: "What If…? (T1)", en: "What If", year: 2021, date: "2021-08-11", type: "series", phase: 4,
-    characters: ["El Vigilante (narrador)", "Versiones alternativas de los héroes del UCM"] },
   { id: "shang-chi", es: "Shang-Chi y la Leyenda de los Diez Anillos", en: "Shang-Chi and the Legend of the Ten Rings", year: 2021, date: "2021-09-03", type: "movie", phase: 4,
     characters: ["Shang-Chi", "Katy", "Xu Wenwu", "Xialing"] },
   { id: "eternals", es: "Eternals", en: "Eternals", year: 2021, date: "2021-11-05", type: "movie", phase: 4,
@@ -700,8 +697,6 @@ const DATA = [
     characters: ["Kamala Khan / Ms. Marvel", "Bruno", "Nakia"] },
   { id: "thor-4", es: "Thor: Love and Thunder", en: "Thor Love and Thunder", year: 2022, date: "2022-07-08", type: "movie", phase: 4,
     characters: ["Thor", "Jane Foster", "Valquiria", "Gorr"] },
-  { id: "i-am-groot", es: "Yo Soy Groot (T1)", en: "I Am Groot", year: 2022, date: "2022-08-10", type: "series", phase: 4,
-    characters: ["Groot", "Rocket"] },
   { id: "she-hulk", es: "She-Hulk: Abogada Hulka", en: "She-Hulk Attorney at Law", year: 2022, date: "2022-08-18", type: "series", phase: 4,
     characters: ["Jennifer Walters / She-Hulk", "Bruce Banner", "Emil Blonsky"] },
   { id: "werewolf", es: "Werewolf by Night", en: "Werewolf by Night", year: 2022, date: "2022-10-07", type: "special", phase: 4,
@@ -716,24 +711,16 @@ const DATA = [
     characters: ["Rocket", "Star-Lord", "Alto Evolucionador", "Gamora"] },
   { id: "secret-invasion", es: "Secret Invasion", en: "Secret Invasion", year: 2023, date: "2023-06-21", type: "series", phase: 5,
     characters: ["Nick Fury", "Talos", "Gravik"] },
-  { id: "i-am-groot-2", es: "Yo Soy Groot (T2)", en: "I Am Groot", year: 2023, tmdbYear: 2022, tmdbSeason: 2, date: "2023-09-06", type: "series", phase: 5,
-    characters: ["Groot", "Uatu, el Vigilante", "Rocket"] },
   { id: "loki-2", es: "Loki (T2)", en: "Loki", year: 2023, tmdbYear: 2021, tmdbSeason: 2, date: "2023-10-06", type: "series", phase: 5,
     characters: ["Loki", "Mobius", "Sylvie", "Victor Timely"] },
   { id: "the-marvels", es: "The Marvels", en: "The Marvels", year: 2023, date: "2023-11-10", type: "movie", phase: 5,
     characters: ["Carol Danvers", "Kamala Khan", "Mónica Rambeau"] },
-  { id: "whatif-2", es: "What If…? (T2)", en: "What If", year: 2023, tmdbYear: 2021, tmdbSeason: 2, date: "2023-12-22", type: "series", phase: 5,
-    characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
   { id: "echo", es: "Echo", en: "Echo", year: 2024, date: "2024-01-09", type: "series", phase: 5,
     characters: ["Maya López / Echo", "Kingpin", "Bucky Barnes"] },
   { id: "deadpool-wolverine", es: "Deadpool & Wolverine", en: "Deadpool and Wolverine", year: 2024, date: "2024-07-26", type: "movie", phase: 5,
     characters: ["Wade Wilson / Deadpool", "Logan / Wolverine"] },
   { id: "agatha", es: "Agatha All Along", en: "Agatha All Along", year: 2024, date: "2024-09-18", type: "series", phase: 5,
     characters: ["Agatha Harkness", "Teen", "Jennifer Kale"] },
-  { id: "whatif-3", es: "What If…? (T3)", en: "What If", year: 2024, tmdbYear: 2021, tmdbSeason: 3, date: "2024-12-22", type: "series", phase: 5,
-    characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
-  { id: "spidey-fns-1", es: "Tu amigo y vecino Spider-Man (T1)", en: "Your Friendly Neighborhood Spider-Man", year: 2025, date: "2025-01-29", type: "series", phase: 5,
-    characters: ["Peter Parker / Spider-Man", "Nico Minoru", "Harry Osborn", "Norman Osborn"] },
   { id: "brave-new-world", es: "Capitán América: Un Nuevo Mundo", en: "Captain America Brave New World", year: 2025, date: "2025-02-14", type: "movie", phase: 5,
     characters: ["Sam Wilson / Capitán América", "Joaquín Torres", "Thaddeus Ross"] },
   { id: "daredevil-1", es: "Daredevil: Born Again (T1)", en: "Daredevil Born Again", year: 2025, date: "2025-03-04", type: "series", phase: 5,
@@ -744,10 +731,6 @@ const DATA = [
     characters: ["Riri Williams / Ironheart", "Parker Robbins"] },
   { id: "fantastic-four", es: "Los 4 Fantásticos: Primeros Pasos", en: "The Fantastic Four First Steps", year: 2025, date: "2025-07-25", tmdbId: 617126, type: "movie", phase: 6,
     characters: ["Reed Richards", "Sue Storm", "Johnny Storm", "Ben Grimm"] },
-  { id: "eyes-wakanda", es: "Eyes of Wakanda", en: "Eyes of Wakanda", year: 2025, date: "2025-08-01", type: "series", phase: 6,
-    characters: ["Guerreros wakandianos de distintas eras"] },
-  { id: "marvel-zombies", es: "Marvel Zombies", en: "Marvel Zombies", year: 2025, date: "2025-09-24", type: "series", phase: 6,
-    characters: ["Kamala Khan", "Versiones zombificadas de héroes conocidos"] },
   { id: "wonder-man", es: "Wonder Man", en: "Wonder Man", year: 2026, date: "2026-01-27", type: "series", phase: 6,
     characters: ["Simon Williams / Wonder Man"] },
   { id: "daredevil-2", es: "Daredevil: Born Again (T2)", en: "Daredevil Born Again", year: 2026, tmdbYear: 2025, tmdbSeason: 2, date: "2026-03-24", type: "series", phase: 6,
@@ -758,13 +741,13 @@ const DATA = [
     characters: ["Peter Parker / Spider-Man"] },
   { id: "visionquest", es: "VisionQuest", en: "VisionQuest", year: 2026, date: "2026-10-14", type: "series", phase: 6 },
   { id: "doomsday", es: "Avengers: Doomsday", en: "Avengers Doomsday", year: 2026, date: "2026-12-18", type: "movie", phase: 6 },
-  { id: "spidey-fns-2", es: "Tu amigo y vecino Spider-Man (T2)", en: "Your Friendly Neighborhood Spider-Man", year: 2027, tmdbYear: 2025, tmdbSeason: 2, date: "2027-01-13", type: "series", phase: 6,
-    characters: ["Peter Parker / Spider-Man", "Nico Minoru", "Harry Osborn"] },
   { id: "daredevil-3", es: "Daredevil: Born Again (T3)", en: "Daredevil Born Again", year: 2027, tmdbYear: 2025, tmdbSeason: 3, date: "2027-03-31", type: "series", phase: 6 },
   { id: "secret-wars", es: "Avengers: Secret Wars", en: "Avengers Secret Wars", year: 2027, date: "2027-12-17", type: "movie", phase: 6 },
   { id: "xmen-2028", es: "X-Men", en: "X-Men", year: 2028, date: "2028-05-05", type: "movie", phase: 7 },
   { id: "ghost-rider-2028", es: "Ghost Rider", en: "Ghost Rider", year: 2028, date: "2028-07-28", type: "movie", phase: 7 },
   { id: "black-panther-3", es: "Black Panther 3", en: "Black Panther 3", year: 2028, date: "2028-12-15", type: "movie", phase: 7 },
+  { id: "zodiac", es: "Zodiac", en: "Zodiac", year: 2028, date: "2028-12-31", dateLabel: "2028", type: "series", phase: 7,
+    characters: [] },
 ];
 
 const QUIZZES = {
@@ -1555,6 +1538,7 @@ const UNIVERSE_META = {
   "venom-ssu": { label: "Venom de Sony", color: "#4C1D95", glow: "#A78BFA" },
   "spiderverse-animado": { label: "Spider-Verse de Sony", color: "#EC4899", glow: "#F9A8D4" },
   "marvel-netflix": { label: "Marvel Television", color: "#8B1E3F", glow: "#E0718F" },
+  "marvel-animation": { label: "Marvel Animation", color: "#D97706", glow: "#FCD34D" },
   "marvel-oneshots": { label: "Marvel One-Shots", color: "#0F766E", glow: "#5EEAD4" },
 };
 
@@ -2284,9 +2268,10 @@ const UNIVERSE_BRANDS = {
   "venom-ssu": { logo: LOGO_SONY, alt: "Sony", short: "Venom" },
   "spiderverse-animado": { logo: LOGO_SONY, alt: "Sony", short: "Spider-Verse" },
   "marvel-netflix": { logo: LOGO_MARVELTV, alt: "Marvel Television", short: "Marvel TV" },
+  "marvel-animation": { logo: LOGO_STUDIOS, alt: "Marvel Studios Animation", short: "Animation" },
   "marvel-oneshots": { logo: LOGO_STUDIOS, alt: "Marvel Studios", short: "One-Shots" },
 };
-const OTHER_UNIVERSES_ORDER = ["marvel-clasico", "xmen-fox", "fantastic-four-fox", "spiderman-sony", "venom-ssu", "spiderverse-animado", "marvel-netflix", "marvel-oneshots"];
+const OTHER_UNIVERSES_ORDER = ["marvel-clasico", "xmen-fox", "fantastic-four-fox", "spiderman-sony", "venom-ssu", "spiderverse-animado", "marvel-netflix", "marvel-oneshots", "marvel-animation"];
 
 const OTHER_DATA = [
   // Marvel Clásico
@@ -2392,6 +2377,8 @@ const OTHER_DATA = [
   // Spider-Verse Animado
   { id: "ov-spiderverse-1", es: "Spider-Man: Into the Spider-Verse", en: "Spider-Man Into the Spider-Verse", year: 2018, date: "2018-12-14", universe: "spiderverse-animado",
     characters: ["Miles Morales", "Peter B. Parker", "Gwen Stacy / Spider-Gwen", "Kingpin"] },
+  { id: "ov-spider-within", es: "The Spider Within: A Spider-Verse Story", en: "The Spider Within A Spider-Verse Story", year: 2024, date: "2024-03-27", universe: "spiderverse-animado", type: "special", tmdbKind: "movie",
+    characters: ["Miles Morales"] },
   { id: "ov-spiderverse-2", es: "Spider-Man: Across the Spider-Verse", en: "Spider-Man Across the Spider-Verse", year: 2023, date: "2023-06-02", universe: "spiderverse-animado",
     characters: ["Miles Morales", "Gwen Stacy", "Miguel O'Hara / Spider-Man 2099", "El Hombre Mancha"] },
   { id: "ov-spiderverse-3", es: "Spider-Man: Beyond the Spider-Verse", en: "Spider-Man Beyond the Spider-Verse", year: 2027, date: "2027-06-18", universe: "spiderverse-animado" },
@@ -2439,10 +2426,42 @@ const OTHER_DATA = [
     characters: ["Thor", "Darryl Jacobson"] },
   { id: "oneshot-team-darryl", es: "Team Darryl", en: "Team Darryl", year: 2018, date: "2018-02-20", universe: "marvel-oneshots", tmdbKind: "movie",
     characters: ["Darryl Jacobson", "Gran Maestro"] },
+  // Marvel Animation (series y especiales animados de Marvel Studios)
+  { id: "whatif-1", es: "What If…? (T1)", en: "What If", year: 2021, tmdbSeason: 1, date: "2021-08-11", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["El Vigilante (narrador)", "Versiones alternativas de los héroes del UCM"] },
+  { id: "i-am-groot", es: "Yo Soy Groot (T1)", en: "I Am Groot", year: 2022, tmdbSeason: 1, date: "2022-08-10", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["Groot", "Rocket"] },
+  { id: "i-am-groot-2", es: "Yo Soy Groot (T2)", en: "I Am Groot", year: 2023, tmdbYear: 2022, tmdbSeason: 2, date: "2023-09-06", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["Groot", "Uatu, el Vigilante", "Rocket"] },
+  { id: "whatif-2", es: "What If…? (T2)", en: "What If", year: 2023, tmdbYear: 2021, tmdbSeason: 2, date: "2023-12-22", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
+  { id: "xmen97-1", es: "X-Men '97 (T1)", en: "X-Men '97", year: 2024, type: "series", universe: "marvel-animation", tmdbKind: "tv", tmdbSeason: 1, date: "2024-03-20",
+    characters: ["Cíclope", "Jean Grey", "Tormenta", "Magneto"] },
+  { id: "whatif-3", es: "What If…? (T3)", en: "What If", year: 2024, tmdbYear: 2021, tmdbSeason: 3, date: "2024-12-22", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["El Vigilante", "Versiones alternativas de los héroes"] },
+  { id: "spidey-fns-1", es: "Tu amigo y vecino Spider-Man (T1)", en: "Your Friendly Neighborhood Spider-Man", year: 2025, tmdbSeason: 1, date: "2025-01-29", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["Peter Parker / Spider-Man", "Nico Minoru", "Harry Osborn", "Norman Osborn"] },
+  { id: "eyes-wakanda", es: "Eyes of Wakanda", en: "Eyes of Wakanda", year: 2025, tmdbSeason: 1, date: "2025-08-01", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["Guerreros wakandianos de distintas eras"] },
+  { id: "marvel-zombies", es: "Marvel Zombies", en: "Marvel Zombies", year: 2025, tmdbSeason: 1, date: "2025-09-24", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["Kamala Khan", "Versiones zombificadas de héroes conocidos"] },
+  { id: "xmen97-2", es: "X-Men '97 (T2)", en: "X-Men '97", year: 2026, tmdbYear: 2024, type: "series", universe: "marvel-animation", tmdbKind: "tv", tmdbSeason: 2, date: "2026-07-01",
+    characters: ["Cíclope", "Jean Grey", "Tormenta", "Magneto"] },
+  { id: "spidey-fns-2", es: "Tu amigo y vecino Spider-Man (T2)", en: "Your Friendly Neighborhood Spider-Man", year: 2027, tmdbYear: 2025, tmdbSeason: 2, date: "2027-01-13", type: "series", universe: "marvel-animation", tmdbKind: "tv",
+    characters: ["Peter Parker / Spider-Man", "Nico Minoru", "Harry Osborn"] },
+  { id: "xmen97-3", es: "X-Men '97 (T3)", en: "X-Men '97", year: 2027, tmdbYear: 2024, type: "series", universe: "marvel-animation", tmdbKind: "tv", tmdbSeason: 3, date: "2027-12-31", dateLabel: "2027",
+    characters: [] },
+  { id: "mz-winter-soldier", es: "Marvel Zombies: The Winter Soldier", en: "Marvel Zombies The Winter Soldier", year: 2027, type: "special", universe: "marvel-animation", date: "2027-10-31", dateLabel: "Octubre de 2027",
+    characters: ["Bucky Barnes"] },
+  { id: "mz-fist-khonshu", es: "Marvel Zombies: The Fist of Khonshu", en: "Marvel Zombies The Fist of Khonshu", year: 2028, type: "special", universe: "marvel-animation", date: "2028-10-31", dateLabel: "Octubre de 2028",
+    characters: [] },
+  { id: "mz-last-guardian", es: "Marvel Zombies: The Last Guardian", en: "Marvel Zombies The Last Guardian", year: 2029, type: "special", universe: "marvel-animation", date: "2029-10-31", dateLabel: "Octubre de 2029",
+    characters: [] },
 ];
 // Duración en minutos (min) y, en series, cantidad de episodios (eps) y temporadas (seasons).
 // Fuente: TMDB. En series, min es la suma de todos los episodios.
 const LENGTHS = {
+  "ov-spider-within": {min: 7},
   "iron-man": {min: 126},
   "hulk": {min: 114},
   "iron-man-2": {min: 124},
@@ -2579,14 +2598,13 @@ const CHRON_ORDER = [
   "spiderman-homecoming", "dr-strange-1", "thor-3", "antman-2",
   "infinity-war", "endgame", "far-from-home", "wandavision", "falcon-ws",
   "loki-1", "shang-chi", "eternals", "hawkeye", "no-way-home", "moon-knight",
-  "dr-strange-2", "ms-marvel", "thor-4", "i-am-groot", "i-am-groot-2", "she-hulk", "echo",
+  "dr-strange-2", "ms-marvel", "thor-4", "she-hulk", "echo",
   "secret-invasion", "loki-2", "quantumania", "the-marvels", "werewolf",
   "wakanda-forever", "gotg-holiday", "gotg-3", "agatha", "deadpool-wolverine",
   "brave-new-world", "daredevil-1", "thunderbolts", "ironheart",
-  "eyes-wakanda", "wonder-man", "daredevil-2", "punisher-special", "daredevil-3",
+  "wonder-man", "daredevil-2", "punisher-special", "daredevil-3",
   "brand-new-day", "visionquest",
-  "whatif-1", "whatif-2", "whatif-3", "spidey-fns-1", "spidey-fns-2", "marvel-zombies",
-  "fantastic-four", "doomsday", "secret-wars", "xmen-2028", "ghost-rider-2028", "black-panther-3",
+  "fantastic-four", "doomsday", "secret-wars", "xmen-2028", "ghost-rider-2028", "black-panther-3", "zodiac",
 ].reduce(function (acc, id, i) { acc[id] = i; return acc; }, {});
 
 const WATCHED_KEY = "mcu-watched-v2";
@@ -3292,7 +3310,7 @@ function buildCardHtml(item) {
     : "";
 
   const lock = !rel
-    ? '<div class="lock-overlay">' + lockSvg + '<span class="lock-label">Próximamente</span><span class="lock-date">' + formatDate(item.date) + "</span></div>"
+    ? '<div class="lock-overlay">' + lockSvg + '<span class="lock-label">Próximamente</span><span class="lock-date">' + (item.dateLabel || formatDate(item.date)) + "</span></div>"
     : "";
 
   const ratingBadge = ratings[item.id] ? '<span class="card-rating-inline">★ ' + ratings[item.id] + "</span>" : "";
@@ -4075,7 +4093,7 @@ function buildSearchRow(item) {
   const blurred = blurUnwatched && !st;
   let meta = item.year + (lengthShort(item) ? " · " + lengthShort(item) : "") + " · " + sectionLabelOf(item);
   if (!rel) {
-    meta = "Sale " + formatDate(item.date) + " · " + sectionLabelOf(item);
+    meta = "Sale " + (item.dateLabel || formatDate(item.date)) + " · " + sectionLabelOf(item);
   } else {
     if (st === "watched") meta += ' · <span style="color:#FFF8E7">✓ Vista</span>';
     else if (st === "summary") meta += ' · <span style="color:#7DD3FC">≡ Solo resumen</span>';
