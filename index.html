@@ -121,6 +121,10 @@
   .card.st-skip .poster-box img { filter: brightness(.4) saturate(.6); }
   .poster-box img.blurred { filter: blur(10px) brightness(.8) !important; }
   .placeholder-title { font-size: 9px; line-height: 1.2; color: rgba(255,248,231,.75); position: relative; z-index: 1; }
+  .type-tag { position: absolute; top: -7px; left: -6px; z-index: 4; display: inline-flex; align-items: center; gap: 3px; pointer-events: none;
+    font-family: Bangers, cursive; font-size: 10.5px; letter-spacing: .06em; line-height: 1; color: var(--text); text-transform: uppercase;
+    background: #12162A; border: 1.5px solid var(--ink); box-shadow: 1.5px 1.5px 0 var(--ink); padding: 3px 5px 2px 4px; transform: rotate(-3deg); }
+  .card.locked .type-tag { display: none; }
   .stk { position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; display: grid; place-items: center; border: 2px solid var(--ink); box-shadow: 1.5px 1.5px 0 var(--ink); z-index: 4; pointer-events: none; }
   .stk-w { background: var(--paper); border-radius: 50%; }
   .stk-s { background: var(--accent); border-radius: 4px; transform: rotate(8deg); }
@@ -135,7 +139,6 @@
   .card.st-skip .card-title, .card.locked .card-title { color: var(--dim); }
   .card-year { display: flex; justify-content: space-between; align-items: center; gap: 4px; font-size: 9.5px; color: var(--muted); margin: 2px 0 0; }
   .card-year .meta { display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; overflow: hidden; }
-  .card-year .type-ic { display: inline-flex; opacity: .8; flex-shrink: 0; }
   .card-rating-inline { color: var(--text); flex-shrink: 0; }
   /* fotogramas de escenas post-créditos: hueco = a mitad de créditos, lleno = al final */
   .fr { display: inline-flex; gap: 2px; margin-left: 3px; flex-shrink: 0; }
@@ -3284,14 +3287,16 @@ function buildCardHtml(item) {
 
   const ratingBadge = ratings[item.id] ? '<span class="card-rating-inline">★ ' + ratings[item.id] + "</span>" : "";
   const len = lengthShort(item);
-  const typeIc = item.type === "series" || item.type === "special" || item.tmdbKind === "tv"
-    ? '<span class="type-ic" title="Serie">' + typeIconSvg("series", "#9EA3C4", 9) + "</span>" : "";
+  // etiqueta de tipo en la esquina (medio afuera del póster, como el sticker de estado)
+  const kind = item.type || (item.tmdbKind === "tv" ? "series" : "movie");
+  const tm = TYPE_META[kind];
+  const typeTag = tm ? '<span class="type-tag">' + typeIconSvg(kind === "special" ? "series" : kind, tm.color, 9) + tm.label + "</span>" : "";
 
   const cls = "card" + (!rel ? " locked" : !st ? " unseen" : " st-" + st) + (lastChangedId === item.id ? " pop" : "");
   return '<button class="' + cls + '" data-id="' + item.id + '" onclick="' + (rel ? "openStatusPicker('" + item.id + "')" : "") + '" style="cursor:' + (rel ? "pointer" : "default") + '">' +
-    '<div class="poster-box">' + centerContent + sticker + lock + "</div>" +
+    '<div class="poster-box">' + centerContent + typeTag + sticker + lock + "</div>" +
     '<p class="card-title">' + escapeHtml(item.es) + "</p>" +
-    '<p class="card-year"><span class="meta">' + typeIc + item.year + (len ? " · " + len : "") + "</span>" + ratingBadge + "</p>" +
+    '<p class="card-year"><span class="meta">' + item.year + (len ? " · " + len : "") + "</span>" + ratingBadge + "</p>" +
     "</button>";
 }
 
