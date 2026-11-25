@@ -42,14 +42,6 @@
   #ucmControls .mini-toggle, #podiumControls .mini-toggle { font-size: 11.5px; padding: 2px 7px 1px; }
   #viewToggle button svg { color: var(--muted); }
 
-  /* gemas de fases */
-  .gauge { display: flex; justify-content: space-between; gap: 6px; margin: 4px 0 14px; max-width: 420px; }
-  .gem-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .gem { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--ink); background: var(--panel); }
-  .gem.gem-done { background: var(--paper); box-shadow: 2px 2px 0 var(--ink); }
-  .gem.gem-partial { background: var(--panel-2); outline: 1.5px dashed var(--accent); outline-offset: 2px; }
-  .gem-num { font-size: 9.5px; color: var(--dim); }
-  .gem-done + .gem-num { color: var(--text); }
 
   /* progreso */
   .stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
@@ -388,7 +380,6 @@
       <button id="blurEyeBtn" style="background:none; border:none; padding:2px; cursor:pointer; color:#6B6B7D; display:flex;"></button>
     </div>
   </div>
-  <div class="gauge" id="gauge"></div>
   <div class="stat-row">
     <div>
       <p class="count" id="count"></p>
@@ -3584,20 +3575,17 @@ function render() {
   document.getElementById("resetBtn").style.display = mainView === "podium" ? "none" : "";
   document.getElementById("overallBar").style.display = mainView === "podium" ? "none" : "";
   if (mainView === "other") {
-    document.getElementById("gauge").style.display = "none";
     document.getElementById("ucmControls").style.display = "none";
     document.getElementById("podiumControls").style.display = "none";
     renderOtherView();
     return;
   }
   if (mainView === "podium") {
-    document.getElementById("gauge").style.display = "none";
     document.getElementById("ucmControls").style.display = "none";
     document.getElementById("podiumControls").style.display = "";
     renderPodiumView();
     return;
   }
-  document.getElementById("gauge").style.display = "";
   document.getElementById("ucmControls").style.display = "";
   document.getElementById("podiumControls").style.display = "none";
 
@@ -3614,24 +3602,6 @@ function render() {
     ? upcoming + (upcoming > 1 ? " títulos todavía sin estrenar" : " título todavía sin estrenar")
     : "";
 
-  function gemSvg(color) {
-    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="1.5"' + SVG_CAP +
-      '<path d="M6 3h12l4 6-10 12L2 9Z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/></svg>';
-  }
-
-  const gauge = document.getElementById("gauge");
-  gauge.innerHTML = Object.keys(PHASES).map(function (p) {
-    const num = Number(p);
-    const meta = PHASES[num];
-    const stats = phaseStats(status, num);
-    const gpct = stats.released ? stats.done / stats.released : 0;
-    const cls = stats.complete ? " gem-done" : gpct > 0 ? " gem-partial" : "";
-    const iconColor = stats.complete ? "#000" : gpct > 0 ? "#7DD3FC" : "#5A6090";
-    return '<div class="gem-wrap" title="' + meta.label + '">' +
-      '<div class="gem' + cls + '">' +
-      gemSvg(iconColor) +
-      '</div><span class="gem-num">' + num + '</span></div>';
-  }).join("");
 
   const main = document.getElementById("main");
 
