@@ -62,7 +62,6 @@
   .seg-w { background: repeating-linear-gradient(45deg, var(--accent) 0 4px, var(--accent-2) 4px 8px); }
   .seg-s { background: rgba(255,248,231,.65); }
   .seg-k { background: var(--line); }
-  .upcoming-note { font-size: 11px; color: var(--dim); margin: 8px 0 0; min-height: 1px; }
 
   /* sagas y fases */
   main { padding: 0 16px; }
@@ -489,7 +488,6 @@
     </button>
   </div>
   <div class="progress-outer" id="overallBar"></div>
-  <p class="upcoming-note" id="upcomingNote"></p>
   <div class="controls-row" id="ucmControls">
     <div class="control-group" id="filters">
       <button class="mini-toggle active" data-filter="all">Todo</button>
@@ -3537,7 +3535,6 @@ function renderPodiumView() {
 
   document.getElementById("count").innerHTML = rated.length + '<span> título' + (rated.length === 1 ? "" : "s") + " calificado" + (rated.length === 1 ? "" : "s") + "</span>";
   document.getElementById("overallBar").innerHTML = "";
-  document.getElementById("upcomingNote").textContent = "";
 
   const main = document.getElementById("main");
   if (rated.length === 0) {
@@ -3582,10 +3579,6 @@ function renderOtherView() {
 
   document.getElementById("count").innerHTML = done.length + '<span> / ' + released.length + " vistas</span>";
   document.getElementById("overallBar").innerHTML = buildBarSegments(done.length, summaryTotal.length, skipTotal.length, released.length, WATCHED_COLOR);
-  const upcoming = OTHER_DATA.length - released.length;
-  document.getElementById("upcomingNote").textContent = upcoming > 0
-    ? upcoming + (upcoming > 1 ? " títulos todavía sin estrenar" : " título todavía sin estrenar")
-    : "";
 
   const main = document.getElementById("main");
 
@@ -3645,10 +3638,6 @@ function render() {
 
   document.getElementById("count").innerHTML = done.length + '<span> / ' + released.length + " vistas</span>";
   document.getElementById("overallBar").innerHTML = buildBarSegments(done.length, summaryTotal.length, skipTotal.length, released.length, WATCHED_COLOR);
-  const upcoming = filtered.length - released.length;
-  document.getElementById("upcomingNote").textContent = upcoming > 0
-    ? upcoming + (upcoming > 1 ? " títulos todavía sin estrenar" : " título todavía sin estrenar")
-    : "";
 
 
   const main = document.getElementById("main");
