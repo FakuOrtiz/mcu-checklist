@@ -367,6 +367,15 @@
   .surv-kicker { margin: 0; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 700; text-align: center; }
   .surv-title { margin: 0; font-size: 28px; line-height: 1.05; text-align: center; text-shadow: 2px 2px 0 #000; }
   .surv-sub { margin: 0; font-size: 13px; line-height: 1.5; color: #C9CCE6; text-align: center; }
+  .surv-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .surv-stats div { display: flex; flex-direction: column; align-items: center; padding: 10px 6px 8px; background: var(--panel); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .surv-stats b { font-size: 40px; font-weight: 400; line-height: 1; color: var(--accent); text-shadow: 2px 2px 0 #000; }
+  .surv-stats span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 4px; }
+  .surv-code-tag { font-family: Bangers, cursive; font-size: .8em; letter-spacing: .1em; padding: 1px 7px 0; margin-left: 6px; background: var(--panel-2); border: 1.5px solid var(--ink); color: var(--accent); vertical-align: 2px; }
+  .surv-hint.center { text-align: center; }
+  .surv-diff { display: inline-flex; align-items: center; gap: 5px; }
+  .bolts { display: inline-flex; gap: 1px; color: var(--accent); }
+  .surv-diff.d-dificil .bolts { color: #000; } .surv-diff.d-experto .bolts { color: var(--accent); }
   .surv-record { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--panel); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
   .surv-record span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
   .surv-record b { font-size: 30px; font-weight: 400; }
@@ -3600,20 +3609,10 @@ function survivalFingerprint() {
   for (let i = 0; i < s.length; i++) { hsh ^= s.charCodeAt(i); hsh = Math.imul(hsh, 16777619); }
   return ((hsh >>> 0) % 1296).toString(36).toUpperCase().padStart(2, "0");
 }
-// Orden: primero "media", después "dificil", después "experto"; si un grupo se agota, sigue con el más cercano.
+// Orden totalmente mezclado (cualquier dificultad puede salir en cualquier momento).
 function buildSequence(seed) {
   const rnd = mulberry32(seed);
-  const buckets = { media: [], dificil: [], experto: [] };
-  seededShuffle(survivalPool(), rnd).forEach(function (p) { (buckets[p.diff] || buckets.media).push(p); });
-  const order = ["media", "dificil", "experto"];
-  const seq = [];
-  const total = buckets.media.length + buckets.dificil.length + buckets.experto.length;
-  for (let i = 0; i < total; i++) {
-    const want = i < 5 ? 0 : i < 15 ? 1 : 2;
-    const tryOrder = [want, want + 1, want - 1, want + 2, want - 2].filter(function (k) { return k >= 0 && k < 3; });
-    for (const k of tryOrder) { if (buckets[order[k]].length) { seq.push(buckets[order[k]].shift()); break; } }
-  }
-  return seq.map(function (p) {
+  return seededShuffle(survivalPool(), rnd).map(function (p) {
     const idx = seededShuffle([0, 1, 2, 3], rnd);
     return { id: p.id, diff: p.diff, question: p.q[0], options: idx.map(function (i) { return p.q[1][i]; }), correct: idx.indexOf(p.q[2]) };
   });
@@ -3638,14 +3637,13 @@ function renderSurvivalHome(msg) {
     '<div class="surv-home">' +
       '<p class="surv-kicker">Supervivencia</p>' +
       '<h2 class="bng surv-title">¿Cuántas seguidas sin equivocarte?</h2>' +
-      '<p class="surv-sub">Preguntas de todo lo que vieron (' + titles + (titles === 1 ? " título" : " títulos") + " · " + pool.length + " preguntas). La primera que fallás, se termina. Cada vez son más difíciles.</p>" +
+      '<div class="surv-stats"><div><b class="bng">' + titles + "</b><span>" + (titles === 1 ? "título visto" : "títulos vistos") + "</span></div>" +
+      "<div><b class=\"bng\">" + pool.length + "</b><span>preguntas</span></div></div>" +
       '<div class="surv-record"><span>Tu récord</span><b class="bng">' + rec + "</b></div>" +
       (enough
-        ? '<button class="surv-primary" onclick="startSurvival()">Jugar</button>' +
-          '<div class="surv-shared"><p class="surv-label">Partida compartida</p>' +
-            '<p class="surv-hint">Los dos juegan las mismas preguntas en el mismo orden, cada uno en su celu.</p>' +
-            '<div class="surv-row"><button class="surv-secondary" onclick="createSharedSurvival()">Crear código</button>' +
-            '<input id="survCodeInput" class="surv-code-input" maxlength="7" placeholder="Código" autocomplete="off" autocapitalize="characters" spellcheck="false">' +
+        ? '<button class="surv-primary" onclick="createSharedSurvival()">Jugar</button>' +
+          '<div class="surv-shared"><p class="surv-label">¿Te pasaron un código?</p>' +
+            '<div class="surv-row"><input id="survCodeInput" class="surv-code-input" maxlength="7" placeholder="4821-K7" autocomplete="off" autocapitalize="characters" spellcheck="false">' +
             '<button class="surv-secondary" onclick="joinSharedSurvival()">Unirme</button></div>' +
             (msg ? '<p class="surv-warn">' + escapeHtml(msg) + "</p>" : "") +
           "</div>"
@@ -3673,19 +3671,25 @@ function renderSurvivalQuestion() {
   if (s.i >= s.seq.length) { renderSurvivalEnd(true); return; }
   const q = s.seq[s.i], item = findItemById(q.id), poster = posters[q.id];
   const diffLabel = { media: "Media", dificil: "Difícil", experto: "Experto" }[q.diff] || "Media";
-  document.getElementById("survivalHeading").textContent = "Racha: " + s.streak;
+  document.getElementById("survivalHeading").innerHTML = "Racha: " + s.streak + (s.code ? ' <span class="surv-code-tag">' + s.code + "</span>" : "");
   s.answered = false;
   document.getElementById("survivalBody").innerHTML =
     '<div class="surv-q">' +
       '<div class="surv-meta">' +
         '<span class="surv-poster">' + (poster ? '<img src="' + poster + '" alt="" />' : "") + "</span>" +
-        '<span class="surv-from"><small>Pregunta ' + (s.i + 1) + (s.code ? " · código " + s.code : "") + "</small>" +
+        '<span class="surv-from"><small>Pregunta ' + (s.i + 1) + "</small>" +
           "<b>" + escapeHtml(item ? item.es : "") + "</b>" +
-          '<span class="surv-diff d-' + q.diff + '">' + diffLabel + "</span></span>" +
+          '<span class="surv-diff d-' + q.diff + '">' + diffBolts(q.diff) + diffLabel + "</span></span>" +
       "</div>" +
       '<p class="quiz-question">' + escapeHtml(q.question) + "</p>" +
       q.options.map(function (o, k) { return '<button class="quiz-option" onclick="answerSurvival(' + k + ')">' + escapeHtml(o) + "</button>"; }).join("") +
     "</div>";
+}
+// Dificultad por cantidad de rayos (no por color): media ⚡, difícil ⚡⚡, experto ⚡⚡⚡.
+function diffBolts(diff) {
+  const n = diff === "experto" ? 3 : diff === "dificil" ? 2 : 1;
+  const bolt = '<svg width="9" height="11" viewBox="0 0 12 16" aria-hidden="true"><path d="M7 0 0 9h5l-1 7 8-10H7z" fill="currentColor" stroke="#000" stroke-width="1"/></svg>';
+  return '<span class="bolts">' + new Array(n + 1).join(bolt) + "</span>";
 }
 function answerSurvival(k) {
   const s = survival;
@@ -3696,7 +3700,7 @@ function answerSurvival(k) {
   btns[q.correct].classList.add("correct");
   if (k === q.correct) {
     s.streak++; s.i++;
-    document.getElementById("survivalHeading").textContent = "Racha: " + s.streak;
+    document.getElementById("survivalHeading").innerHTML = "Racha: " + s.streak + (s.code ? ' <span class="surv-code-tag">' + s.code + "</span>" : "");
     setTimeout(function () { if (survival === s) renderSurvivalQuestion(); }, 750);
   } else {
     btns[k].classList.add("incorrect");
@@ -3715,8 +3719,8 @@ function renderSurvivalEnd(cleared) {
       '<p class="surv-sub">' + (s.streak === 1 ? "respuesta seguida" : "respuestas seguidas") + "</p>" +
       (isRecord ? '<p class="surv-newrec bng">¡Nuevo récord!</p>' : '<div class="surv-record"><span>Tu récord</span><b class="bng">' + Math.max(prev, s.streak) + "</b></div>") +
       (!cleared && last ? '<div class="surv-miss"><small>Fallaste en ' + escapeHtml(item ? item.es : "") + "</small><p>" + escapeHtml(last.question) + "</p><b>Era: " + escapeHtml(last.options[last.correct]) + "</b></div>" : "") +
-      (s.code ? '<p class="surv-hint">Código de la partida: <b>' + s.code + "</b>. Compará tu racha con la del otro.</p>" : "") +
-      '<button class="surv-primary" onclick="startSurvival()">Jugar de nuevo</button>' +
+      (s.code ? '<p class="surv-hint center">Código de la partida: <b class="surv-code-tag">' + s.code + "</b></p>" : "") +
+      '<button class="surv-primary" onclick="createSharedSurvival()">Jugar de nuevo</button>' +
       '<button class="surv-secondary wide" onclick="renderSurvivalHome()">Volver</button>' +
     "</div>";
 }
